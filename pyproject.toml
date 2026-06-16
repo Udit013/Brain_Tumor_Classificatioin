@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "btc-production"
+version = "0.1.0"
+description = "Production extension of the IEEE 2024 EfficientNetB3 brain-tumor classifier"
+readme = "README.md"
+requires-python = ">=3.9,<3.12"   # bounded by TensorFlow 2.15
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

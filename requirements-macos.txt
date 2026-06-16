@@ -1,0 +1,38 @@
+# Pinned dependencies for macOS Apple Silicon (M1/M2/M3).
+# Identical to requirements.txt except TensorFlow is provided by the
+# tensorflow-macos wheel plus the tensorflow-metal GPU (MPS) plugin.
+# Requires Python 3.11 (install via `brew install python@3.11`).
+#
+# Install with:
+#   python3.11 -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements-macos.txt
+
+# --- core DL stack ---
+tensorflow-macos==2.15.0
+tensorflow-metal==1.1.0   # GPU acceleration via Apple Metal (MPS)
+numpy==1.26.4
+pandas==2.2.2
+
+# --- imaging / preprocessing ---
+pillow==10.3.0
+opencv-python-headless==4.9.0.80
+imageio==2.34.1
+imagehash==4.3.1
+
+# --- metrics / science ---
+scikit-learn==1.4.2
+scipy==1.13.0
+matplotlib==3.8.4
+
+# --- ONNX export + runtime ---
+tf2onnx==1.16.1
+onnx==1.16.0
+onnxruntime==1.17.3
+
+# --- serving ---
+fastapi==0.110.2
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# --- data download ---
+kaggle==1.6.12

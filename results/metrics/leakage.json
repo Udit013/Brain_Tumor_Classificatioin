@@ -1,0 +1,19 @@
+{
+  "n_train": 5600,
+  "n_test": 1600,
+  "exact_duplicates_in_test": 114,
+  "exact_duplicate_rate": 0.07125,
+  "phash_near_dup_threshold": 5,
+  "near_duplicates_in_test": 714,
+  "near_duplicate_rate": 0.44625,
+  "near_dup_cross_label": 8,
+  "nn_distance_min": 0,
+  "nn_distance_median": 6.0,
+  "nn_distance_mean": 5.57875,
+  "patient_level_audit_possible": false,
+  "patient_id_limitation": "Patient/scan IDs are not recoverable from the compiled Kaggle release (flat per-class JPGs, re-indexed filenames; SARTAJ/Br35H never carried IDs). Image-similarity duplicates below are a LOWER BOUND on true patient-level leakage.",
+  "accuracy_full_test": 0.939375,
+  "accuracy_leak_free_subset": 0.899548532731377,
+  "accuracy_near_dup_subset": 0.988795518207283,
+  "n_leak_free": 886
+}

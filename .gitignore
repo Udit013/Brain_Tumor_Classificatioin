@@ -1,0 +1,57 @@
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments / local caches
+.venv/
+.venv-tools/
+venv/
+env/
+.cache/
+.pytest_cache/
+.mypy_cache/
+
+# ---------------------------------------------------------------------------
+# Dataset (downloaded via scripts/download_data.sh — never commit MRI images)
+# ---------------------------------------------------------------------------
+data/
+
+# ---------------------------------------------------------------------------
+# Model weights / large binary artifacts (reproduced via scripts/reproduce.sh)
+# ---------------------------------------------------------------------------
+*.h5
+*.onnx
+*.npz
+models/temperature.json
+
+# ---------------------------------------------------------------------------
+# Secrets / credentials — MUST NOT be committed
+# ---------------------------------------------------------------------------
+kaggle.json
+**/kaggle.json
+.kaggle/
+access_token
+.env
+.env.*
+*.env
+
+# ---------------------------------------------------------------------------
+# Claude-specific files — MUST NOT be committed
+# ---------------------------------------------------------------------------
+CLAUDE.md
+.claude/
+
+# ---------------------------------------------------------------------------
+# OS / editor
+# ---------------------------------------------------------------------------
+.DS_Store
+.ipynb_checkpoints/
+*.swp
+
+# NOTE: results/ (metrics JSON + figures) IS tracked — it is the portfolio
+# evidence and contains only small, derived artifacts.

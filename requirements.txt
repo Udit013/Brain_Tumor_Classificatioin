@@ -1,0 +1,34 @@
+# Pinned dependencies for the production extension (Linux / Docker / CUDA).
+# Python 3.11 is required: TensorFlow 2.15 (Keras 2) is needed for byte-level
+# parity with the published notebooks, and it supports Python 3.9-3.11 only.
+# macOS Apple Silicon users: use requirements-macos.txt instead (it swaps
+# tensorflow for tensorflow-macos + tensorflow-metal). Everything else matches.
+
+# --- core DL stack (parity with published EfficientNetB3 notebook) ---
+tensorflow==2.15.0
+numpy==1.26.4            # TF 2.15 requires numpy<2
+pandas==2.2.2
+
+# --- imaging / preprocessing ---
+pillow==10.3.0
+opencv-python-headless==4.9.0.80
+imageio==2.34.1
+imagehash==4.3.1        # perceptual hashing for leakage analysis
+
+# --- metrics / science ---
+scikit-learn==1.4.2
+scipy==1.13.0
+matplotlib==3.8.4
+
+# --- ONNX export + runtime (serving / latency) ---
+tf2onnx==1.16.1
+onnx==1.16.0
+onnxruntime==1.17.3
+
+# --- serving ---
+fastapi==0.110.2
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# --- data download ---
+kaggle==1.6.12
