@@ -1,5 +1,9 @@
 # Model Card — EfficientNetB3 Brain Tumor Classifier
 
+**Live demo:** https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier
+· **Model:** https://huggingface.co/Udit013/brain-tumor-efficientnetb3
+· **Code:** https://github.com/Udit013/Brain_Tumor_Classificatioin
+
 ## Model details
 - **Architecture:** EfficientNetB3 (ImageNet-pretrained, fully trainable) with
   `pooling='max'` → BatchNorm → Dense(512, L2/L1-regularised) → Dropout(0.4) →
@@ -60,6 +64,12 @@
   reported on (caveat documented).
 - **Bias:** demographic, scanner, and acquisition-protocol distributions of the
   compiled dataset are undocumented; performance across subgroups is unknown.
+- **Robustness:** near-random under additive Gaussian noise (~25% at all
+  severities) and degrades under heavy blur/JPEG; robust to brightness,
+  contrast, and rotation. Mean accuracy across 6 corruptions x 5 severities is
+  72.5% (vs 93.0% clean). See `results/metrics/robustness.json`.
+- **Uncertainty:** TTA predictive entropy is higher on wrong (0.78) than correct
+  (0.36) predictions, so entropy is a usable abstain/flag signal.
 
 ## Quantitative results (measured)
 | Metric | Value |

@@ -14,6 +14,15 @@ The four original notebooks are kept **byte-for-byte** under
 [`/legacy`](legacy/) and are never modified. All new code lives in
 [`src/btc`](src/btc/).
 
+**🚀 Live demo:** [huggingface.co/spaces/Udit013/brain-tumor-mri-classifier](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
+· **🤗 Model:** [Udit013/brain-tumor-efficientnetb3](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
+· **📄 Paper:** [DOI 10.1109/ICC-ROBINS60238.2024.10533941](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941)
+· ![CI](https://github.com/Udit013/Brain_Tumor_Classificatioin/actions/workflows/ci.yml/badge.svg)
+
+Upload an MRI on the live demo to get predicted class, calibrated confidence,
+uncertainty, Grad-CAM overlay, and ONNX-CPU latency, with an explicit
+not-a-medical-device disclaimer.
+
 ---
 
 ## Section 1 — Published Work (IEEE 2024)
@@ -74,8 +83,11 @@ differs from 99.844%), then layers the modules below.
 | 4 | Calibration (ECE + temperature scaling) | [`calibration.py`](src/btc/calibration.py) | `results/metrics/calibration.json`, reliability diagram |
 | 5 | Explainability (Grad-CAM) | [`explain.py`](src/btc/explain.py) | `results/figures/gradcam_montage.png` |
 | 6 | Serving (FastAPI) + ONNX + latency | [`serve/app.py`](src/btc/serve/app.py), [`export_onnx.py`](src/btc/export_onnx.py) | ONNX model, `latency.json` |
-| 7 | Drift monitoring stub | [`monitoring.py`](src/btc/monitoring.py) | `models/drift_reference.npz`, `drift_log.jsonl` |
-| 8 | Packaging | [`Dockerfile`](Dockerfile), [`requirements.txt`](requirements.txt), [`scripts/`](scripts/), [`MODEL_CARD.md`](MODEL_CARD.md) | reproducible image |
+| 7 | Robustness to corruptions | [`robustness.py`](src/btc/robustness.py) | `results/metrics/robustness.json`, curves |
+| 8 | Uncertainty (Test-Time Augmentation) | [`uncertainty.py`](src/btc/uncertainty.py) | `results/metrics/uncertainty.json` |
+| 9 | Drift monitoring stub | [`monitoring.py`](src/btc/monitoring.py) | `models/drift_reference.npz`, `drift_log.jsonl` |
+| 10 | Serving: ONNX + FastAPI + **Gradio web app** | [`export_onnx.py`](src/btc/export_onnx.py), [`serve/app.py`](src/btc/serve/app.py), [`space/app.py`](space/app.py) | ONNX model, `latency.json`, live Space |
+| 11 | Packaging + CI | [`Dockerfile`](Dockerfile) (build-ready), [`requirements.txt`](requirements.txt), [`.github/workflows/ci.yml`](.github/workflows/ci.yml), [`MODEL_CARD.md`](MODEL_CARD.md) | pinned deps, CI on push |
 
 ### Results (measured)
 
@@ -106,6 +118,26 @@ differs from 99.844%), then layers the modules below.
 | ![Leakage histogram](results/figures/leakage_nn_hist.png) | ![Grad-CAM montage](results/figures/gradcam_montage.png) |
 
 Per-class precision-recall curves: [`results/figures/pr_curves.png`](results/figures/pr_curves.png).
+
+### Robustness & uncertainty (measured)
+
+<!-- ROBUSTNESS:BEGIN -->
+**Robustness to common corruptions** (accuracy at severity 1 / 3 / 5; clean = 93.0%):
+
+| Corruption | sev 1 | sev 3 | sev 5 |
+|---|---|---|---|
+| gaussian_noise | 25% | 25% | 26% |
+| gaussian_blur | 91% | 50% | 40% |
+| brightness | 92% | 89% | 81% |
+| contrast | 94% | 93% | 80% |
+| jpeg_compression | 90% | 84% | 59% |
+| rotation | 93% | 93% | 90% |
+| **mean corrupted** | | | **72.5%** |
+
+![Robustness curves](results/figures/robustness_curves.png)
+
+**Uncertainty (Test-Time Augmentation):** mean predictive entropy **0.36 on correct** vs **0.78 on wrong** predictions (n=200) — the model is measurably less certain when it errs.
+<!-- ROBUSTNESS:END -->
 
 ### Evaluation Limitations (read this)
 
@@ -155,6 +187,37 @@ should be interpreted.
   semantics; expect a large drop from the in-distribution number.
 
 ---
+
+## Live Demo & Deployment
+
+The public [Gradio Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
+runs on Hugging Face free-tier CPU. Inference (class + calibrated confidence +
+TTA uncertainty + latency) uses **ONNX Runtime**; Grad-CAM uses the Keras model.
+Model weights are pulled from the [HF Hub model repo](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
+at startup, so the Space stays lightweight and the model is versioned separately.
+
+```mermaid
+flowchart LR
+    U[User uploads MRI] --> G[Gradio app on HF Spaces]
+    H[(HF Hub model repo<br/>ONNX + weights + T)] -->|download at startup| G
+    G -->|ONNX Runtime CPU| P[Class + calibrated confidence<br/>+ TTA uncertainty + latency]
+    G -->|Keras| C[Grad-CAM overlay]
+    P --> O[Result + disclaimer]
+    C --> O
+```
+
+**Deploy your own** (weights already on the Hub):
+```bash
+huggingface-cli login
+huggingface-cli upload Udit013/brain-tumor-mri-classifier space/ . --repo-type space
+```
+Set `python_version: "3.11"` in the Space README (TensorFlow 2.15 needs ≤3.11).
+
+### FastAPI (alternative serving path)
+```bash
+uvicorn btc.serve.app:app --port 8000
+curl -F "file=@some_mri.jpg" http://localhost:8000/predict   # JSON: class, calibrated confidence, Grad-CAM (base64), latency
+```
 
 ## Quickstart
 

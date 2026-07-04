@@ -100,16 +100,43 @@ def build_block() -> str:
     return "\n".join(lines)
 
 
+R2_BEGIN = "<!-- ROBUSTNESS:BEGIN -->"
+R2_END = "<!-- ROBUSTNESS:END -->"
+
+
+def build_robustness_block() -> str:
+    rob = _load("robustness.json")
+    unc = _load("uncertainty.json")
+    if rob is None or unc is None:
+        raise SystemExit("Missing robustness.json/uncertainty.json. Run reproduce.sh.")
+
+    lines = ["**Robustness to common corruptions** (accuracy at severity 1 / 3 / 5; "
+             f"clean = {rob['clean_accuracy']*100:.1f}%):\n",
+             "| Corruption | sev 1 | sev 3 | sev 5 |", "|---|---|---|---|"]
+    for kind, accs in rob["corruptions"].items():
+        lines.append(f"| {kind} | {accs[0]*100:.0f}% | {accs[2]*100:.0f}% | {accs[4]*100:.0f}% |")
+    lines.append(f"| **mean corrupted** | | | **{rob['mean_corruption_accuracy']*100:.1f}%** |")
+    lines.append(f"\n![Robustness curves](results/figures/robustness_curves.png)\n")
+    lines.append(
+        f"**Uncertainty (Test-Time Augmentation):** mean predictive entropy "
+        f"**{unc['mean_entropy_correct']:.2f} on correct** vs "
+        f"**{unc['mean_entropy_wrong']:.2f} on wrong** predictions "
+        f"(n={unc['n']}) — the model is measurably less certain when it errs.")
+    return "\n".join(lines)
+
+
+def _replace(text, begin, end, block):
+    if begin not in text or end not in text:
+        raise SystemExit(f"Markers {begin}/{end} not found in README.md")
+    return f"{text.split(begin)[0]}{begin}\n{block}\n{end}{text.split(end)[1]}"
+
+
 def main() -> None:
-    block = build_block()
     text = README.read_text()
-    if BEGIN not in text or END not in text:
-        raise SystemExit(f"Markers {BEGIN}/{END} not found in README.md")
-    pre = text.split(BEGIN)[0]
-    post = text.split(END)[1]
-    new = f"{pre}{BEGIN}\n{block}\n{END}{post}"
-    README.write_text(new)
-    print("README results table updated from measured metrics.")
+    text = _replace(text, BEGIN, END, build_block())
+    text = _replace(text, R2_BEGIN, R2_END, build_robustness_block())
+    README.write_text(text)
+    print("README results + robustness tables updated from measured metrics.")
 
 
 if __name__ == "__main__":

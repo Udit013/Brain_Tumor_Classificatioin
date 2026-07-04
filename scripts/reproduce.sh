@@ -21,7 +21,7 @@ SKIP_TRAIN=0
 [ "${1:-}" == "--skip-train" ] && SKIP_TRAIN=1
 
 echo "==================================================================="
-echo " STEP 1/8  Train EfficientNetB3 (reproduce published 99.844%)"
+echo " STEP 1/10  Train EfficientNetB3 (reproduce published 99.844%)"
 echo "==================================================================="
 if [ "$SKIP_TRAIN" -eq 0 ] && [ ! -f models/EfficientNetB3_model_weights.h5 ]; then
   python -m btc.train
@@ -30,37 +30,47 @@ else
 fi
 
 echo "==================================================================="
-echo " STEP 2/8  Evaluation rigor (P/R/F1, CM, ROC-AUC, PR)"
+echo " STEP 2/10  Evaluation rigor (P/R/F1, CM, ROC-AUC, PR)"
 echo "==================================================================="
 python -m btc.evaluate
 
 echo "==================================================================="
-echo " STEP 3/8  Leakage analysis (+ leak-free accuracy)"
+echo " STEP 3/10  Leakage analysis (+ leak-free accuracy)"
 echo "==================================================================="
 python -m btc.leakage --eval
 
 echo "==================================================================="
-echo " STEP 4/8  External (out-of-distribution) validation"
+echo " STEP 4/10  External (out-of-distribution) validation"
 echo "==================================================================="
 python -m btc.external_validation || echo "  (external dataset not present — skipped)"
 
 echo "==================================================================="
-echo " STEP 5/8  Calibration (ECE + temperature scaling)"
+echo " STEP 5/10  Calibration (ECE + temperature scaling)"
 echo "==================================================================="
 python -m btc.calibration
 
 echo "==================================================================="
-echo " STEP 6/8  Grad-CAM overlays"
+echo " STEP 6/10  Grad-CAM overlays"
 echo "==================================================================="
 python -m btc.explain
 
 echo "==================================================================="
-echo " STEP 7/8  ONNX export + latency benchmark"
+echo " STEP 7/10  ONNX export + latency benchmark"
 echo "==================================================================="
 python -m btc.export_onnx
 
 echo "==================================================================="
-echo " STEP 8/8  Drift-monitoring reference"
+echo " STEP 8/10 Robustness to common image corruptions"
+echo "==================================================================="
+python -m btc.robustness --limit 400
+
+echo "==================================================================="
+echo " STEP 9/10 Uncertainty (Test-Time Augmentation)"
+echo "==================================================================="
+python -m btc.uncertainty
+
+echo "==================================================================="
+echo " STEP 10/10 Drift-monitoring reference"
 echo "==================================================================="
 python -m btc.monitoring build-reference --limit 1000
 
