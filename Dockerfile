@@ -27,6 +27,12 @@ RUN pip install --no-cache-dir -e .
 #   docker run -v $(pwd)/models:/app/models -p 8000:8000 btc-serve
 COPY models ./models
 
+# Run as a non-root user: if the service or one of its dependencies is ever
+# compromised, this limits what the resulting process can touch on the host
+# (no write access outside its own directories, no root inside the container).
+RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s \
     CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)" || exit 1

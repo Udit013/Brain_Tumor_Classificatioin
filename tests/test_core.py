@@ -46,6 +46,21 @@ def test_ece_zero_for_perfect_calibration():
     assert ece < 1e-6
 
 
+def test_ece_counts_zero_confidence_samples():
+    """The first bin must be closed at 0.0, not exclusive.
+
+    Regression test: with a half-open (lo, hi] first bin, a sample whose top
+    confidence is exactly 0.0 falls into no bin at all and silently vanishes
+    from the ECE weighting. Unreachable via a 4-class softmax (min confidence
+    0.25) but wrong for any direct use of this helper.
+    """
+    y = np.array([0, 1])
+    probs = np.zeros((2, 4))          # every confidence is exactly 0.0
+    ece, stats = calibration.expected_calibration_error(probs, y, n_bins=15)
+    total_counted = sum(s["count"] for s in stats)
+    assert total_counted == 2, "zero-confidence samples must not be dropped"
+
+
 def test_fit_temperature_positive():
     rng = np.random.default_rng(2)
     y = rng.integers(0, 4, size=200)

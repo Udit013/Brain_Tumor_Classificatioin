@@ -36,7 +36,12 @@ def _scan_split(split_dir: Path) -> pd.DataFrame:
     for fold in sorted(split_dir.iterdir()):
         if not fold.is_dir():
             continue
-        for file in fold.iterdir():
+        # Sorted so file order is deterministic across independent calls (e.g.
+        # leakage.py and evaluate.py each rebuild this dataframe separately and
+        # must land on index-identical ordering — raw iterdir() order is
+        # filesystem-dependent and not guaranteed stable, which would silently
+        # misalign per-image arrays built from two different calls).
+        for file in sorted(fold.iterdir()):
             if file.is_file():
                 filepaths.append(str(file))
                 labels.append(fold.name)

@@ -34,8 +34,11 @@ onnx_path = hf_hub_download(MODEL_REPO, "efficientnetb3.onnx")
 weights_path = hf_hub_download(MODEL_REPO, "EfficientNetB3_model_weights.h5")
 try:
     temp_path = hf_hub_download(MODEL_REPO, "temperature.json")
-    TEMPERATURE = float(json.load(open(temp_path))["temperature"])
-except Exception:
+    with open(temp_path) as f:
+        TEMPERATURE = float(json.load(f)["temperature"])
+except Exception as exc:  # noqa: BLE001 — any failure here is non-fatal
+    print(f"WARNING: could not load calibration temperature, defaulting to "
+          f"uncalibrated (T=1.0): {exc}")
     TEMPERATURE = 1.0
 
 import onnxruntime as ort
@@ -140,24 +143,31 @@ def predict(image):
         return None, None, "Please upload an MRI image."
     from PIL import Image
 
-    img = Image.fromarray(image).convert("RGB").resize(IMG_SIZE)
-    x = np.asarray(img, dtype="float32")  # [0,255], parity preprocessing
+    # Any failure past this point (corrupt/unusual image data, a transient
+    # ONNX Runtime error, etc.) is reported back to the user in the UI rather
+    # than raised, so a single bad upload can never crash the shared demo
+    # process for every other visitor.
+    try:
+        img = Image.fromarray(image).convert("RGB").resize(IMG_SIZE)
+        x = np.asarray(img, dtype="float32")  # [0,255], parity preprocessing
 
-    t0 = time.perf_counter()
-    raw = _onnx_predict(x[None, ...])[0]
-    latency_ms = (time.perf_counter() - t0) * 1000.0
-    cal = _apply_temperature(raw)
-    cls = int(cal.argmax())
+        t0 = time.perf_counter()
+        raw = _onnx_predict(x[None, ...])[0]
+        latency_ms = (time.perf_counter() - t0) * 1000.0
+        cal = _apply_temperature(raw)
+        cls = int(cal.argmax())
 
-    # TTA uncertainty (ONNX, cheap)
-    views = _tta_augment(x)
-    tta_probs = _onnx_predict(views)
-    mean_p = tta_probs.mean(axis=0)
-    entropy = float(-(mean_p * np.log(np.clip(mean_p, 1e-12, 1.0))).sum())
-    std_top = float(tta_probs[:, cls].std())
+        # TTA uncertainty (ONNX, cheap)
+        views = _tta_augment(x)
+        tta_probs = _onnx_predict(views)
+        mean_p = tta_probs.mean(axis=0)
+        entropy = float(-(mean_p * np.log(np.clip(mean_p, 1e-12, 1.0))).sum())
+        std_top = float(tta_probs[:, cls].std())
 
-    overlay = _gradcam(x, cls)
-    probs_dict = {CLASS_NAMES[i]: float(cal[i]) for i in range(4)}
+        overlay = _gradcam(x, cls)
+        probs_dict = {CLASS_NAMES[i]: float(cal[i]) for i in range(4)}
+    except Exception as exc:  # noqa: BLE001 — surface to the user, don't crash the app
+        return None, None, f"⚠️ Could not process that image: {exc}"
 
     info = (
         f"### Prediction: **{CLASS_NAMES[cls]}**\n"

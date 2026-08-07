@@ -47,8 +47,13 @@ def expected_calibration_error(probs, y_true, n_bins=N_BINS):
     bins = np.linspace(0.0, 1.0, n_bins + 1)
     ece, n = 0.0, len(y_true)
     bin_stats = []
-    for lo, hi in zip(bins[:-1], bins[1:]):
-        mask = (conf > lo) & (conf <= hi)
+    for i, (lo, hi) in enumerate(zip(bins[:-1], bins[1:])):
+        # Half-open bins (lo, hi], except the first, which is closed [lo, hi]
+        # so a confidence of exactly 0.0 is still counted. Without this the
+        # first bin is exclusive at 0.0 and such samples silently vanish from
+        # the ECE weighting. (Unreachable for a 4-class softmax, where
+        # confidence >= 0.25, but correct for any general use of this helper.)
+        mask = (conf >= lo) & (conf <= hi) if i == 0 else (conf > lo) & (conf <= hi)
         if mask.any():
             acc = correct[mask].mean()
             avg_conf = conf[mask].mean()

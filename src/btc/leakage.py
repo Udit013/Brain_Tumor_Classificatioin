@@ -93,22 +93,40 @@ def analyse(eval_clean_subset: bool = False) -> dict:
             exact_dupe_test.append(p)
 
     # ---- near duplicates (perceptual hash) ----------------------------- #
-    tr_phash = [(_phash(p), lab) for p, lab in zip(tr_paths, tr_labels)]
-    nn_distances = []          # nearest train phash distance for each test img
-    near_dupe_flags = []       # bool per test image
-    cross_label_near = 0       # near-dup whose train match has a DIFFERENT label
-    for p, lab in zip(te_paths, te_labels):
-        h = _phash(p)
-        best, best_lab = min(((h - th, tl) for th, tl in tr_phash),
-                             key=lambda t: t[0])
-        nn_distances.append(int(best))
-        is_near = best <= PHASH_NEAR_DUP_THRESHOLD
-        near_dupe_flags.append(is_near)
-        if is_near and best_lab != lab:
-            cross_label_near += 1
+    # Vectorized nearest-neighbour search: computing this as a Python loop
+    # calling min() over every (test, train) pair is O(n_test * n_train) with
+    # heavy interpreter overhead (~9M pair comparisons at this dataset's size).
+    # Instead we compute the full pairwise Hamming-distance matrix in one shot
+    # via a matrix multiply, using the identity XOR(a,b) = a + b - 2ab for
+    # boolean a, b:
+    #   dist[i, j] = popcount(train_i XOR test_j)
+    #              = sum(train_i) + sum(test_j) - 2 * dot(train_i, test_j)
+    # This is BLAS-backed and produces IDENTICAL results to the naive loop
+    # (verified against it), including tie-breaking: np.argmin, like Python's
+    # min(), returns the first occurrence of the minimum value.
+    tr_hashes = [_phash(p) for p in tr_paths]
+    te_hashes = [_phash(p) for p in te_paths]
+    tr_bits = np.stack([np.asarray(h.hash, dtype=np.float32).ravel() for h in tr_hashes])
+    te_bits = np.stack([np.asarray(h.hash, dtype=np.float32).ravel() for h in te_hashes])
 
-    near_dupe_flags = np.array(near_dupe_flags)
-    nn_distances = np.array(nn_distances)
+    dist = (
+        tr_bits.sum(axis=1)[:, None]
+        + te_bits.sum(axis=1)[None, :]
+        - 2.0 * (tr_bits @ te_bits.T)
+    )
+    dist = np.rint(dist).astype(np.int64)  # exact integer Hamming distances
+
+    nn_idx = dist.argmin(axis=0)           # nearest train image, per test image
+    nn_distances = dist[nn_idx, np.arange(len(te_paths))]
+    near_dupe_flags = nn_distances <= PHASH_NEAR_DUP_THRESHOLD
+
+    tr_labels_arr = np.array(tr_labels)
+    te_labels_arr = np.array(te_labels)
+    nearest_train_label = tr_labels_arr[nn_idx]
+    cross_label_near = int(
+        np.sum(near_dupe_flags & (nearest_train_label != te_labels_arr))
+    )
+
     n_test = len(te_paths)
 
     result = {
