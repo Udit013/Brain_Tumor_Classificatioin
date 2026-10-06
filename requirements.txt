@@ -3,6 +3,11 @@
 # parity with the published notebooks, and it supports Python 3.9-3.11 only.
 # macOS Apple Silicon users: use requirements-macos.txt instead (it swaps
 # tensorflow for tensorflow-macos + tensorflow-metal). Everything else matches.
+#
+# Security: audited with pip-audit. Remaining advisories are all blocked by the
+# TF 2.15 parity requirement — keras 2.15 (fixes only in Keras 3), onnx (capped
+# at 1.18.0 by TF's ml_dtypes~=0.2 pin) and protobuf (capped <5 by TF). The app
+# loads only its own trusted model files, which limits exposure; see README.
 
 # --- core DL stack (parity with published EfficientNetB3 notebook) ---
 tensorflow==2.15.0
@@ -10,25 +15,27 @@ numpy==1.26.4            # TF 2.15 requires numpy<2
 pandas==2.2.2
 
 # --- imaging / preprocessing ---
-pillow==10.3.0
+pillow==12.3.0
 opencv-python-headless==4.9.0.80
 imageio==2.34.1
 imagehash==4.3.1        # perceptual hashing for leakage analysis
 
 # --- metrics / science ---
-scikit-learn==1.4.2
+scikit-learn==1.5.2
 scipy==1.13.0
 matplotlib==3.8.4
 
 # --- ONNX export + runtime (serving / latency) ---
-tf2onnx==1.16.1
-onnx==1.16.0
+tf2onnx==1.17.0
+onnx==1.18.0            # >=1.19 conflicts with TF 2.15's ml_dtypes pin
+protobuf==4.25.8        # TF 2.15 requires protobuf<5
 onnxruntime==1.17.3
 
 # --- serving ---
-fastapi==0.110.2
+fastapi==0.142.2
+starlette==1.7.0
 uvicorn[standard]==0.29.0
-python-multipart==0.0.9
+python-multipart==0.0.32
 
 # --- data download ---
 kaggle==1.6.12

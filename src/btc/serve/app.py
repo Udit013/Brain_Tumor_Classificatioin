@@ -36,7 +36,11 @@ import numpy as np
 # a local inside _build_app(), resolution fails at request time with
 # `PydanticUserError: ... is not fully defined`, turning every /predict call
 # into a 500. Keeping the import here is what makes the annotation resolvable.
+import threading
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 from .. import config
@@ -51,6 +55,9 @@ app = None  # set below by _build_app()
 # Lazily-populated singletons.
 _state: dict = {"model": None, "grad_model": None, "temperature": 1.0,
                 "calibrated": False}
+# Serialises model loading and inference across worker threads: Keras models
+# are not documented as safe for concurrent predict()/GradientTape calls.
+_model_lock = threading.Lock()
 
 
 def _load():
@@ -75,12 +82,82 @@ def _apply_temperature(probs: np.ndarray) -> np.ndarray:
     return p / p.sum()
 
 
-def _build_app():
-    api = FastAPI(title="Brain Tumor Classifier (EfficientNetB3)", version="0.1.0")
+def _decode_upload(raw: bytes) -> np.ndarray:
+    """Validate and decode an uploaded image into the parity input array.
 
-    @api.on_event("startup")
-    def _startup():
-        _load()
+    Pure CPU/PIL work with no TensorFlow dependency, so bad uploads are rejected
+    without ever loading the model. Raises HTTPException (413/400).
+    """
+    from PIL import Image
+
+    if len(raw) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Image exceeds the {MAX_UPLOAD_BYTES // (1024*1024)}MB upload limit.",
+        )
+    try:
+        img = Image.open(io.BytesIO(raw)).convert("RGB").resize(config.IMG_SIZE)
+    except Exception as exc:  # noqa: BLE001 — any decode failure is a client error
+        raise HTTPException(status_code=400, detail=f"Invalid image: {exc}")
+    # Identical to keras img_to_array for an RGB PIL image: float32, HWC, [0,255].
+    return np.asarray(img, dtype="float32")
+
+
+def _infer(x: np.ndarray) -> dict:
+    """Blocking model inference + Grad-CAM. Must run off the event loop."""
+    from ..explain import gradcam_heatmap, overlay
+    import imageio.v2 as imageio
+
+    with _model_lock:
+        if _state["model"] is None:
+            _load()
+        t_start = time.perf_counter()
+        raw_probs = _state["model"].predict(x[None, ...], verbose=0)[0]
+        cal_probs = _apply_temperature(raw_probs)
+        cls = int(np.argmax(cal_probs))
+        inference_ms = (time.perf_counter() - t_start) * 1000.0
+
+        # Grad-CAM costs roughly an order of magnitude more than the forward
+        # pass (an extra forward+backward pass plus PNG encoding), so it is
+        # timed and reported separately rather than hidden inside "latency".
+        t_cam = time.perf_counter()
+        hm, _ = gradcam_heatmap(x, _state["model"], _state["grad_model"], class_idx=cls)
+    ov = overlay(x, hm)
+    buf = io.BytesIO()
+    imageio.imwrite(buf, ov, format="png")
+    gradcam_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    gradcam_ms = (time.perf_counter() - t_cam) * 1000.0
+
+    return {
+        "class": config.CLASS_NAMES[cls],
+        "class_index": cls,
+        "calibrated_confidence": float(cal_probs[cls]),
+        "raw_confidence": float(raw_probs[cls]),
+        "is_calibrated": _state["calibrated"],
+        "probabilities": {n: float(cal_probs[i]) for i, n in enumerate(config.CLASS_NAMES)},
+        "gradcam_png_base64": gradcam_b64,
+        # Server-side timing breakdown (excludes network transfer).
+        "inference_ms": inference_ms,
+        "gradcam_ms": gradcam_ms,
+        "latency_ms": inference_ms + gradcam_ms,
+    }
+
+
+@asynccontextmanager
+async def _lifespan(_api: FastAPI):
+    # Load the model at startup (in a worker thread so startup itself doesn't
+    # block the loop); _infer() lazily loads it too, as a fallback.
+    def _load_locked():
+        with _model_lock:
+            if _state["model"] is None:
+                _load()
+    await run_in_threadpool(_load_locked)
+    yield
+
+
+def _build_app():
+    api = FastAPI(title="NeuroClass — Brain Tumor Classifier (EfficientNetB3)",
+                  version="0.1.0", lifespan=_lifespan)
 
     @api.get("/health")
     def health():
@@ -89,62 +166,18 @@ def _build_app():
 
     @api.post("/predict")
     async def predict(file: UploadFile = File(...)):
-        from PIL import Image
-        from tensorflow.keras.preprocessing.image import img_to_array
-        from ..explain import gradcam_heatmap, overlay
-        import imageio.v2 as imageio
-
-        if _state["model"] is None:
-            _load()
-        try:
-            # Read up to MAX_UPLOAD_BYTES+1: if that many bytes come back, the
-            # upload exceeds the cap regardless of what Content-Length claimed
-            # (a client can lie about or omit that header).
-            raw = await file.read(MAX_UPLOAD_BYTES + 1)
-            if len(raw) > MAX_UPLOAD_BYTES:
-                raise HTTPException(
-                    status_code=413,
-                    detail=f"Image exceeds the {MAX_UPLOAD_BYTES // (1024*1024)}MB upload limit.",
-                )
-            img = Image.open(io.BytesIO(raw)).convert("RGB").resize(config.IMG_SIZE)
-        except HTTPException:
-            raise
-        except Exception as exc:  # noqa: BLE001
-            raise HTTPException(status_code=400, detail=f"Invalid image: {exc}")
-
-        x = img_to_array(img).astype("float32")  # [0,255], parity preprocessing
-        t_start = time.perf_counter()
-        raw_probs = _state["model"].predict(x[None, ...], verbose=0)[0]
-        cal_probs = _apply_temperature(raw_probs)
-        cls = int(np.argmax(cal_probs))
-        inference_ms = (time.perf_counter() - t_start) * 1000.0
-
-        # Grad-CAM overlay for the predicted class. This costs roughly an order
-        # of magnitude more than the forward pass (an extra forward+backward
-        # pass plus PNG encoding), so it is timed and reported separately —
-        # reporting only the inference time as "latency" would understate the
-        # real cost of a /predict call by ~10x.
-        t_cam = time.perf_counter()
-        hm, _ = gradcam_heatmap(x, _state["model"], _state["grad_model"], class_idx=cls)
-        ov = overlay(x, hm)
-        buf = io.BytesIO()
-        imageio.imwrite(buf, ov, format="png")
-        gradcam_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
-        gradcam_ms = (time.perf_counter() - t_cam) * 1000.0
-
-        return JSONResponse({
-            "class": config.CLASS_NAMES[cls],
-            "class_index": cls,
-            "calibrated_confidence": float(cal_probs[cls]),
-            "raw_confidence": float(raw_probs[cls]),
-            "is_calibrated": _state["calibrated"],
-            "probabilities": {n: float(cal_probs[i]) for i, n in enumerate(config.CLASS_NAMES)},
-            "gradcam_png_base64": gradcam_b64,
-            # Server-side timing breakdown (excludes network transfer).
-            "inference_ms": inference_ms,
-            "gradcam_ms": gradcam_ms,
-            "latency_ms": inference_ms + gradcam_ms,
-        })
+        # Read up to MAX_UPLOAD_BYTES+1: if that many bytes come back, the
+        # upload exceeds the cap regardless of what Content-Length claimed (a
+        # client can lie about or omit that header).
+        raw = await file.read(MAX_UPLOAD_BYTES + 1)
+        x = _decode_upload(raw)
+        # Inference is CPU-bound and synchronous. Running it directly inside
+        # this async handler (the previous behaviour) froze the whole event
+        # loop for each request — /health took 1.4s instead of <1ms with four
+        # predictions in flight, long enough to trip the container healthcheck
+        # under load. A worker thread keeps the loop responsive; _model_lock
+        # keeps model access serialised exactly as before.
+        return JSONResponse(await run_in_threadpool(_infer, x))
 
     return api
 

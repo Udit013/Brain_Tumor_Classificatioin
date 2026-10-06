@@ -1,58 +1,58 @@
 {
-  "accuracy": 0.939375,
-  "macro_roc_auc": 0.9852140624999999,
-  "macro_avg_precision": 0.9674740083222838,
+  "accuracy": 0.9125,
+  "macro_roc_auc": 0.9797734374999999,
+  "macro_avg_precision": 0.9606549282568102,
   "classification_report": {
     "glioma": {
-      "precision": 0.9968253968253968,
-      "recall": 0.785,
-      "f1-score": 0.8783216783216783,
+      "precision": 0.9963235294117647,
+      "recall": 0.6775,
+      "f1-score": 0.8065476190476191,
       "support": 400.0
     },
     "meningioma": {
-      "precision": 0.8605664488017429,
-      "recall": 0.9875,
-      "f1-score": 0.919674039580908,
+      "precision": 0.792,
+      "recall": 0.99,
+      "f1-score": 0.88,
       "support": 400.0
     },
     "notumor": {
-      "precision": 0.9345794392523364,
+      "precision": 0.9259259259259259,
       "recall": 1.0,
-      "f1-score": 0.966183574879227,
+      "f1-score": 0.9615384615384616,
       "support": 400.0
     },
     "pituitary": {
-      "precision": 0.9899497487437185,
-      "recall": 0.985,
-      "f1-score": 0.9874686716791979,
+      "precision": 0.9924242424242424,
+      "recall": 0.9825,
+      "f1-score": 0.9874371859296482,
       "support": 400.0
     },
-    "accuracy": 0.939375,
+    "accuracy": 0.9125,
     "macro avg": {
-      "precision": 0.9454802584057986,
-      "recall": 0.939375,
-      "f1-score": 0.9379119911152528,
+      "precision": 0.9266684244404833,
+      "recall": 0.9125,
+      "f1-score": 0.9088808166289322,
       "support": 1600.0
     },
     "weighted avg": {
-      "precision": 0.9454802584057986,
-      "recall": 0.939375,
-      "f1-score": 0.9379119911152527,
+      "precision": 0.9266684244404833,
+      "recall": 0.9125,
+      "f1-score": 0.9088808166289323,
       "support": 1600.0
     }
   },
   "confusion_matrix": [
     [
-      314,
-      58,
-      28,
+      271,
+      97,
+      32,
       0
     ],
     [
       1,
-      395,
+      396,
       0,
-      4
+      3
     ],
     [
       0,
@@ -62,22 +62,22 @@
     ],
     [
       0,
-      6,
+      7,
       0,
-      394
+      393
     ]
   ],
   "per_class_roc_auc": {
-    "glioma": 0.9548499999999999,
-    "meningioma": 0.9882624999999999,
-    "notumor": 0.9986729166666667,
-    "pituitary": 0.9990708333333334
+    "glioma": 0.9368874999999999,
+    "meningioma": 0.9865895833333332,
+    "notumor": 0.9989208333333333,
+    "pituitary": 0.9966958333333333
   },
   "per_class_avg_precision": {
-    "glioma": 0.9438030130200731,
-    "meningioma": 0.9343972763626975,
-    "notumor": 0.9936852627706351,
-    "pituitary": 0.9980104811357294
+    "glioma": 0.919940094816416,
+    "meningioma": 0.9330526518486111,
+    "notumor": 0.9952524440471155,
+    "pituitary": 0.9943745223150982
   },
   "n_test": 1600,
   "published_reference_accuracy": 0.99844

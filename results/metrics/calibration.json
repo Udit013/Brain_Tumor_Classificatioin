@@ -1,7 +1,7 @@
 {
-  "temperature": 0.8191919191919192,
-  "ece_before": 0.04246472351253031,
-  "ece_after": 0.013553582616150419,
+  "temperature": 0.5611111111111111,
+  "ece_before": 0.19639720147475603,
+  "ece_after": 0.07328287145122886,
   "n_bins": 15,
   "fit_protocol": "fit_and_report_on_test",
   "holdout_fraction": 0.0,

@@ -109,6 +109,37 @@ PRIMARY_MODEL = "EfficientNetB3"
 SEED = 75
 
 
+def configure_inference_device() -> None:
+    """Pin TensorFlow inference to CPU unless BTC_INFERENCE_DEVICE=gpu.
+
+    WHY: on Apple Silicon the tensorflow-metal GPU plugin computes materially
+    different outputs for this model than TensorFlow's CPU kernels — the same
+    weights score 93.94% on Metal but 91.25% on CPU, disagreeing on 2.9% of
+    test images (max probability difference 0.76). CPU TensorFlow and ONNX
+    Runtime agree with each other to 2.4e-5, and CPU is what the deployed
+    Space (ONNX Runtime) and any Linux/Docker environment actually run. So every
+    reported metric is measured on CPU, the reference implementation, so that the
+    numbers describe the model users are served. Training may still use a GPU.
+
+    Must run before TensorFlow initialises its devices (i.e. before the first
+    op); if called too late it warns rather than silently measuring on GPU.
+    """
+    if os.environ.get("BTC_INFERENCE_DEVICE", "cpu").lower() == "gpu":
+        return
+    import warnings
+
+    import tensorflow as tf
+
+    try:
+        tf.config.set_visible_devices([], "GPU")
+    except RuntimeError as exc:  # devices already initialised in this process
+        warnings.warn(
+            f"Could not pin inference to CPU ({exc}); results may come from a "
+            "GPU backend and differ from the deployed CPU model.",
+            stacklevel=2,
+        )
+
+
 def ensure_dirs() -> None:
     """Create artifact directories if missing (safe to call repeatedly)."""
     for d in (MODELS_DIR, RESULTS_DIR, FIGURES_DIR, METRICS_DIR):

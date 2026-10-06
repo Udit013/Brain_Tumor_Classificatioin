@@ -19,7 +19,6 @@ space/
 # Exclude docs, but NOT README.md — pyproject.toml declares
 # `readme = "README.md"`, so `pip install -e .` fails without it present.
 MODEL_CARD.md
-PORTFOLIO.md
 PROJECT_DOCUMENTATION.md
 fastflo_guide.md
 
@@ -35,3 +34,4 @@ access_token
 CLAUDE.md
 
 .DS_Store
+knowledge_doc.md

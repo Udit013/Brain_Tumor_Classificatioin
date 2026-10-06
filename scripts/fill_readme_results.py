@@ -85,7 +85,7 @@ def build_block() -> str:
         ("ECE before → after temperature scaling",
          f"{cal['ece_before']:.4f} → {cal['ece_after']:.4f} "
          f"(T={cal['temperature']:.3f})"),
-        ("Inference latency, Keras / ONNX-CPU / ONNX-CoreML",
+        ("Single-image latency, Keras-CPU / ONNX-CPU / ONNX-CoreML",
          f"{keras:.0f}ms / {cpu:.0f}ms / {coreml:.1f}ms"),
     ]
 
@@ -125,6 +125,34 @@ def build_robustness_block() -> str:
     return "\n".join(lines)
 
 
+PC_BEGIN = "<!-- PERCLASS:BEGIN -->"
+PC_END = "<!-- PERCLASS:END -->"
+
+
+def build_perclass_block() -> str:
+    ev = _load("evaluation.json")
+    if ev is None:
+        raise SystemExit("Missing evaluation.json. Run reproduce.sh.")
+    names = ["glioma", "meningioma", "notumor", "pituitary"]
+    rep, cm = ev["classification_report"], ev["confusion_matrix"]
+    lines = ["| Class | Precision | Recall | F1 | ROC-AUC | Support |",
+             "|---|---|---|---|---|---|"]
+    for n in names:
+        r = rep[n]
+        lines.append(f"| {n} | {r['precision']:.3f} | {r['recall']:.3f} | "
+                     f"{r['f1-score']:.3f} | {ev['per_class_roc_auc'][n]:.3f} | "
+                     f"{int(r['support'])} |")
+    g = names.index("glioma")
+    to_mening, to_none = cm[g][names.index("meningioma")], cm[g][names.index("notumor")]
+    n_glioma = sum(cm[g])
+    lines.append(
+        f"\n**Weakest class: glioma.** Of {n_glioma} glioma test images, "
+        f"{to_mening} are predicted as meningioma and **{to_none} "
+        f"({to_none / n_glioma * 100:.1f}%) as `notumor`** — a missed-tumor error, "
+        f"the most consequential failure mode for any screening use.")
+    return "\n".join(lines)
+
+
 def _replace(text, begin, end, block):
     if begin not in text or end not in text:
         raise SystemExit(f"Markers {begin}/{end} not found in README.md")
@@ -135,8 +163,9 @@ def main() -> None:
     text = README.read_text()
     text = _replace(text, BEGIN, END, build_block())
     text = _replace(text, R2_BEGIN, R2_END, build_robustness_block())
+    text = _replace(text, PC_BEGIN, PC_END, build_perclass_block())
     README.write_text(text)
-    print("README results + robustness tables updated from measured metrics.")
+    print("README results, per-class and robustness tables updated from measured metrics.")
 
 
 if __name__ == "__main__":

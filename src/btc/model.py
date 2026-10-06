@@ -83,6 +83,9 @@ def load_trained_model(weights_path=None):
     from an untrained head.
     """
     weights_path = weights_path or config.WEIGHTS_PATH
+    # Every evaluation/serving path loads the model through here, so this one
+    # call pins all reported metrics to the CPU reference implementation.
+    config.configure_inference_device()
     if not weights_path.exists():
         raise FileNotFoundError(
             f"Trained weights not found at {weights_path}.\n"

@@ -1,5 +1,5 @@
 ---
-title: Brain Tumor MRI Classifier
+title: NeuroClass
 emoji: 🧠
 colorFrom: indigo
 colorTo: purple
@@ -11,7 +11,7 @@ pinned: false
 license: mit
 ---
 
-# Brain Tumor MRI Classifier (EfficientNetB3)
+# NeuroClass — Brain Tumor MRI Classifier (EfficientNetB3)
 
 Upload a T1-weighted brain MRI to get the predicted tumor class
 (`glioma`, `meningioma`, `notumor`, `pituitary`), a temperature-calibrated
