@@ -37,8 +37,13 @@ RESULTS_DIR = REPO_ROOT / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
 METRICS_DIR = RESULTS_DIR / "metrics"
 
-# Trained weights produced by btc.train (mirrors the notebook's filename).
-WEIGHTS_PATH = MODELS_DIR / "EfficientNetB3_model_weights.h5"
+# Parity weights produced by btc.train (mirrors the notebook's filename).
+PARITY_WEIGHTS_PATH = MODELS_DIR / "EfficientNetB3_model_weights.h5"
+# Improved model produced by btc.train_v2 (selected on a leakage-safe val split).
+V2_WEIGHTS_PATH = MODELS_DIR / "NeuroClass_v2_weights.h5"
+# The model every evaluation and serving path loads. BTC_WEIGHTS overrides it,
+# e.g. BTC_WEIGHTS=models/EfficientNetB3_model_weights.h5 to evaluate parity.
+WEIGHTS_PATH = Path(os.environ.get("BTC_WEIGHTS", PARITY_WEIGHTS_PATH))
 ONNX_PATH = MODELS_DIR / "efficientnetb3.onnx"
 # Fitted temperature for calibration (single scalar saved as JSON).
 TEMPERATURE_PATH = MODELS_DIR / "temperature.json"

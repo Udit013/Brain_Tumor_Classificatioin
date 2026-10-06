@@ -119,3 +119,53 @@ def test_phash_identical_images_zero_distance(tmp_path):
     Image.fromarray(arr).save(b)
     assert leakage._phash(str(a)) - leakage._phash(str(b)) == 0
     assert leakage._content_hash(str(a)) == leakage._content_hash(str(b))
+
+
+# --------------------------------------------------------------------------- #
+# shared preprocessing (train / eval / serve must agree)
+# --------------------------------------------------------------------------- #
+def test_preprocess_contract(tmp_path):
+    from PIL import Image
+    from btc import preprocess
+
+    p = tmp_path / "x.png"
+    Image.fromarray((np.random.rand(300, 200) * 255).astype("uint8"), mode="L").save(p)
+    x = preprocess.load_image(p)          # grayscale file of an odd size
+    assert x.shape == (256, 256, 3) and x.dtype == np.float32
+    assert x.max() > 1.0                  # raw [0,255], never rescaled to [0,1]
+
+
+def test_api_decode_matches_shared_preprocessing(tmp_path):
+    """The FastAPI decoder must produce exactly what evaluation measured."""
+    import io
+    from PIL import Image
+    from btc import preprocess
+    from btc.serve import app as serve_app
+
+    buf = io.BytesIO()
+    Image.fromarray((np.random.rand(180, 240, 3) * 255).astype("uint8")).save(buf, "PNG")
+    p = tmp_path / "y.png"
+    p.write_bytes(buf.getvalue())
+    np.testing.assert_array_equal(serve_app._decode_upload(buf.getvalue()),
+                                  preprocess.load_image(p))
+
+
+# --------------------------------------------------------------------------- #
+# leakage-safe split: near-duplicate clustering
+# --------------------------------------------------------------------------- #
+def test_cluster_groups_near_duplicates_transitively():
+    from btc.splits import _cluster
+
+    base = np.zeros(64, dtype=np.float32)
+    a = base.copy()
+    b = base.copy(); b[:3] = 1           # 3 bits from a  -> near-dup of a
+    c = b.copy(); c[3:6] = 1             # 3 bits from b, 6 from a -> joins via b
+    d = np.ones(64, dtype=np.float32)    # 64 bits from a: not a near-dup of a/b/c
+    e = d.copy()                         # phash-identical to d, but same content hash as a
+    f = np.ones(64, dtype=np.float32); f[:32] = 0   # 32 bits from both groups, unique hash
+    ids = _cluster(np.stack([a, b, c, d, e, f]), ["h1", "h2", "h3", "h4", "h1", "h5"],
+                   threshold=5)
+    assert ids[0] == ids[1] == ids[2]    # chained near-duplicates share one cluster
+    assert ids[4] == ids[0]              # exact (content-hash) duplicate joins a's cluster
+    assert ids[3] == ids[4]              # d joins through its phash twin e
+    assert ids[5] not in ids[:5]         # f is near nothing -> its own cluster

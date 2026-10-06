@@ -88,6 +88,12 @@ The paper's published 99.844% is not directly comparable: it was scored on
   outputs for these weights (93.94% vs 91.25% on CPU, disagreeing on 2.9% of
   test images). CPU TensorFlow and ONNX Runtime agree with each other, so
   inference is pinned to CPU and Metal is used for training only.
+- **Train/serve preprocessing skew:** metrics are measured with Keras
+  nearest-neighbour resizing (the published pipeline), but serving resizes with
+  PIL's bicubic default; under the serving preprocessing test accuracy is
+  **90.25%**, a point below the reported 91.25%. Averaging the Space's 6
+  test-time-augmentation views raises that to 92.31% (glioma recall 64.3% →
+  71.5%) — measured, not yet adopted.
 - **Distribution shift:** out-of-distribution accuracy (70.8%) is far below the
   in-distribution number — the honest generalisation signal.
 - **Robustness:** near chance (~25%) under additive Gaussian noise at every

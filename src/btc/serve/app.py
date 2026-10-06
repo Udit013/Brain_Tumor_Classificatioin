@@ -90,17 +90,18 @@ def _decode_upload(raw: bytes) -> np.ndarray:
     """
     from PIL import Image
 
+    from ..preprocess import to_model_input
+
     if len(raw) > MAX_UPLOAD_BYTES:
         raise HTTPException(
             status_code=413,
             detail=f"Image exceeds the {MAX_UPLOAD_BYTES // (1024*1024)}MB upload limit.",
         )
     try:
-        img = Image.open(io.BytesIO(raw)).convert("RGB").resize(config.IMG_SIZE)
+        with Image.open(io.BytesIO(raw)) as img:
+            return to_model_input(img)  # the one shared preprocessing function
     except Exception as exc:  # noqa: BLE001 — any decode failure is a client error
         raise HTTPException(status_code=400, detail=f"Invalid image: {exc}")
-    # Identical to keras img_to_array for an RGB PIL image: float32, HWC, [0,255].
-    return np.asarray(img, dtype="float32")
 
 
 def _infer(x: np.ndarray) -> dict:

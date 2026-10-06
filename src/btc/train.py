@@ -57,7 +57,7 @@ def main() -> None:
         EarlyStopping(monitor="loss", min_delta=1e-11, patience=12, verbose=1),
         ReduceLROnPlateau(monitor="val_loss", factor=0.2, patience=6, verbose=1),
         ModelCheckpoint(
-            filepath=str(config.WEIGHTS_PATH),
+            filepath=str(config.PARITY_WEIGHTS_PATH),
             save_weights_only=True,
             monitor="val_accuracy",
             mode="max",
@@ -83,16 +83,16 @@ def main() -> None:
     # training data (NO optimizer step -> learned weights unchanged), which
     # recovers correct inference behaviour. This was verified to move full-test
     # accuracy from ~0.53 to ~0.94. Documented in README Evaluation Limitations.
-    model.load_weights(str(config.WEIGHTS_PATH))  # best checkpoint
+    model.load_weights(str(config.PARITY_WEIGHTS_PATH))  # best checkpoint
     recalibrate_bn(model, train_generator)
-    model.save_weights(str(config.WEIGHTS_PATH))
+    model.save_weights(str(config.PARITY_WEIGHTS_PATH))
     print("Recalibrated BN moving statistics and re-saved weights.")
 
     # Persist history (real measured numbers only).
     hist = {k: [float(v) for v in vals] for k, vals in history.history.items()}
     out = config.METRICS_DIR / "train_history.json"
     out.write_text(json.dumps(hist, indent=2))
-    print(f"Saved best weights -> {config.WEIGHTS_PATH}")
+    print(f"Saved best weights -> {config.PARITY_WEIGHTS_PATH}")
     print(f"Saved history       -> {out}")
 
     # Quick parity check against the paper's headline (printed, not asserted —

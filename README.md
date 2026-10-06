@@ -108,7 +108,7 @@ from the JSON files a real run produces.
 | 8 | Drift monitoring stub (PCA + PSI) | [`monitoring.py`](src/btc/monitoring.py) | `models/drift_reference.npz`, `drift_log.jsonl` |
 | 9 | ONNX export + latency benchmark | [`export_onnx.py`](src/btc/export_onnx.py) | `models/efficientnetb3.onnx`, `latency.json` |
 | 10 | Serving: Gradio Space + FastAPI | [`space/app.py`](space/app.py), [`serve/app.py`](src/btc/serve/app.py) | live demo, REST API |
-| 11 | Packaging, tests, CI | [`Dockerfile`](Dockerfile), [`requirements.txt`](requirements.txt), [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml), [`MODEL_CARD.md`](MODEL_CARD.md) | pinned deps, 32 tests on every push |
+| 11 | Packaging, tests, CI | [`Dockerfile`](Dockerfile), [`requirements.txt`](requirements.txt), [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml), [`MODEL_CARD.md`](MODEL_CARD.md) | pinned deps, 35 tests on every push, verified Docker image |
 
 ### Results (measured on CPU)
 
@@ -193,7 +193,8 @@ its own.
   this repo's parity reproduction pick the checkpoint with the best
   `val_accuracy`, where validation *is* (part of) the test set. Reported test
   metrics are therefore optimistically biased. Carving a validation split out of
-  Training is the fix, and is first on the roadmap.
+  Training is the fix: `btc.splits` now builds a leakage-safe validation split
+  (see *Toward a better model* below), and retraining against it is next.
 
 - **Metal vs CPU numerics.** `tensorflow-metal` 1.1.0 is used only to make
   training fast on Apple Silicon. Its kernels produce materially different
@@ -201,6 +202,14 @@ its own.
   pinned to CPU by `config.configure_inference_device()`, which every model load
   goes through. Set `BTC_INFERENCE_DEVICE=gpu` to opt out. Numbers previously
   reported from Metal are superseded by the CPU numbers above.
+
+- **Train/serve preprocessing skew.** Evaluation resizes images with Keras
+  `load_img` (nearest-neighbour, as in the published notebooks), but both
+  serving paths resize with PIL's default (bicubic). Under the serving
+  preprocessing the same model scores **90.25%** on the test set, a point below
+  the 91.25% reported above. The reported numbers stay on the committed
+  evaluation path so they remain reproducible; `btc/preprocess.py` is the shared
+  function evaluation should move onto.
 
 - **BatchNorm recalibration.** Under the published recipe (momentum 0.99,
   batch 16) the backbone's BatchNorm running statistics did not converge on
@@ -227,6 +236,41 @@ its own.
 - **External validation taxonomy.** The out-of-distribution set is binary
   (tumor / no tumor), so the 4-class model is scored by collapsing its three
   tumor classes into one.
+
+### Toward a better model (in progress)
+
+**A leakage-safe validation split.** `python -m btc.splits` carves 841
+validation images (about 210 per class) out of Kaggle Training. It first groups
+images into near-duplicate clusters (perceptual-hash distance ≤ 5, or identical
+pixels) and keeps every cluster on one side. That matters: **43% of Training
+images (2,399) sit in near-duplicate clusters**, the largest holding 22 slices,
+so a random split would leak. Verified: **zero** near-duplicate pairs straddle
+train and validation (the official test set has 714). The split is saved to
+`results/splits/train_val_split.json`.
+
+**NeuroClass v2 (experimental, no model yet).** `btc/train_v2.py` targets each
+weakness measured above: it trains on CPU with the serving preprocessing,
+selects checkpoints on the validation split, freezes the backbone's BatchNorm,
+uses full epochs, and adds augmentation including Gaussian noise. The first
+full run used the parity learning rate (1e-3) and stayed at chance after one
+epoch. 60-step diagnostics on a subset traced that to the learning rate: with
+BatchNorm frozen, 1e-3 scrambles the pretrained features, while 1e-4 learns
+(65% validation accuracy after 60 steps, against 64% for the parity recipe).
+The recipe now defaults to 1e-4; a full run is next. No v2 metric is reported.
+
+**Measured, not yet adopted: test-time augmentation.** Averaging the 6
+augmented views the Space already computes for uncertainty, under the serving
+preprocessing, lifts test accuracy from 90.25% to **92.31%**, leak-free accuracy
+from 85.7% to 87.6%, and glioma recall from 64.3% to **71.5%**. It costs 6
+forward passes per image instead of 1.
+
+### Roadmap
+1. Train NeuroClass v2 to completion on the leakage-safe split; compare with the
+   parity model on the test set's leak-free subset.
+2. Move evaluation onto the shared serving preprocessing.
+3. Adopt test-time-augmentation averaging if it holds up on validation.
+4. Target glioma → `notumor` misses specifically (the 8% missed-tumor rate).
+5. Upgrade the Space to Gradio 6 to clear its remaining dependency advisories.
 
 ---
 
@@ -320,9 +364,11 @@ PYTHONPATH=src pytest tests/ -q
 docker build -t neuroclass-api .
 docker run -v "$(pwd)/models:/app/models" -p 8000:8000 neuroclass-api
 ```
-The image runs as a non-root user with a `/health` healthcheck. **The
-Dockerfile has not been build-tested** — Docker wasn't available on the
-development machine.
+Verified on Docker 29.8 (linux/arm64): the image builds (981 MB), runs as the
+non-root `appuser`, installs the pinned stack (TF 2.15.0, FastAPI 0.142.2,
+Starlette 1.7.0, Pillow 12.3.0), serves a correct prediction, returns 413 for an
+oversized upload and 400 for a corrupt one, and Docker's own healthcheck
+reports **healthy**.
 
 ## Environment & dependencies
 
@@ -349,11 +395,14 @@ src/btc/                    # production extension package
   config.py  data.py  model.py  train.py
   evaluate.py  leakage.py  external_validation.py  calibration.py
   explain.py  robustness.py  uncertainty.py  monitoring.py  export_onnx.py
+  preprocess.py             # serving image preprocessing (shared with train_v2)
+  splits.py                 # leakage-safe train/val split of Kaggle Training
+  train_v2.py               # EXPERIMENTAL improved recipe (not yet trained)
   serve/app.py              # FastAPI service
 space/                      # Gradio app deployed to Hugging Face Spaces
 scripts/                    # setup_env, download_data, reproduce, fill_readme_results
-tests/                      # 32 tests: pure logic + FastAPI contract (no TF needed)
-results/                    # metrics/*.json + figures/*.png (generated, tracked)
+tests/                      # 35 tests: pure logic + FastAPI contract (no TF needed)
+results/                    # metrics, figures, and the train/val split (generated, tracked)
 models/                     # weights, ONNX, temperature, drift reference (generated, ignored)
 Dockerfile  requirements*.txt  pyproject.toml  MODEL_CARD.md  PROJECT_DOCUMENTATION.md
 ```

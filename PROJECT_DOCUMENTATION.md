@@ -137,7 +137,7 @@ There is no client-server web app with a database in the traditional sense. Inst
 - **Hugging Face Spaces** — hosts the live Gradio demo (free CPU compute).
 - **GitHub Actions** — runs the automated test suite on every push (Continuous Integration).
 
-**Deployment architecture:** the Gradio Space is a single Docker-like container HF Spaces builds automatically from `space/requirements.txt` and `space/app.py`, pinned to Python 3.11. A separate, standalone `Dockerfile` in the repo root packages the FastAPI service for self-hosting (this Dockerfile is written and valid but has not been build-tested on the development machine, since Docker itself was not installed there — this is stated plainly rather than glossed over).
+**Deployment architecture:** the Gradio Space is a single Docker-like container HF Spaces builds automatically from `space/requirements.txt` and `space/app.py`, pinned to Python 3.11. A separate, standalone `Dockerfile` in the repo root packages the FastAPI service for self-hosting (built, run as a non-root user, and health-checked on Docker 29.8 — see §14).
 
 ---
 
@@ -167,6 +167,9 @@ Brain_Tumor_Classificatioin/
 │   ├── monitoring.py                  input-drift detection stub (production monitoring)
 │   ├── robustness.py                  stress-tests the model against corrupted images
 │   ├── uncertainty.py                 Test-Time Augmentation-based uncertainty estimation
+│   ├── preprocess.py                  serving image preprocessing (shared with train_v2)
+│   ├── splits.py                      leakage-safe train/val split of Kaggle Training
+│   ├── train_v2.py                    EXPERIMENTAL improved training recipe (not yet trained)
 │   └── serve/
 │       ├── __init__.py
 │       └── app.py                     FastAPI REST service
@@ -185,7 +188,7 @@ Brain_Tumor_Classificatioin/
 │   └── recalibrate_bn.py              one-off standalone BatchNorm-fix script
 │
 ├── tests/
-│   ├── test_core.py                   27 pure-logic unit tests (no TensorFlow/data/weights)
+│   ├── test_core.py                   30 pure-logic unit tests (no TensorFlow/data/weights)
 │   └── test_api.py                    5 FastAPI contract tests (stubbed model, no TensorFlow)
 │
 ├── .github/workflows/ci.yml           GitHub Actions: runs tests on every push
@@ -541,6 +544,25 @@ This file has two small functions. `ensure_dirs()` it creates the `models/`, `re
 
 **Why Test-Time Augmentation instead of Monte Carlo Dropout (the other common lightweight uncertainty technique)?** Both are legitimate, cheap options that don't require retraining or a different architecture. TTA was chosen here specifically because it composes naturally with the ONNX Runtime serving path used in the live demo — it just means running the same exported ONNX model 6 times on 6 slightly different inputs, with no need to keep dropout layers "active" at inference time (which MC-Dropout requires, and which some inference runtimes, including ONNX Runtime by default, aren't set up to do easily, since dropout is normally disabled at inference for a reason). TTA is a pure, black-box, model-agnostic technique from the outside.
 
+### 5.14 `preprocess.py`, `splits.py`, `train_v2.py` — toward a better model
+
+**`preprocess.py`** holds the serving preprocessing: `to_model_input()` (PIL `convert("RGB").resize((256, 256))` → float32, raw [0, 255]) and `load_image()`/`load_images()`. The FastAPI service decodes uploads through it, and the Space repeats the same two PIL calls inline. It exists because of a measured **train/serve skew**: evaluation (`data.load_test_arrays`) resizes with Keras `load_img`, which is nearest-neighbour, while serving uses PIL's default, bicubic. Under the serving preprocessing the deployed model scores **90.25%** on the test set versus the reported 91.25%. The reported metrics deliberately stay on the committed evaluation path so they remain reproducible; moving evaluation onto `preprocess.py` is on the roadmap.
+
+**`splits.py`** builds a validation set the test set never influences, without the leakage a random split would have. `_cluster()` runs union-find over all Training images: two images join a cluster if their perceptual hashes are within Hamming distance 5 (computed blockwise with the same matmul identity as `leakage.py`) or their content hashes match. Whole clusters are then assigned to validation per class until each class reaches 15%. Measured: **43% of Training (2,399 images) sits in multi-image clusters**, the largest holding 22 slices; the result is 4,759 train / 841 val (about 210 per class), with **zero** near-duplicate pairs straddling the two (versus 714 test images that have a near-duplicate in Training). The split is written to `results/splits/train_val_split.json` and is deterministic for a given seed; `load_split()` returns absolute paths and integer labels.
+
+**`train_v2.py`** is an **experimental** improved recipe; no v2 model exists yet and no v2 metric is reported. It trains on CPU with the serving preprocessing, selects checkpoints on the validation split, freezes the backbone's BatchNorm (the usual practice for fine-tuning EfficientNet, which removes the BatchNorm-statistics problem at its source), uses full epochs, and augments with flips, small rotations/zooms/shifts, brightness/contrast, and Gaussian noise (aimed at the near-chance noise robustness). The architecture is unchanged, so the ONNX export, the API, and the Space would only need new weights. The first full run used the parity learning rate of 1e-3 and stayed at chance (27% train / 25% val after one 12-minute epoch). Rather than guess, four 60-step variants on a fixed 960-image subset isolated the cause:
+
+| Variant | Train acc (last 20 steps) | Val acc (256 imgs) |
+|---|---|---|
+| frozen BatchNorm, lr 1e-3, augmentation (the failed run) | 0.24 | 0.30 |
+| frozen BatchNorm, **lr 1e-4**, augmentation | 0.56 | **0.65** |
+| frozen BatchNorm, lr 1e-3, no augmentation | 0.66 | 0.57 |
+| parity recipe (trainable BatchNorm) on CPU | 0.84 | 0.64 |
+
+With BatchNorm frozen, nothing re-normalises activations, so 1e-3 scrambles the pretrained features; the default is now 1e-4. These are short-run diagnostics on small samples, not results.
+
+**Measured, not adopted: test-time augmentation.** Averaging the 6 augmented views the Space already computes for its uncertainty estimate, under the serving preprocessing, raised test accuracy from 90.25% to **92.31%**, leak-free accuracy from 85.7% to 87.6%, and glioma recall from 64.3% to **71.5%**, at 6 forward passes per image instead of 1.
+
 ---
 
 ## 6. The Serving Layer: Gradio App & FastAPI Service
@@ -624,7 +646,7 @@ Two small, standalone diagnostic/fix scripts written during the actual live debu
 ## 8. Tests & Continuous Integration
 
 ### 8.1 `tests/test_core.py` and `tests/test_api.py`
-32 fast tests in total. `test_core.py` holds 27 unit tests, using `pytest`, covering only the **pure-logic** parts of the codebase — code that doesn't need TensorFlow, a trained model, or the dataset to be present. This is a deliberate scope boundary: model- and data-dependent behavior (does training actually converge, does the pipeline reproduce the right accuracy) is validated separately by actually running `scripts/reproduce.sh`, which needs real data and takes much longer; CI is meant to catch *logic* regressions in seconds, not re-run the whole ML pipeline on every push.
+35 fast tests in total. `test_core.py` holds 30 unit tests, using `pytest`, covering only the **pure-logic** parts of the codebase — code that doesn't need TensorFlow, a trained model, or the dataset to be present. This is a deliberate scope boundary: model- and data-dependent behavior (does training actually converge, does the pipeline reproduce the right accuracy) is validated separately by actually running `scripts/reproduce.sh`, which needs real data and takes much longer; CI is meant to catch *logic* regressions in seconds, not re-run the whole ML pipeline on every push.
 
 Test groups:
 - **config** — sanity-checks the class names, count, and image shape constants.
@@ -632,6 +654,8 @@ Test groups:
 - **robustness** — parametrized across all 6 corruption types and 3 representative severities, checking that every corruption function preserves the image's shape and stays within the valid `[0, 255]` pixel range. (A further calibration test pins the ECE fix: a confidence of exactly 0.0 must still be counted in the first bin.)
 - **uncertainty** — checks that the TTA augmentation function produces at least 4 views of the correct shape, and that feeding a deterministic "stub" fake model (one that always predicts class 2 with 100% confidence) into `tta_predict` correctly reports class 2 with near-zero entropy — a test of the *aggregation logic* using a fake model, rather than needing the real 11.7-million-parameter network.
 - **leakage** — checks that two byte-identical images produce a perceptual-hash Hamming distance of exactly 0, and an identical content hash.
+- **preprocessing** — checks the shared serving preprocessing returns 256×256×3 float32 in raw [0, 255] for any input mode/size, and that the FastAPI decoder produces byte-identical arrays to it.
+- **splits** — checks the near-duplicate clustering behind the validation split: chained near-duplicates and exact (content-hash) duplicates join one cluster, and an image near nothing stays on its own.
 
 **Why "stub" a fake model instead of loading the real one in tests?** The real model is an 11.7M-parameter TensorFlow network requiring the actual trained weights file (tens of megabytes, not checked into git) and a full TensorFlow installation. A stub function that mimics the real model's *interface* (takes a batch, returns probabilities) but is instantaneous and deterministic lets the test suite verify the *aggregation and math logic* around the model (does TTA averaging work correctly, does entropy compute correctly) completely independently of whether the model itself is any good — a classic and valuable unit-testing technique called **mocking** or **stubbing**.
 
@@ -807,7 +831,7 @@ Covered in §5.6 (perceptual hashing) and §5.11 (PSI, Mahalanobis) with full te
 ### Docker Containers
 
 **Simple:** a Docker container is a way to package an application together with its *entire* environment (exact OS libraries, exact Python version, exact dependency versions) into one portable unit, so it runs identically anywhere Docker itself is installed, instead of "works on my machine" uncertainty.
-**Technical:** this project's `Dockerfile` builds from `python:3.11-slim`, installs OS-level shared libraries OpenCV needs at import time (`libgl1`, `libglib2.0-0` — without these, `import cv2` crashes with a missing-shared-library error on a minimal base image), installs the pinned Python dependencies, copies in the application code and the trained model artifacts, and defines a `HEALTHCHECK` so an orchestrator (Docker Compose, Kubernetes, etc.) can automatically detect if the service becomes unresponsive. Note (stated honestly, not glossed over): this Dockerfile has been written to be correct and was reasoned through carefully, but was **not actually build-tested** on the development machine, because Docker itself was not installed there — this is documented plainly in the project's README rather than silently claimed as "verified."
+**Technical:** this project's `Dockerfile` builds from `python:3.11-slim`, installs OS-level shared libraries OpenCV needs at import time (`libgl1`, `libglib2.0-0` — without these, `import cv2` crashes with a missing-shared-library error on a minimal base image), installs the pinned Python dependencies, copies in the application code and the trained model artifacts, and defines a `HEALTHCHECK` so an orchestrator (Docker Compose, Kubernetes, etc.) can automatically detect if the service becomes unresponsive. It has been **built and run**: on Docker 29.8 (linux/arm64) the image builds (981 MB), runs as the non-root `appuser`, serves a correct prediction, returns 413/400 for oversized/corrupt uploads, and Docker's healthcheck reports `healthy`. One practical gotcha found while building: Docker Desktop's credential helper (`docker-credential-desktop`) lives in `/Applications/Docker.app/Contents/Resources/bin`, which a non-login shell may not have on its PATH.
 
 ### Continuous Integration (CI)
 
@@ -834,7 +858,7 @@ This project has **no** Server-Side Rendering, Client-Side Rendering distinction
 | Report the dataset-drift finding explicitly (paper's 5,712/1,311 split vs. today's actual 5,600/1,600) instead of silently reproducing "close enough" | Ignore the discrepancy since it's not the author's fault | Silently ignoring it would make the reproduced 91.25% number look directly comparable to the paper's 99.844% when it isn't (different test set); flagging it lets a reader correctly attribute part of the gap to genuine leakage-removal and part to a moved dataset, rather than overstating the leakage finding | The finding is slightly more complicated to explain than a single clean number, but it's the honest description of what was actually measured |
 | Perceptual hash (not exact patient IDs) for leakage detection | Try to recover true patient IDs from the source datasets | The Kaggle compilation genuinely does not retain patient/scan metadata — there is no ground truth to recover | The leakage rate is explicitly documented as a *lower bound* / proxy measurement, not an exact patient-level figure — a real, acknowledged limitation of the method rather than a hidden one |
 | Test-Time Augmentation over Monte Carlo Dropout for uncertainty | MC-Dropout (running the model multiple times with dropout layers kept active) | TTA is architecture-agnostic and composes cleanly with the ONNX Runtime serving path already chosen for speed; MC-Dropout requires special inference-time handling of dropout layers that most inference runtimes (including ONNX Runtime by default) disable at inference for good reason | TTA captures a different, narrower notion of uncertainty (sensitivity to small input perturbations) than MC-Dropout (which approximates a Bayesian posterior over weights) — a real, acknowledged limitation of what this specific uncertainty signal actually measures |
-| Docker image written but not build-verified | Build and test it locally before claiming it works | Docker was not installed on the available development machine | Explicitly documented as "build-ready, unverified" in the README rather than claimed as a tested, working deployment artifact |
+| Docker image documented as unverified until it was actually built | Claim it works without building it | Docker was not installed on the development machine at first | Labelled "build-ready, unverified" until Docker was available; it has since been built, run, and health-checked (§14), and the docs say so |
 
 ---
 
@@ -1026,7 +1050,7 @@ python -m py_compile src/btc/*.py src/btc/serve/*.py space/app.py
    (syntax-checks every file, including TF-dependent ones, without importing them)
  ↓
 PYTHONPATH=src pytest tests/ -q
-   (32 tests run: 27 covering calibration math, corruption functions, TTA
+   (35 tests run: 30 covering calibration math, corruption functions, TTA
    aggregation logic, and hash equality — all without TensorFlow or real data)
  ↓
 Workflow reports success/failure back to GitHub
