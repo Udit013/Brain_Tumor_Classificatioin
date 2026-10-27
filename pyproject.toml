@@ -20,5 +20,9 @@ line-length = 100
 target-version = "py311"
 extend-exclude = ["legacy", "*.ipynb"]
 
+[tool.ruff.lint]
+# Explicit, so the result does not change with ruff's defaults (CI pins ruff).
+select = ["E4", "E7", "E9", "F"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E702"]   # compact one-line fixture setup
