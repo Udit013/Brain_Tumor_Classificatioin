@@ -89,7 +89,8 @@ def load_trained_model(weights_path=None):
     if not weights_path.exists():
         raise FileNotFoundError(
             f"Trained weights not found at {weights_path}.\n"
-            "Run `python -m btc.train` (or scripts/reproduce.sh) first."
+            "Download them from the Hugging Face Hub (Udit013/brain-tumor-efficientnetb3) "
+            "or train with scripts/reproduce.sh (python -m btc.finetune --export-to ...)."
         )
     # weights='imagenet' keeps the backbone init identical before load; using
     # None would also work since we overwrite all weights immediately.

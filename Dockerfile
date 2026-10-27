@@ -23,14 +23,17 @@ COPY pyproject.toml .
 COPY src ./src
 RUN pip install --no-cache-dir -e .
 
-# Trained weights + fitted temperature must be mounted or baked in at deploy:
-#   docker run -v $(pwd)/models:/app/models -p 8000:8000 btc-serve
+# The deployed model (weights + fitted temperature) is baked in; mount a
+# different models/ directory to serve another one:
+#   docker run -v $(pwd)/models:/app/models -p 8000:8000 neuroclass-api
 COPY models ./models
 
 # Run as a non-root user: if the service or one of its dependencies is ever
 # compromised, this limits what the resulting process can touch on the host
-# (no write access outside its own directories, no root inside the container).
-RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /app
+# (no root inside the container). /app stays root-owned and read-only to it —
+# the API never writes there — which also avoids a `chown -R` layer that would
+# duplicate the ~95 MB of model files in the image.
+RUN useradd --create-home --uid 1000 appuser
 USER appuser
 
 EXPOSE 8000

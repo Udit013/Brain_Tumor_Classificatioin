@@ -468,15 +468,26 @@ PYTHONPATH=src pytest tests/ -q
 ### Docker
 ```bash
 docker build -t neuroclass-api .
-docker run -v "$(pwd)/models:/app/models" -p 8000:8000 neuroclass-api
 ```
-Verified on Docker 29.8 (linux/arm64): the image builds (981 MB), runs as the
-non-root `appuser`, installs the pinned stack (TF 2.15.0, FastAPI 0.142.2,
-Starlette 1.7.0, Pillow 12.3.0), serves a correct prediction, returns 413 for an
-oversized upload and 400 for a corrupt one, and Docker's own healthcheck
-reports **healthy**. That check predates the latest serving changes (503 on a
-model-load failure, `BTC_TEMPERATURE`), which are covered by the API tests but
-not yet by a rebuilt image.
+```bash
+docker run -p 8000:8000 neuroclass-api
+```
+The deployed model is baked into the image; mount another `models/` directory
+(`-v "$(pwd)/models:/app/models"`) to serve a different one.
+
+Verified on Docker 29.9.2 (linux/arm64) with the deployed model:
+- the image is 3.29 GB on disk, **715 MB compressed**; it ships only the served
+  model (the rollback archive and the parity weights are excluded);
+- it runs as the non-root `appuser`, which cannot write to `/app`, with the
+  pinned stack (TF 2.15.0, FastAPI 0.142.2, Starlette 1.7.0, Pillow 12.3.0);
+- predictions on the four example images equal the offline Keras-CPU
+  predictions exactly; 413 oversized, 400 corrupt or empty, 422 no file,
+  grayscale PNG accepted;
+- 12 concurrent predictions complete in 1.4 s while `/health` stays under 45 ms;
+  after warm-up a prediction including Grad-CAM takes ~120–150 ms;
+- Docker's healthcheck reports **healthy**; with the weights missing the
+  container keeps running, `/health` and `/predict` return 503 with the cause,
+  and Docker reports **unhealthy** instead of a crash loop.
 
 ## Environment & dependencies
 

@@ -42,3 +42,7 @@ knowledge_doc.md
 # Debugging checkpoints — never served
 models/EfficientNetB3_raw_bnbroken.h5
 models/EfficientNetB3_recalibrated.h5
+
+# Rollback archive and the parity reproduction — never served by the API
+models/archive/
+models/EfficientNetB3_parity_weights.h5
