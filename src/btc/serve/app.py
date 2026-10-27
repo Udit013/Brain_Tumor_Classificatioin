@@ -130,10 +130,9 @@ def _decode_upload(raw: bytes) -> np.ndarray:
 def _infer(x: np.ndarray) -> dict:
     """Blocking model inference + Grad-CAM. Must run off the event loop."""
     from ..explain import gradcam_heatmap, overlay
-    import imageio.v2 as imageio
 
     with _model_lock:
-        _ensure_loaded()
+        _ensure_loaded()   # first, so an unavailable model is a 503 whatever else fails
         t_start = time.perf_counter()
         raw_probs = _state["model"].predict(x[None, ...], verbose=0)[0]
         cal_probs = _apply_temperature(raw_probs)
@@ -147,6 +146,8 @@ def _infer(x: np.ndarray) -> dict:
         hm, _ = gradcam_heatmap(x, _state["model"], _state["grad_model"], class_idx=cls)
     ov = overlay(x, hm)
     buf = io.BytesIO()
+    import imageio.v2 as imageio
+
     imageio.imwrite(buf, ov, format="png")
     gradcam_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
     gradcam_ms = (time.perf_counter() - t_cam) * 1000.0
