@@ -1,0 +1,68 @@
+{
+  "weights": "runs/v2-twostage-cpu/head_serving.h5",
+  "split": "val",
+  "tta": false,
+  "device": "cpu",
+  "load_seconds": 3,
+  "predict_seconds": 16,
+  "uncalibrated": {
+    "n": 841,
+    "accuracy": 0.9678953626634959,
+    "cross_entropy": 0.14207430183887482,
+    "macro_f1": 0.9679074954015663,
+    "per_class": {
+      "glioma": {
+        "precision": 0.9951,
+        "recall": 0.9623,
+        "f1": 0.9784
+      },
+      "meningioma": {
+        "precision": 0.9252,
+        "recall": 0.9565,
+        "f1": 0.9406
+      },
+      "notumor": {
+        "precision": 0.9764,
+        "recall": 0.981,
+        "f1": 0.9787
+      },
+      "pituitary": {
+        "precision": 0.9762,
+        "recall": 0.9716,
+        "f1": 0.9739
+      }
+    },
+    "confusion_matrix": [
+      [
+        204,
+        7,
+        0,
+        1
+      ],
+      [
+        1,
+        198,
+        5,
+        3
+      ],
+      [
+        0,
+        3,
+        207,
+        1
+      ],
+      [
+        0,
+        6,
+        0,
+        205
+      ]
+    ],
+    "glioma_recall": 0.9622641509433962,
+    "glioma_to_notumor": 0,
+    "ece": 0.019706780469658496
+  },
+  "temperature_fitted": 0.9671717171717172,
+  "temperature": 0.9671717171717172,
+  "ece_calibrated": 0.01978365568428632
+}

@@ -1,8 +1,8 @@
 {
-  "note": "One-time test-set comparison; v2 was selected on the validation split only. CPU, serving preprocessing (btc.preprocess).",
+  "note": "One-time test-set comparison made before the upgrade; the current model was selected on the validation split only. CPU, serving preprocessing (btc.preprocess). previous = parity model deployed until 2026-10 (Hub tag parity-2024).",
   "n_test": 1600,
   "n_novel": 886,
-  "parity": {
+  "previous": {
     "test_accuracy": 0.9025,
     "macro_f1": 0.8978603345349722,
     "novel_subset_accuracy": 0.8566591422121896,
@@ -111,7 +111,7 @@
     "external_tumor_recall": 0.5032258064516129,
     "external_notumor_specificity": 1.0
   },
-  "v2": {
+  "current": {
     "test_accuracy": 0.934375,
     "macro_f1": 0.9329134716595028,
     "novel_subset_accuracy": 0.8939051918735892,
@@ -220,18 +220,18 @@
     "external_tumor_recall": 0.5612903225806452,
     "external_notumor_specificity": 0.9897959183673469
   },
-  "v2_validation": {
+  "current_validation_candidates": {
     "head": 0.9678953626634959,
     "head_tta": 0.9702734839476813,
     "best": 0.9631391200951248,
     "best_tta": 0.9607609988109393
   },
-  "v2_validation_mean_corrupted": {
+  "current_validation_mean_corrupted": {
     "head": 0.7923333333333333,
     "best": 0.9239166666666668
   },
-  "v2_temperature": 0.937,
-  "v2_training": {
+  "current_temperature": 0.937,
+  "current_training": {
     "recipe": "train_v2 two-stage",
     "git_rev": "80c0b95-dirty",
     "seed": 75,
@@ -251,18 +251,18 @@
   },
   "significance": {
     "full_test": {
-      "parity_only_correct": 30,
-      "v2_only_correct": 81,
+      "previous_only_correct": 30,
+      "current_only_correct": 81,
       "exact_mcnemar_p": 1.3738677823789658e-06
     },
     "novel_subset": {
-      "parity_only_correct": 23,
-      "v2_only_correct": 56,
+      "previous_only_correct": 23,
+      "current_only_correct": 56,
       "exact_mcnemar_p": 0.000263636776465269
     },
     "glioma": {
-      "parity_only_correct": 9,
-      "v2_only_correct": 70,
+      "previous_only_correct": 9,
+      "current_only_correct": 70,
       "exact_mcnemar_p": 7.778844062771146e-13
     }
   }

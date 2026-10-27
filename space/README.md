@@ -20,11 +20,11 @@ slightly altered versions of the image agree?), ONNX-Runtime CPU latency, and a
 Grad-CAM heatmap.
 
 This Space is the deployed front end of a production extension of an IEEE 2024
-publication. Inference runs on **ONNX Runtime**; Grad-CAM uses the Keras model.
-Weights are pulled from the [model repo](https://huggingface.co/Udit013/brain-tumor-efficientnetb3);
-the optional Space variables `NEUROCLASS_ONNX`, `NEUROCLASS_WEIGHTS` and
-`NEUROCLASS_TEMPERATURE` choose which model files to serve (unset: the parity
-model). Example images: [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset),
+publication; the model was retrained in October 2026 (93.4% test accuracy,
+89.4% on test images with no near-duplicate in training). Inference runs on **ONNX Runtime**; Grad-CAM uses the Keras model.
+Weights are pulled from the [model repo](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
+(branch `main`; the optional Space variable `NEUROCLASS_REVISION` selects another
+branch, tag or commit — `parity-2024` is the previous model). Example images: [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset),
 Masoud Nickparvar, CC BY 4.0.
 
 **⚠️ Not a medical device.** Research/education only. The underlying dataset has

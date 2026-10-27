@@ -1,0 +1,32 @@
+{
+  "image_shape": [
+    256,
+    256,
+    3
+  ],
+  "keras": {
+    "mean_ms": 78.9611741155386,
+    "p50_ms": 78.29093700274825,
+    "p95_ms": 84.24890444148332,
+    "n_runs": 50
+  },
+  "onnx_available_providers": [
+    "CoreMLExecutionProvider",
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "onnx": {
+    "CPUExecutionProvider": {
+      "mean_ms": 33.52232582401484,
+      "p50_ms": 33.44779147300869,
+      "p95_ms": 34.064927080180496,
+      "n_runs": 50
+    },
+    "CoreMLExecutionProvider": {
+      "mean_ms": 18.553279149346054,
+      "p50_ms": 18.619312439113855,
+      "p95_ms": 18.90947299543768,
+      "n_runs": 50
+    }
+  }
+}

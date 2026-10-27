@@ -1,7 +1,7 @@
-"""Staged pre-flight checks for the v2 recipe — run before any long training job.
+"""Staged pre-flight checks for btc.finetune — run before any long training job.
 
 Each check is cheap (the whole script takes ~2 minutes on an M3 Pro GPU) and
-targets a way the first v2 run silently failed or could fail:
+targets a way an earlier run of the recipe silently failed or could fail:
 
   1. label mapping     split labels agree with class-directory names
   2. forward pass      output shape, finite, softmax rows sum to 1
@@ -16,7 +16,7 @@ targets a way the first v2 run silently failed or could fail:
                        defect (config.disable_metal_graph_optimizer)
 
 Usage:
-    python scripts/v2_sanity_checks.py [--device {auto,cpu}] [--steps 40]
+    python scripts/finetune_sanity_checks.py [--device {auto,cpu}] [--steps 40]
 """
 
 from __future__ import annotations
@@ -57,7 +57,7 @@ def main() -> int:
 
     from btc.preprocess import load_images
     from btc.splits import load_split
-    from btc.train_v2 import _augment_fn, build_v2_model
+    from btc.finetune import _augment_fn, build_finetune_model
 
     tf.keras.utils.set_random_seed(config.SEED)
     results: dict[str, bool] = {}
@@ -81,7 +81,7 @@ def main() -> int:
     y = tf.one_hot(labels[idx], config.NUM_CLASSES)
 
     # 2. forward pass ----------------------------------------------------------
-    model, n_frozen = build_v2_model()
+    model, n_frozen = build_finetune_model()
     p = model.predict(x, batch_size=16, verbose=0)
     results["forward"] = check(
         "forward pass", p.shape == (32, 4) and np.isfinite(p).all()
@@ -137,7 +137,7 @@ def main() -> int:
     overfit = {}
     for lr in (1e-4, 1e-3):
         tf.keras.utils.set_random_seed(config.SEED)
-        m, _ = build_v2_model(lr=lr)
+        m, _ = build_finetune_model(lr=lr)
         t0 = time.time()
         h = m.fit(x, y, batch_size=16, epochs=args.steps // 2, shuffle=True, verbose=0)
         acc = float(m.evaluate(x, y, batch_size=16, verbose=0)[1])

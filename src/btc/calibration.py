@@ -119,13 +119,13 @@ def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(description="Calibration / temperature scaling")
-    parser.add_argument("--fit-on", choices=["test", "val"], default="test",
-                        help="test (default, the protocol behind the reported "
-                             "numbers): fit on the test set, optionally a --holdout "
-                             "slice of it. val: fit on the leakage-safe validation "
-                             "split (btc.splits) and report on the full test set — "
-                             "only valid for a model that never trained on those "
-                             "images, so NOT for the parity model.")
+    parser.add_argument("--fit-on", choices=["test", "val"], default="val",
+                        help="val (default): fit on the leakage-safe validation split "
+                             "(btc.splits) and report on the full test set — valid for "
+                             "the deployed model, which never trained on those images. "
+                             "test: fit on the test set, optionally a --holdout slice "
+                             "of it — the only option for the parity model, which "
+                             "trained on all of Kaggle Training.")
     parser.add_argument("--holdout", type=float, default=0.0,
                         help="with --fit-on test: fraction of the test set used ONLY "
                              "for fitting T (the rest reports ECE). 0 = fit & report "

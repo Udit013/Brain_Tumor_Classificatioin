@@ -96,7 +96,7 @@ def _multiclass(y: np.ndarray, p: np.ndarray) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--weights", type=Path, default=config.PARITY_WEIGHTS_PATH)
+    ap.add_argument("--weights", type=Path, default=config.WEIGHTS_PATH)
     ap.add_argument("--split", choices=["val", "test", "external"], required=True)
     ap.add_argument("--tta", action="store_true")
     ap.add_argument("--temperature", type=float, default=None,

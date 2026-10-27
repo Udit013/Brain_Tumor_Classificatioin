@@ -5,20 +5,30 @@
 · **Code:** https://github.com/Udit013/Brain_Tumor_Classificatioin
 
 ## Model details
-- **Architecture:** EfficientNetB3 (ImageNet-pretrained, fully trainable) with
-  `pooling='max'` → BatchNorm → Dense(512, L2/L1-regularised) → Dropout(0.4) →
-  Dense(256, regularised) → Dropout(0.2) → Dense(4, softmax). 11.7M params.
+- **Version:** retrained October 2026 (replaced the paper-recipe model, which is
+  preserved — see "Previous model" below). Same architecture, file names and
+  serving stack.
+- **Architecture:** EfficientNetB3 (ImageNet-pretrained) with `pooling='max'` →
+  BatchNorm → Dense(512, L2/L1-regularised) → Dropout(0.4) → Dense(256,
+  regularised) → Dropout(0.2) → Dense(4, softmax). 11.7M params.
 - **Input:** 256×256×3 RGB, **raw [0,255] pixels** (EfficientNet applies its own
-  rescaling internally — do not divide by 255).
+  rescaling internally — do not divide by 255). Load the `.h5` weights into the
+  architecture built with `weights=None` (`btc.model.build_model`).
 - **Output:** softmax over `[glioma, meningioma, notumor, pituitary]`, then a
-  fitted temperature for calibrated confidence (deployed: T = 0.561, fit before
-  evaluation moved to the serving preprocessing; re-fit on it: T = 0.577).
-- **Training:** Adamax(1e-3), categorical cross-entropy, 20 epochs,
-  EarlyStopping(loss), ReduceLROnPlateau(val_loss), best-`val_accuracy`
-  checkpoint, followed by BatchNorm running-statistics recalibration.
+  temperature (T = 0.937, fit on the validation split) for calibrated confidence.
+- **Training** (`btc/finetune.py`, 21.5 min on an Apple M3 Pro CPU, seed 75):
+  1. head only on cached features of the frozen ImageNet backbone (each image
+     and its mirror), Adamax 1e-3, early-stopped on validation accuracy;
+  2. fine-tune from `block6a` up with flips, small rotations/zooms/shifts,
+     brightness/contrast and Gaussian noise, Adamax 1e-4 reduced on validation
+     plateaus, BatchNorm frozen throughout.
+
+  Checkpoint, learning-rate schedule and early stopping are all driven by the
+  validation split; the test set was used once, after selection.
 - **Serving formats:** Keras `.h5` weights (Grad-CAM) and ONNX (inference). The
-  ONNX export matches CPU Keras to within 2.4e-5 per output probability.
-- **Origin:** reproduces the best model from "Identifying Various Types of Brain
+  ONNX export matches CPU Keras to within 5.3e-6 per output probability on all
+  1,600 test images.
+- **Origin:** builds on the best model from "Identifying Various Types of Brain
   Tumors using Deep Neural Network based Image Features," 2024 International
   Conference on Cognitive Robotics and Intelligent Systems (ICC-ROBINS), IEEE,
   2024. DOI: 10.1109/ICC-ROBINS60238.2024.10533941. The original notebooks are
@@ -31,100 +41,54 @@
   triage, or any clinical decision-making. No regulatory clearance.
 
 ## Training data
-- Msoud Nickparvar **"Brain Tumor MRI Dataset"** (Kaggle), a compilation of
-  figshare CE-MRI + SARTAJ + Br35H. The paper used 7,023 images (5,712 train /
-  1,311 test); the dataset as currently distributed has 7,200 (5,600 / 1,600).
-- **Preprocessing:** resize 256×256, RGB; horizontal-flip augmentation (train).
-  Training resizes with Keras nearest-neighbour (as published); evaluation and
-  serving use the same PIL resize (`btc/preprocess.py`).
+- Msoud Nickparvar **"Brain Tumor MRI Dataset"** (Kaggle, CC BY 4.0), a
+  compilation of figshare CE-MRI + SARTAJ + Br35H. The paper used 7,023 images
+  (5,712 train / 1,311 test); the dataset as currently distributed has 7,200
+  (5,600 / 1,600).
+- **Split:** Kaggle Training is divided into 4,759 training / 841 validation
+  images (about 210 per class) by `btc/splits.py`, which groups near-duplicate
+  images (perceptual-hash distance ≤ 5, or identical pixels) and keeps each
+  group on one side: zero near-duplicate pairs straddle the split.
+- **Preprocessing:** resize 256×256 RGB with PIL (`btc/preprocess.py`) — the
+  same function used for evaluation and serving.
 
 ## Evaluation data & metrics
-- **In-distribution:** the full 1,600-image Kaggle test split.
+- **In-distribution:** the full 1,600-image Kaggle test split, plus its 886
+  images that have no near-duplicate in Kaggle Training ("novel subset").
 - **Out-of-distribution:** a separate public dataset (Navoneel Chakrabarty
   binary tumor/no-tumor set, n=253), scored by collapsing the three tumor
   classes into one.
 - **Device and preprocessing:** all metrics are measured on **CPU** with the
   serving preprocessing — the same computation the deployed ONNX model performs.
-  See "Metal vs CPU" below.
-- Every number here is produced by `scripts/reproduce.sh`; none is transcribed
-  by hand.
+- Every number here is produced by `scripts/reproduce.sh`
+  (`results/metrics/*.json`); none is transcribed by hand.
 
 ## Quantitative results (measured on CPU, serving preprocessing)
 | Metric | Value |
 |---|---|
-| Accuracy (full 1,600-image test set) | 90.25% |
-| Macro ROC-AUC / average precision | 0.981 / 0.963 |
-| Accuracy: test images with a near-duplicate in training vs novel images | 95.9% vs 85.7% |
-| Near-duplicate / exact-duplicate test images | 714 (44.6%) / 114 (7.1%) |
-| External out-of-distribution accuracy (n=253) | 69.6% (tumor recall 50.3%, no-tumor specificity 100%) |
-| ECE before → after temperature scaling | 0.188 → 0.068 (fit on half of test, scored on the other half: 0.194 → 0.065) |
-| Clean vs mean corrupted accuracy (6 corruptions × 5 severities) | 90.25% vs 67.3% |
-| TTA predictive entropy, correct vs wrong predictions | 0.81 vs 1.02 |
-| Single-image latency, Keras-CPU / ONNX-CPU / ONNX-CoreML | 79 / 34 / 18.6 ms |
+| Accuracy (full 1,600-image test set) | 93.44% |
+| Macro ROC-AUC / average precision | 0.993 / 0.983 |
+| Accuracy: novel images (n=886) vs images with a near-duplicate in training (n=714) | 89.4% vs 98.5% |
+| External out-of-distribution accuracy (n=253) | 72.7% (tumor recall 56.1%, no-tumor specificity 99.0%) |
+| ECE, raw → temperature-scaled (T fit on validation, reported on test) | 0.022 → 0.024 |
+| Clean vs mean corrupted accuracy (6 corruptions × 5 severities, n=400) | 92.0% vs 90.7% |
+| Single-image latency, Keras-CPU / ONNX-CPU / ONNX-CoreML | 78 / 34.5 / 20.3 ms |
 
-| Class | Precision | Recall | F1 |
-|---|---|---|---|
-| glioma | 1.000 | **0.642** | 0.782 |
-| meningioma | 0.771 | 0.985 | 0.865 |
-| notumor | 0.924 | 1.000 | 0.960 |
-| pituitary | 0.985 | 0.983 | 0.984 |
-
-Until October 2026 evaluation resized images differently from serving, and
-these numbers were reported as 91.25% accuracy, 97.2% vs 86.5%, OOD 70.8%,
-ECE 0.196 → 0.073 and glioma recall 67.7%; the values above replace them.
+| Class | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|
+| glioma | 0.978 | **0.795** | 0.877 | 0.984 |
+| meningioma | 0.872 | 0.950 | 0.909 | 0.990 |
+| notumor | 0.930 | 0.998 | 0.963 | 0.999 |
+| pituitary | 0.971 | 0.995 | 0.983 | 0.999 |
 
 The paper's published 99.844% is not directly comparable: it was scored on
 640 of 1,311 test images, from an older version of the dataset (see below).
 
-## Limitations & ethical considerations
-- **Missed tumors (glioma).** Glioma recall is 64.2%: of 400 glioma test images,
-  110 are predicted as meningioma and **33 (8.2%) as `notumor`**. A missed tumor
-  is the most consequential error for any screening use. On the external set
-  the model finds only half the tumors (50.3%).
-- **Train/test leakage:** the published split is image-level over a multi-source
-  compilation of 3-D volumes, so near-identical slices from one scan can appear
-  on both sides. Patient/scan IDs are **not recoverable** from the Kaggle
-  release, so the leakage module reports an image-similarity **lower bound**.
-  The model is 10.3 points less accurate on novel images than on leaked ones.
-- **Test set used for model selection:** the best checkpoint is chosen by
-  `val_accuracy` computed on (part of) the test set, both in the paper and in
-  this parity reproduction. Test metrics are therefore optimistically biased.
-- **Published metrics on partial test sets:** each paper notebook evaluates
-  `1311 // 32 = 40` batches. With batch size 16, EfficientNetB3's 99.844% is
-  exactly 639/640 — 49% of the test set, unshuffled. The other three models
-  were scored on 1,280 images, so the comparison used different denominators.
-- **Metal vs CPU:** on Apple Silicon, `tensorflow-metal`'s *graph* mode (used
-  by Keras `predict` and `fit`) computes a different function: 93.81% vs 90.25%
-  on CPU for these weights, 3.6% of predictions flipped; eager mode matches CPU.
-  Disabling grappler's meta-optimizer removes the forward-pass difference. The
-  model was trained through the defective path. CPU TensorFlow and ONNX Runtime
-  agree, so inference is pinned to CPU.
-- **Train/serve preprocessing skew:** the model was trained with Keras
-  nearest-neighbour resizing but is served (and now evaluated) with PIL's
-  bicubic resize; serving costs it about a point of accuracy (91.25% under the
-  training-style resize). Averaging the Space's 6 test-time-augmentation views
-  helps this model (external OOD 69.6% → 71.9%) but is not used for its
-  predictions; the Space uses those views only for its stability indicator.
-- **Distribution shift:** out-of-distribution accuracy (69.6%) is far below the
-  in-distribution number — the honest generalisation signal.
-- **Robustness:** near chance (~25%) under additive Gaussian noise at every
-  severity tested; degrades sharply under heavy blur and JPEG compression;
-  stays above 70% under brightness, contrast, and rotation changes.
-- **Uncertainty:** TTA entropy is higher on wrong predictions, but the
-  correct/wrong distributions overlap heavily, so entropy alone is a weak
-  abstain signal.
-- **Bias:** demographic, scanner, and acquisition-protocol distributions of the
-  compiled dataset are undocumented; performance across subgroups is unknown.
+## Comparison with the previous model
+Scored once on the test set with the same code, before the upgrade
+(`results/metrics/model_comparison.json`):
 
-## Candidate replacement: NeuroClass v2 (staged, not deployed)
-Same architecture and weight layout; retrained with `btc/train_v2.py` (head on
-cached features, then fine-tuning from `block6a` with augmentation including
-Gaussian noise; BatchNorm frozen; CPU, serving preprocessing; 21.5 min on a
-laptop CPU). Selected on a leakage-safe validation split of Kaggle Training
-(841 images; near-duplicate clusters never straddle the split) and compared
-with the deployed model once on the test set:
-
-| Metric (CPU, serving preprocessing) | Deployed | v2 |
+| Metric | Previous (paper recipe) | Current |
 |---|---|---|
 | Test accuracy | 90.25% | **93.44%** |
 | Novel-image subset (n=886) | 85.67% | **89.39%** |
@@ -136,16 +100,62 @@ with the deployed model once on the test set:
 | External tumor recall / no-tumor specificity | 50.3% / 100% | 56.1% / 99.0% |
 
 Accuracy gains are paired-significant (exact McNemar: full test p = 1.4e-6,
-novel subset p = 2.6e-4, glioma p = 7.8e-13). v2 trained on fewer images
-(4,759 vs 5,600) and, unlike the deployed model, never saw the test set during
-model selection. Its weaknesses: glioma recall is still the lowest (79.5%), it
-still misses 44% of tumors in the external set, and results are from a single
-training seed. Full numbers: `results/metrics/v2_comparison.json`.
+novel subset p = 2.6e-4, glioma p = 7.8e-13). The current model trained on
+fewer images (4,759 vs 5,600), and the previous model's checkpoint was selected
+on the test set, so the comparison if anything favours the previous model.
+
+## Limitations & ethical considerations
+- **Missed tumors (glioma).** Glioma is the weakest class: recall 79.5%; of 400
+  glioma test images, 54 are predicted as meningioma and **25 (6.25%) as
+  `notumor`**. On the external set the model finds only 56% of tumors. A missed
+  tumor is the most consequential error for any screening use.
+- **Train/test leakage:** the published split is image-level over a
+  multi-source compilation of 3-D volumes, so near-identical slices from one
+  scan can appear on both sides. Patient/scan IDs are **not recoverable** from
+  the Kaggle release, so the leakage module reports an image-similarity **lower
+  bound**. The model is 9.1 points less accurate on novel images than on leaked
+  ones; the novel-subset accuracy (89.4%) is the more honest in-distribution
+  number.
+- **Distribution shift:** out-of-distribution accuracy (72.7%) is far below the
+  in-distribution number — the honest generalisation signal.
+- **Single training run:** all numbers come from one training seed; run-to-run
+  variation has not been measured.
+- **Published metrics on partial test sets:** each paper notebook evaluates
+  `1311 // 32 = 40` batches. With batch size 16, EfficientNetB3's 99.844% is
+  exactly 639/640 — 49% of the test set, unshuffled. The other three models
+  were scored on 1,280 images, so the comparison used different denominators.
+- **Metal vs CPU:** on Apple Silicon, `tensorflow-metal`'s *graph* mode (used
+  by Keras `predict` and `fit`) computes a different function from CPU
+  (the previous model: 93.81% vs 90.25%); eager mode matches CPU. This model was
+  trained and evaluated on CPU; CPU TensorFlow and ONNX Runtime agree.
+- **Robustness:** above 80% at every tested severity of Gaussian noise, blur,
+  brightness, contrast, JPEG compression and rotation, lowest under heavy blur
+  (81%). Other shifts (different scanners, sequences, slice orientations) are
+  untested beyond the external set.
+- **Uncertainty:** the Space's stability level (agreement of 6 slightly altered
+  views plus calibrated confidence) is a fixed heuristic that flags fragile
+  answers; a "High" level is not evidence that an answer is correct.
+- **Bias:** demographic, scanner, and acquisition-protocol distributions of the
+  compiled dataset are undocumented; performance across subgroups is unknown.
+
+## Previous model (preserved for rollback)
+The exact reproduction of the paper's recipe, deployed until October 2026
+(trained on all of Kaggle Training through `tensorflow-metal`, checkpoint
+selected on the test set, BatchNorm statistics re-estimated after training).
+On the same evaluation it scores 90.25% accuracy (85.7% novel), glioma recall
+64.2% with 33 gliomas called `notumor`, ECE 0.188 → 0.068 after temperature
+scaling fit on the test set, and 69.6% out of distribution. Its weights, ONNX
+export and live temperature (T = 0.561) are on the Hub at tag `parity-2024` and
+in `models/archive/parity-2024/` (with SHA-256 checksums); its metrics and
+figures are in `results/archive/parity-2024/`. The Space serves it again with
+the variable `NEUROCLASS_REVISION=parity-2024` (or, for a full rollback, restore
+the model repo's `main` and the Space code from their `parity-2024` tags). `python -m btc.train`
+reproduces it into `models/EfficientNetB3_parity_weights.h5`.
 
 ## How to reproduce
 ```bash
 bash scripts/setup_env.sh
 bash scripts/download_data.sh      # needs Kaggle credentials
-bash scripts/reproduce.sh
+bash scripts/reproduce.sh          # trains with btc.finetune if no weights exist
 python scripts/fill_readme_results.py
 ```

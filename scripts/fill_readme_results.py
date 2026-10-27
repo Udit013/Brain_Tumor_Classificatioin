@@ -67,7 +67,7 @@ def build_block() -> str:
     bc = ex["binary_collapse"]
 
     rows = [
-        ("Reproduced accuracy (full test set)", f"{ev['accuracy']*100:.2f}%"),
+        ("Deployed model accuracy (full test set)", f"{ev['accuracy']*100:.2f}%"),
         ("Published reference (paper)", "99.844%"),
         ("Macro ROC-AUC / avg-precision",
          f"{ev['macro_roc_auc']:.3f} / {ev['macro_avg_precision']:.3f}"),
@@ -84,7 +84,8 @@ def build_block() -> str:
          f"{bc['accuracy']*100:.1f}%"),
         ("ECE before → after temperature scaling",
          f"{cal['ece_before']:.4f} → {cal['ece_after']:.4f} "
-         f"(T={cal['temperature']:.3f})"),
+         f"(T={cal['temperature']:.3f}, "
+         f"{cal.get('fit_protocol', '').replace('_', ' ')})"),
         ("Single-image latency, Keras-CPU / ONNX-CPU / ONNX-CoreML",
          f"{keras:.0f}ms / {cpu:.0f}ms / {coreml:.1f}ms"),
     ]
@@ -153,16 +154,16 @@ def build_perclass_block() -> str:
     return "\n".join(lines)
 
 
-V2_BEGIN = "<!-- V2:BEGIN -->"
-V2_END = "<!-- V2:END -->"
+UPGRADE_BEGIN = "<!-- UPGRADE:BEGIN -->"
+UPGRADE_END = "<!-- UPGRADE:END -->"
 
 
-def build_v2_block() -> str:
-    """v2 vs parity, from results/metrics/v2_comparison.json (scripts/compare_models.py)."""
-    c = _load("v2_comparison.json")
+def build_upgrade_block() -> str:
+    """Previous vs current model, from results/metrics/model_comparison.json."""
+    c = _load("model_comparison.json")
     if c is None:
-        return "_v2 comparison not run yet (scripts/compare_models.py)._"
-    p, v, sig = c["parity"], c["v2"], c["significance"]
+        return "_comparison not run yet (scripts/compare_models.py)._"
+    p, v, sig = c["previous"], c["current"], c["significance"]
 
     def pct(x):
         return f"{x * 100:.2f}%"
@@ -191,17 +192,18 @@ def build_v2_block() -> str:
          f"{pct(p['external_tumor_recall'])} / {pct(p['external_notumor_specificity'])}",
          f"{pct(v['external_tumor_recall'])} / {pct(v['external_notumor_specificity'])}"),
     ]
-    lines = ["| Metric (CPU, serving preprocessing) | Deployed (parity) | **v2** |",
+    lines = ["| Metric (CPU, serving preprocessing) | Previous (parity, 2024) | **Current** |",
              "|---|---|---|"]
     lines += [f"| {a} | {b} | {d} |" for a, b, d in rows]
     lines.append("")
     lines.append("Paired significance (exact McNemar): " + "; ".join(
-        f"{k.replace('_', ' ')}: {s['v2_only_correct']} images only v2 gets right vs "
-        f"{s['parity_only_correct']} only the parity model does, p = {s['exact_mcnemar_p']:.1e}"
+        f"{k.replace('_', ' ')}: {s['current_only_correct']} images only the current model "
+        f"gets right vs {s['previous_only_correct']} only the previous one does, "
+        f"p = {s['exact_mcnemar_p']:.1e}"
         for k, s in sig.items()) + ".")
     lines.append("")
-    lines.append(f"Calibration: parity — {p['calibration_protocol']}; v2 — "
-                 f"{v['calibration_protocol']} (T = {c['v2_temperature']:.3f}).")
+    lines.append(f"Calibration: previous — {p['calibration_protocol']}; current — "
+                 f"{v['calibration_protocol']} (T = {c['current_temperature']:.3f}).")
     return "\n".join(lines)
 
 
@@ -216,9 +218,9 @@ def main() -> None:
     text = _replace(text, BEGIN, END, build_block())
     text = _replace(text, R2_BEGIN, R2_END, build_robustness_block())
     text = _replace(text, PC_BEGIN, PC_END, build_perclass_block())
-    text = _replace(text, V2_BEGIN, V2_END, build_v2_block())
+    text = _replace(text, UPGRADE_BEGIN, UPGRADE_END, build_upgrade_block())
     README.write_text(text)
-    print("README results, per-class, robustness and v2 tables updated from measured metrics.")
+    print("README results, per-class, robustness and upgrade tables updated from measured metrics.")
 
 
 if __name__ == "__main__":

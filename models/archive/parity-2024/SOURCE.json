@@ -1,0 +1,5 @@
+{
+  "hub_repo": "Udit013/brain-tumor-efficientnetb3",
+  "hub_revision": "31a6602d40ea14a1e012855c4529326d06f9c126",
+  "note": "Deployed parity model as served before the 2026-10 upgrade; temperature.json is the live T=0.561."
+}

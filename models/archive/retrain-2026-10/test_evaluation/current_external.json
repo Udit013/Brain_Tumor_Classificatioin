@@ -1,0 +1,12 @@
+{
+  "weights": "runs/v2-twostage-cpu/best_serving.h5",
+  "split": "external",
+  "tta": false,
+  "device": "cpu",
+  "load_seconds": 1,
+  "predict_seconds": 6,
+  "n": 253,
+  "accuracy_binary": 0.7272727272727273,
+  "tumor_recall": 0.5612903225806452,
+  "notumor_specificity": 0.9897959183673469
+}

@@ -29,22 +29,24 @@ from huggingface_hub import hf_hub_download
 import logic
 
 MODEL_REPO = "Udit013/brain-tumor-efficientnetb3"
-# Which model files to serve. Defaults are the deployed parity model; set these
-# Space variables to switch models (and unset them to roll back) without a code
-# change. All three must come from the same model.
-ONNX_FILE = os.environ.get("NEUROCLASS_ONNX", "efficientnetb3.onnx")
-WEIGHTS_FILE = os.environ.get("NEUROCLASS_WEIGHTS", "EfficientNetB3_model_weights.h5")
-TEMPERATURE_FILE = os.environ.get("NEUROCLASS_TEMPERATURE", "temperature.json")
+# Which revision of the model repo to serve: a branch, tag or commit. Default
+# "main" is the deployed model. Setting the Space variable NEUROCLASS_REVISION
+# serves another one without a code change — "candidate" for staging, or the
+# tag "parity-2024" to roll back to the model deployed until 2026-10.
+REVISION = os.environ.get("NEUROCLASS_REVISION", "main")
+ONNX_FILE = "efficientnetb3.onnx"
+WEIGHTS_FILE = "EfficientNetB3_model_weights.h5"
+TEMPERATURE_FILE = "temperature.json"
 CLASS_NAMES = logic.CLASS_NAMES
 
 # --------------------------------------------------------------------------- #
 # Load artifacts once at startup
 # --------------------------------------------------------------------------- #
-print(f"Serving {ONNX_FILE} / {WEIGHTS_FILE} / {TEMPERATURE_FILE} from {MODEL_REPO}")
-onnx_path = hf_hub_download(MODEL_REPO, ONNX_FILE)
-weights_path = hf_hub_download(MODEL_REPO, WEIGHTS_FILE)
+print(f"Serving {MODEL_REPO} at revision {REVISION}")
+onnx_path = hf_hub_download(MODEL_REPO, ONNX_FILE, revision=REVISION)
+weights_path = hf_hub_download(MODEL_REPO, WEIGHTS_FILE, revision=REVISION)
 try:
-    temp_path = hf_hub_download(MODEL_REPO, TEMPERATURE_FILE)
+    temp_path = hf_hub_download(MODEL_REPO, TEMPERATURE_FILE, revision=REVISION)
     with open(temp_path) as f:
         TEMPERATURE = float(json.load(f)["temperature"])
 except Exception as exc:  # noqa: BLE001 — any failure here is non-fatal
@@ -159,38 +161,24 @@ saved by this app. Remove any patient-identifying information before uploading.
 ABOUT = """
 **Model.** EfficientNetB3 fine-tuned on the
 [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
-(Masoud Nickparvar, CC BY 4.0), reproducing an
+(Masoud Nickparvar, CC BY 4.0), improving on the model of an
 [IEEE ICC-ROBINS 2024 paper](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941).
-Inference runs on ONNX Runtime (CPU); Grad-CAM uses the Keras model.
+It was retrained in 2026 on a validation split that keeps near-duplicate
+images apart, with augmentation for noise and blur. Inference runs on ONNX
+Runtime (CPU); Grad-CAM uses the Keras model.
 
 **Known weaknesses (measured on CPU, see the
 [model card](https://github.com/Udit013/Brain_Tumor_Classificatioin/blob/main/MODEL_CARD.md)).**
-{weaknesses}
+- It misses gliomas most often: about 1 in 5 glioma test images is labelled
+  something else, and about 1 in 16 is labelled *no tumor*.
+- Accuracy on test images with no near-copy in the training set is about 9
+  points lower than on images that have one (89% vs 98%).
+- On a different public MRI dataset it was right about 73% of the time
+  (tumor vs no tumor), finding just over half of the tumors.
 - The heatmap shows which pixels influenced the score, not where a tumor is.
 
 **Example images** are from the dataset's test split (CC BY 4.0).
 """
-
-# Measured test-set facts for each published model (MODEL_CARD.md); the About
-# panel must describe the model actually being served.
-WEAKNESSES = {
-    "efficientnetb3.onnx": """**Model in use:** the original reproduction (parity model).
-- It misses gliomas most often: about 1 in 3 glioma test images is labelled
-  something else, and about 1 in 12 is labelled *no tumor*.
-- Accuracy on test images with no near-copy in the training set is about 10
-  points lower than on images that have one (86% vs 96%).
-- On a different public MRI dataset it was right only about 70% of the time
-  (tumor vs no tumor), finding only half of the tumors.""",
-    "neuroclass_v2.onnx": """**Model in use:** NeuroClass v2 (retrained on a leakage-safe split).
-- It still misses gliomas most often: about 1 in 5 glioma test images is
-  labelled something else, and about 1 in 16 is labelled *no tumor*.
-- Accuracy on test images with no near-copy in the training set is about 9
-  points lower than on images that have one (89% vs 98%).
-- On a different public MRI dataset it was right about 73% of the time
-  (tumor vs no tumor), finding just over half of the tumors.""",
-}
-ABOUT = ABOUT.format(weaknesses=WEAKNESSES.get(
-    ONNX_FILE, f"**Model in use:** `{ONNX_FILE}` — see the model card for its measured limitations."))
 
 CSS = """
 .nc-disclaimer { border-left: 4px solid #b45309; padding: 10px 14px;
@@ -281,4 +269,5 @@ with gr.Blocks(title="NeuroClass — Brain Tumor MRI Classifier",
 if __name__ == "__main__":
     # server_name=0.0.0.0 so the HF Spaces proxy can reach it; show_api=False
     # keeps the demo UI-only.
-    demo.launch(server_name="0.0.0.0", server_port=7860, show_api=False)
+    demo.launch(server_name="0.0.0.0",
+                server_port=int(os.environ.get("GRADIO_SERVER_PORT", 7860)), show_api=False)

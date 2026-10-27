@@ -37,13 +37,17 @@ RESULTS_DIR = REPO_ROOT / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
 METRICS_DIR = RESULTS_DIR / "metrics"
 
-# Parity weights produced by btc.train (mirrors the notebook's filename).
-PARITY_WEIGHTS_PATH = MODELS_DIR / "EfficientNetB3_model_weights.h5"
-# Improved model produced by btc.train_v2 (selected on a leakage-safe val split).
-V2_WEIGHTS_PATH = MODELS_DIR / "NeuroClass_v2_weights.h5"
-# The model every evaluation and serving path loads. BTC_WEIGHTS overrides it,
-# e.g. BTC_WEIGHTS=models/EfficientNetB3_model_weights.h5 to evaluate parity.
-WEIGHTS_PATH = Path(os.environ.get("BTC_WEIGHTS", PARITY_WEIGHTS_PATH))
+# The deployed model: produced by btc.finetune (selected on a leakage-safe
+# validation split) and exported for the serving architecture. Every evaluation
+# and serving path loads it; BTC_WEIGHTS overrides it.
+DEPLOYED_WEIGHTS_PATH = MODELS_DIR / "EfficientNetB3_model_weights.h5"
+WEIGHTS_PATH = Path(os.environ.get("BTC_WEIGHTS", DEPLOYED_WEIGHTS_PATH))
+# Output of btc.train, the exact reproduction of the published recipe (the
+# model deployed until 2026-10). Kept separate so reproducing the paper can
+# never overwrite the deployed model; evaluate it with BTC_WEIGHTS=<this path>.
+PARITY_WEIGHTS_PATH = MODELS_DIR / "EfficientNetB3_parity_weights.h5"
+# Read-only backups of every deployed model generation (with SHA256SUMS).
+ARCHIVE_DIR = MODELS_DIR / "archive"
 ONNX_PATH = MODELS_DIR / "efficientnetb3.onnx"
 # Fitted temperature for calibration (single scalar saved as JSON).
 TEMPERATURE_PATH = Path(os.environ.get("BTC_TEMPERATURE", MODELS_DIR / "temperature.json"))

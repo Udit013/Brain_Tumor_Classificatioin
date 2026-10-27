@@ -1,8 +1,8 @@
-"""NeuroClass v2 — EXPERIMENTAL improved training recipe (two-stage fine-tune).
+"""The recipe that trains the deployed model: a two-stage EfficientNetB3 fine-tune.
 
-train.py reproduces the published recipe exactly (parity). This module is the
-separate, improved recipe. Every change targets a weakness measured on the
-parity model:
+train.py reproduces the published recipe exactly (parity; the model deployed
+until 2026-10). This module is the improved recipe that replaced it. Every
+change targets a weakness measured on the parity model:
 
   problem measured on the parity model           change here
   ---------------------------------------------  -----------------------------------------
@@ -32,7 +32,7 @@ Recipe (the standard way to fine-tune EfficientNet, and much cheaper on CPU):
            so a step costs a fraction of full fine-tuning.
 
 An earlier variant unfroze the whole backbone at once: at lr 1e-3 it stayed at
-chance (the overfit test in scripts/v2_sanity_checks.py reproduces this: 31% on
+chance (the overfit test in scripts/finetune_sanity_checks.py reproduces this: 31% on
 32 images vs 100% at 1e-4), and at 1e-4 on CPU it costs ~6 min per epoch.
 
 The architecture is unchanged (same layers, same weight layout), so the ONNX
@@ -52,12 +52,14 @@ Outputs (never committed, never written to models/):
 Re-running with the same --run-name resumes: cached features and the stage-1
 head are reused, and stage 2 continues from its last completed epoch.
 
-A candidate is promoted to models/NeuroClass_v2_weights.h5 by hand, and only
-after scripts/evaluate_candidate.py shows it is better on validation and, once,
-on the test set. Run scripts/v2_sanity_checks.py before any long job.
+Nothing is written to models/ unless --export-to is given. A candidate replaces
+the deployed weights only after scripts/evaluate_candidate.py shows it is better
+on validation and, once, on the test set. Run scripts/finetune_sanity_checks.py
+before any long job. The deployed model was produced by the defaults below.
 
 Usage:
-    python -m btc.train_v2 [--epochs 6] [--unfreeze-from block6a] [--run-name NAME]
+    python -m btc.finetune [--epochs 8] [--unfreeze-from block6a] [--run-name NAME]
+                           [--export-to models/EfficientNetB3_model_weights.h5]
 """
 
 from __future__ import annotations
@@ -65,15 +67,15 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from pathlib import Path
 
 import numpy as np
 
 from . import config
 
-V2_WEIGHTS_PATH = config.V2_WEIGHTS_PATH
 NOISE_PROB = 0.5        # fraction of training images that receive Gaussian noise
 NOISE_MAX_STD = 25.0    # per-image noise std ~ U(0, 25) on the 0-255 scale
-V2_LEARNING_RATE = 1e-4  # stage 2; 1e-3 destroys pretrained features with BN frozen
+FINETUNE_LEARNING_RATE = 1e-4  # stage 2; 1e-3 destroys pretrained features with BN frozen
 HEAD_LEARNING_RATE = 1e-3
 
 
@@ -99,7 +101,7 @@ def _augment_fn():
     return augment
 
 
-def build_v2_model(lr: float = V2_LEARNING_RATE):
+def build_finetune_model(lr: float = FINETUNE_LEARNING_RATE):
     """Parity architecture with the backbone's BatchNorm layers frozen."""
     from tensorflow.keras.layers import BatchNormalization
     from tensorflow.keras.optimizers import Adamax
@@ -148,13 +150,14 @@ IMAGENET_STDDEV_RGB = np.array([0.229, 0.224, 0.225], dtype="float32")
 
 
 def export_for_serving(model, path, probe: np.ndarray) -> float:
-    """Write v2 weights loadable by btc.model.load_trained_model (weights=None).
+    """Write weights loadable by btc.model.load_trained_model (weights=None).
 
     Keras's EfficientNet inserts an extra input layer,
     Rescaling(1 / sqrt(IMAGENET_STDDEV_RGB)), only when built with
-    weights="imagenet" (tensorflow#49930). v2 trains from ImageNet weights, so
-    it has that layer; evaluation, ONNX export, FastAPI and the Space build with
-    weights=None and do not. Loading v2 weights there silently computes a
+    weights="imagenet" (tensorflow#49930). This recipe trains from ImageNet
+    weights, so its model has that layer; evaluation, ONNX export, FastAPI and
+    the Space build with weights=None and do not. Loading the raw checkpoint
+    there silently computes a
     different function (measured: 95.0% -> 86.7% validation accuracy). The
     layer is a per-channel scale right after the Normalization layer, so it
     folds exactly into that layer's variance: (x - m) / sqrt(v) / sqrt(s) =
@@ -197,10 +200,10 @@ def unfreeze_from(model, block: str) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train NeuroClass v2 (two-stage)")
+    parser = argparse.ArgumentParser(description="Fine-tune the NeuroClass model (two-stage)")
     parser.add_argument("--head-epochs", type=int, default=60)
-    parser.add_argument("--epochs", type=int, default=6, help="stage-2 epochs")
-    parser.add_argument("--lr", type=float, default=V2_LEARNING_RATE, help="stage-2 lr")
+    parser.add_argument("--epochs", type=int, default=8, help="stage-2 epochs")
+    parser.add_argument("--lr", type=float, default=FINETUNE_LEARNING_RATE, help="stage-2 lr")
     parser.add_argument("--unfreeze-from", default="block6a")
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--train-head-bn", action="store_true",
@@ -214,6 +217,9 @@ def main() -> None:
                              "graph-mode defect workaround is applied, but gradients are "
                              "not verified equal to CPU (see config."
                              "disable_metal_graph_optimizer). Evaluation is always CPU.")
+    parser.add_argument("--export-to", type=Path, default=None,
+                        help="also copy the serving export of the best checkpoint here "
+                             "(e.g. the deployed path) — only after it has been evaluated")
     parser.add_argument("--run-name", default=None,
                         help="experiment directory under runs/ (re-use it to resume)")
     args = parser.parse_args()
@@ -234,14 +240,14 @@ def main() -> None:
     from .splits import SPLIT_PATH, load_split
 
     # Experiments live outside tracked files and never touch models/.
-    run_dir = config.REPO_ROOT / "runs" / (args.run_name or time.strftime("v2-%Y%m%d-%H%M%S"))
+    run_dir = config.REPO_ROOT / "runs" / (args.run_name or time.strftime("finetune-%Y%m%d-%H%M%S"))
     run_dir.mkdir(parents=True, exist_ok=True)
     tf.keras.utils.set_random_seed(config.SEED)
     gpus = tf.config.get_visible_devices("GPU")
     meta_path = run_dir / "metadata.json"
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
     meta.update({
-        "recipe": "train_v2 two-stage", "git_rev": _git_rev(), "seed": config.SEED,
+        "recipe": "btc.finetune two-stage", "git_rev": _git_rev(), "seed": config.SEED,
         "head_lr": HEAD_LEARNING_RATE, "head_epochs_max": args.head_epochs,
         "finetune_lr": args.lr, "finetune_epochs_max": args.epochs,
         "unfreeze_from": args.unfreeze_from, "batch_size": args.batch_size,
@@ -270,7 +276,7 @@ def main() -> None:
     y_va = np.eye(config.NUM_CLASSES, dtype="float32")[split["val"][1]]
     print(f"loaded {len(x_tr)} train / {len(x_va)} val images in {time.time() - t0:.0f}s")
 
-    model, n_frozen_bn = build_v2_model(lr=args.lr)
+    model, n_frozen_bn = build_finetune_model(lr=args.lr)
     base = model.get_layer("efficientnetb3")
     head_layers = model.layers[1:]
 
@@ -367,6 +373,10 @@ def main() -> None:
     save_meta()
     print(f"best val_accuracy {max(hist['val_accuracy']):.4f} -> "
           f"{run_dir / 'best_serving.h5'}")
+    if args.export_to:
+        import shutil
+        shutil.copy2(run_dir / "best_serving.h5", args.export_to)
+        print(f"exported -> {args.export_to}")
 
 
 if __name__ == "__main__":

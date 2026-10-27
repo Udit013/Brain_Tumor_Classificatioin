@@ -21,10 +21,13 @@ SKIP_TRAIN=0
 [ "${1:-}" == "--skip-train" ] && SKIP_TRAIN=1
 
 echo "==================================================================="
-echo " STEP 1/10  Train EfficientNetB3 (reproduce published 99.844%)"
+echo " STEP 1/10  Train the deployed model (btc.finetune, CPU, ~25 min)"
 echo "==================================================================="
+# The published recipe is reproduced separately: python -m btc.train writes
+# models/EfficientNetB3_parity_weights.h5 and never touches the deployed model.
 if [ "$SKIP_TRAIN" -eq 0 ] && [ ! -f models/EfficientNetB3_model_weights.h5 ]; then
-  python -m btc.train
+  python scripts/finetune_sanity_checks.py --device cpu
+  python -m btc.finetune --run-name reproduce --export-to models/EfficientNetB3_model_weights.h5
 else
   echo "Using existing models/EfficientNetB3_model_weights.h5 (skip-train)."
 fi

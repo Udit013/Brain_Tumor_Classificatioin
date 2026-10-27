@@ -1,0 +1,10 @@
+{
+  "temperature": 0.6070707070707072,
+  "ece_before": 0.1942766115069389,
+  "ece_after": 0.06543853383511307,
+  "n_bins": 15,
+  "fit_protocol": "test_holdout",
+  "n_fit": 800,
+  "n_report": 800,
+  "caveat": "T fit on a disjoint holdout slice of the test split."
+}

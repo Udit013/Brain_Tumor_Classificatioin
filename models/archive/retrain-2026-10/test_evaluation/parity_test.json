@@ -1,0 +1,76 @@
+{
+  "weights": "/Users/uditagarwal/Code/Brain_Tumor_Classificatioin/models/EfficientNetB3_model_weights.h5",
+  "split": "test",
+  "tta": false,
+  "device": "cpu",
+  "load_seconds": 18,
+  "predict_seconds": 26,
+  "uncalibrated": {
+    "n": 1600,
+    "accuracy": 0.9025,
+    "cross_entropy": 0.495606929063797,
+    "macro_f1": 0.8978603345349722,
+    "per_class": {
+      "glioma": {
+        "precision": 1.0,
+        "recall": 0.6425,
+        "f1": 0.7823
+      },
+      "meningioma": {
+        "precision": 0.771,
+        "recall": 0.985,
+        "f1": 0.865
+      },
+      "notumor": {
+        "precision": 0.9238,
+        "recall": 1.0,
+        "f1": 0.9604
+      },
+      "pituitary": {
+        "precision": 0.985,
+        "recall": 0.9825,
+        "f1": 0.9837
+      }
+    },
+    "confusion_matrix": [
+      [
+        257,
+        110,
+        33,
+        0
+      ],
+      [
+        0,
+        394,
+        0,
+        6
+      ],
+      [
+        0,
+        0,
+        400,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        393
+      ]
+    ],
+    "glioma_recall": 0.6425,
+    "glioma_to_notumor": 33,
+    "ece": 0.18800297429785137
+  },
+  "near_duplicate_subset": {
+    "n": 714,
+    "accuracy": 0.9593837535014006
+  },
+  "novel_subset": {
+    "n": 886,
+    "accuracy": 0.8566591422121896,
+    "macro_f1": 0.8302427897979957,
+    "glioma_recall": 0.6305732484076433,
+    "glioma_to_notumor": 33
+  }
+}

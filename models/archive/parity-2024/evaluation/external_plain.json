@@ -1,0 +1,12 @@
+{
+  "weights": "/Users/uditagarwal/Code/Brain_Tumor_Classificatioin/models/EfficientNetB3_model_weights.h5",
+  "split": "external",
+  "tta": false,
+  "device": "cpu",
+  "load_seconds": 1,
+  "predict_seconds": 6,
+  "n": 253,
+  "accuracy_binary": 0.6956521739130435,
+  "tumor_recall": 0.5032258064516129,
+  "notumor_specificity": 1.0
+}

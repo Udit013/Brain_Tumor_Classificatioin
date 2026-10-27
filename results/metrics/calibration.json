@@ -1,10 +1,10 @@
 {
-  "temperature": 0.5767676767676768,
-  "ece_before": 0.18800295159220698,
-  "ece_after": 0.06830047599971295,
+  "temperature": 0.936868686868687,
+  "ece_before": 0.022207900397479535,
+  "ece_after": 0.023921479806303984,
   "n_bins": 15,
-  "fit_protocol": "fit_and_report_on_test",
-  "n_fit": 1600,
+  "fit_protocol": "fit_on_val_report_on_test",
+  "n_fit": 841,
   "n_report": 1600,
-  "caveat": "T fit and ECE reported on the same test split \u2014 can be optimistic."
+  "caveat": "T fit on the leakage-safe validation split; ECE reported on the full test set, which played no part in fitting."
 }

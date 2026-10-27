@@ -180,7 +180,7 @@ def test_evaluation_uses_serving_preprocessing():
     src = Path(__file__).resolve().parents[1] / "src" / "btc"
     for name in ("data.py", "external_validation.py", "monitoring.py", "explain.py",
                  "evaluate.py", "calibration.py", "robustness.py", "uncertainty.py",
-                 "train_v2.py", "serve/app.py"):
+                 "finetune.py", "serve/app.py"):
         text = (src / name).read_text()
         if name == "data.py":   # only the parity training generators may use Keras I/O
             text = text[text.index("def load_test_arrays"):]

@@ -1,0 +1,10 @@
+{
+  "temperature": 0.5767676767676768,
+  "ece_before": 0.18800295159220698,
+  "ece_after": 0.06830047599971295,
+  "n_bins": 15,
+  "fit_protocol": "fit_and_report_on_test",
+  "n_fit": 1600,
+  "n_report": 1600,
+  "caveat": "T fit and ECE reported on the same test split \u2014 can be optimistic."
+}

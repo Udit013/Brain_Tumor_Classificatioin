@@ -2,7 +2,7 @@
 
 The FastAPI service, the Hugging Face Space (space/logic.py, asserted
 identical in tests/test_space.py), every evaluation loader (test set, external
-set, drift reference, Grad-CAM) and btc.train_v2 all turn an image into model
+set, drift reference, Grad-CAM) and btc.finetune all turn an image into model
 input with these exact PIL calls, so every reported metric describes the
 computation that is deployed.
 
