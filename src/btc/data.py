@@ -121,18 +121,22 @@ def make_generators(seed: int = config.SEED):
 def load_test_arrays() -> tuple[np.ndarray, np.ndarray, list[str]]:
     """Materialise the full ordered test set as (X, y_int, filepaths).
 
-    Used by calibration, ROC/PR and Grad-CAM, which need raw arrays rather than
-    an exhausting generator. Preprocessing matches the parity path: 256x256 RGB,
-    float32, NO rescaling (EfficientNet handles it internally).
+    Used by evaluation, calibration, ROC/PR, robustness, TTA and Grad-CAM.
+    Preprocessing is btc.preprocess — byte-identical to what the FastAPI service
+    and the Space compute for an upload — so every reported number describes
+    the deployed computation: 256x256 RGB, float32, NO rescaling (EfficientNet
+    handles it internally).
+
+    Until this was unified, evaluation used Keras ``load_img`` (nearest-
+    neighbour resize, as in the published training generators) while serving
+    resized bicubically; the reported test accuracy fell from 91.25% to 90.25%
+    when measured on the serving path. Parity *training* (make_generators)
+    still uses the published Keras pipeline.
     """
-    from tensorflow.keras.preprocessing.image import load_img, img_to_array
+    from .preprocess import load_images
 
     _, test_df = build_dataframes()
-    xs, ys, paths = [], [], []
     label_to_idx = {name: i for i, name in enumerate(config.CLASS_NAMES)}
-    for fp, label in zip(test_df["filepaths"], test_df["label"]):
-        img = load_img(fp, target_size=config.IMG_SIZE, color_mode="rgb")
-        xs.append(img_to_array(img))  # float32, range [0,255]
-        ys.append(label_to_idx[label])
-        paths.append(fp)
-    return np.asarray(xs, dtype="float32"), np.asarray(ys, dtype="int64"), paths
+    paths = list(test_df["filepaths"])
+    ys = np.asarray([label_to_idx[label] for label in test_df["label"]], dtype="int64")
+    return load_images(paths), ys, paths

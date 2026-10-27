@@ -22,13 +22,16 @@ jobs:
         # and the dataset are intentionally excluded so CI stays fast (< 1 min).
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pillow opencv-python-headless imagehash pytest
+          pip install numpy pillow opencv-python-headless imagehash pytest ruff
           # FastAPI contract tests (tests/test_api.py) — still no TensorFlow.
           pip install fastapi python-multipart httpx
           pip install -e . --no-deps
 
+      - name: Lint
+        run: ruff check src tests space scripts
+
       - name: Syntax check (all modules)
-        run: python -m py_compile src/btc/*.py src/btc/serve/*.py space/app.py
+        run: python -m py_compile src/btc/*.py src/btc/serve/*.py space/*.py scripts/*.py
 
       - name: Run tests
         run: PYTHONPATH=src pytest tests/ -q

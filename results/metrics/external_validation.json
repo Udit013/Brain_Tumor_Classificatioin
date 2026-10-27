@@ -8,31 +8,31 @@
   "note": "Out-of-distribution evaluation; a large drop from the in-distribution 99.844% is expected and is the honest generalisation signal.",
   "binary_collapse": {
     "n": 253,
-    "accuracy": 0.7075098814229249,
+    "accuracy": 0.6956521739130435,
     "report": {
       "no_tumor": {
-        "precision": 0.5697674418604651,
+        "precision": 0.56,
         "recall": 1.0,
-        "f1-score": 0.725925925925926,
+        "f1-score": 0.717948717948718,
         "support": 98.0
       },
       "tumor": {
         "precision": 1.0,
-        "recall": 0.5225806451612903,
-        "f1-score": 0.6864406779661016,
+        "recall": 0.5032258064516129,
+        "f1-score": 0.6695278969957081,
         "support": 155.0
       },
-      "accuracy": 0.7075098814229249,
+      "accuracy": 0.6956521739130435,
       "macro avg": {
-        "precision": 0.7848837209302326,
-        "recall": 0.7612903225806451,
-        "f1-score": 0.7061833019460138,
+        "precision": 0.78,
+        "recall": 0.7516129032258064,
+        "f1-score": 0.693738307472213,
         "support": 253.0
       },
       "weighted avg": {
-        "precision": 0.8333486533688759,
-        "recall": 0.7075098814229249,
-        "f1-score": 0.7017353589940177,
+        "precision": 0.8295652173913043,
+        "recall": 0.6956521739130435,
+        "f1-score": 0.6882837881158463,
         "support": 253.0
       }
     },
@@ -42,8 +42,8 @@
         0
       ],
       [
-        74,
-        81
+        77,
+        78
       ]
     ]
   }

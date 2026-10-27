@@ -1,0 +1,269 @@
+{
+  "note": "One-time test-set comparison; v2 was selected on the validation split only. CPU, serving preprocessing (btc.preprocess).",
+  "n_test": 1600,
+  "n_novel": 886,
+  "parity": {
+    "test_accuracy": 0.9025,
+    "macro_f1": 0.8978603345349722,
+    "novel_subset_accuracy": 0.8566591422121896,
+    "near_duplicate_subset_accuracy": 0.9593837535014006,
+    "glioma_recall": 0.6425,
+    "glioma_recall_novel_subset": 0.6305732484076433,
+    "glioma_to_notumor": 33,
+    "per_class": {
+      "glioma": {
+        "precision": 1.0,
+        "recall": 0.6425,
+        "f1": 0.7823
+      },
+      "meningioma": {
+        "precision": 0.771,
+        "recall": 0.985,
+        "f1": 0.865
+      },
+      "notumor": {
+        "precision": 0.9238,
+        "recall": 1.0,
+        "f1": 0.9604
+      },
+      "pituitary": {
+        "precision": 0.985,
+        "recall": 0.9825,
+        "f1": 0.9837
+      }
+    },
+    "confusion_matrix": [
+      [
+        257,
+        110,
+        33,
+        0
+      ],
+      [
+        0,
+        394,
+        0,
+        6
+      ],
+      [
+        0,
+        0,
+        400,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        393
+      ]
+    ],
+    "cross_entropy": 0.495606929063797,
+    "ece_raw": 0.18800297429785137,
+    "ece_calibrated": 0.06543853383511307,
+    "calibration_protocol": "T fit on half the test set, ECE on the other half",
+    "mean_corrupted_accuracy": 0.6731666666666668,
+    "robustness_by_corruption": {
+      "gaussian_noise": [
+        0.2475,
+        0.2675,
+        0.31,
+        0.305,
+        0.2375
+      ],
+      "gaussian_blur": [
+        0.8475,
+        0.5975,
+        0.43,
+        0.395,
+        0.36
+      ],
+      "brightness": [
+        0.8925,
+        0.8575,
+        0.84,
+        0.8125,
+        0.7075
+      ],
+      "contrast": [
+        0.895,
+        0.8925,
+        0.885,
+        0.8475,
+        0.6825
+      ],
+      "jpeg_compression": [
+        0.83,
+        0.7775,
+        0.75,
+        0.645,
+        0.5225
+      ],
+      "rotation": [
+        0.8825,
+        0.885,
+        0.8825,
+        0.87,
+        0.84
+      ]
+    },
+    "external_accuracy": 0.6956521739130435,
+    "external_tumor_recall": 0.5032258064516129,
+    "external_notumor_specificity": 1.0
+  },
+  "v2": {
+    "test_accuracy": 0.934375,
+    "macro_f1": 0.9329134716595028,
+    "novel_subset_accuracy": 0.8939051918735892,
+    "near_duplicate_subset_accuracy": 0.9845938375350141,
+    "glioma_recall": 0.795,
+    "glioma_recall_novel_subset": 0.7515923566878981,
+    "glioma_to_notumor": 25,
+    "per_class": {
+      "glioma": {
+        "precision": 0.9785,
+        "recall": 0.795,
+        "f1": 0.8772
+      },
+      "meningioma": {
+        "precision": 0.8716,
+        "recall": 0.95,
+        "f1": 0.9091
+      },
+      "notumor": {
+        "precision": 0.9301,
+        "recall": 0.9975,
+        "f1": 0.9626
+      },
+      "pituitary": {
+        "precision": 0.9707,
+        "recall": 0.995,
+        "f1": 0.9827
+      }
+    },
+    "confusion_matrix": [
+      [
+        318,
+        54,
+        25,
+        3
+      ],
+      [
+        6,
+        380,
+        5,
+        9
+      ],
+      [
+        1,
+        0,
+        399,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        398
+      ]
+    ],
+    "cross_entropy": 0.20350748300552368,
+    "ece_raw": 0.022207899242639544,
+    "ece_calibrated": 0.023913599886000163,
+    "calibration_protocol": "T fit on the validation split, ECE on the full test set",
+    "mean_corrupted_accuracy": 0.9067500000000001,
+    "robustness_by_corruption": {
+      "gaussian_noise": [
+        0.92,
+        0.915,
+        0.9125,
+        0.8925,
+        0.8525
+      ],
+      "gaussian_blur": [
+        0.92,
+        0.925,
+        0.8975,
+        0.8575,
+        0.805
+      ],
+      "brightness": [
+        0.9225,
+        0.92,
+        0.9225,
+        0.925,
+        0.925
+      ],
+      "contrast": [
+        0.92,
+        0.92,
+        0.93,
+        0.935,
+        0.92
+      ],
+      "jpeg_compression": [
+        0.92,
+        0.9175,
+        0.915,
+        0.9,
+        0.8675
+      ],
+      "rotation": [
+        0.9275,
+        0.925,
+        0.9125,
+        0.9125,
+        0.8675
+      ]
+    },
+    "external_accuracy": 0.7272727272727273,
+    "external_tumor_recall": 0.5612903225806452,
+    "external_notumor_specificity": 0.9897959183673469
+  },
+  "v2_validation": {
+    "head": 0.9678953626634959,
+    "head_tta": 0.9702734839476813,
+    "best": 0.9631391200951248,
+    "best_tta": 0.9607609988109393
+  },
+  "v2_validation_mean_corrupted": {
+    "head": 0.7923333333333333,
+    "best": 0.9239166666666668
+  },
+  "v2_temperature": 0.937,
+  "v2_training": {
+    "recipe": "train_v2 two-stage",
+    "git_rev": "80c0b95-dirty",
+    "seed": 75,
+    "split_sha256": "2110eac2904340c1",
+    "device": "cpu",
+    "machine": "arm64",
+    "unfreeze_from": "block6a",
+    "finetune_lr": 0.0001,
+    "head_lr": 0.001,
+    "feature_seconds": 153,
+    "stage1": {
+      "seconds": 17,
+      "epochs_run": 21,
+      "best_val_accuracy": 0.9678953886032104
+    },
+    "stage2_seconds_this_session": 1072
+  },
+  "significance": {
+    "full_test": {
+      "parity_only_correct": 30,
+      "v2_only_correct": 81,
+      "exact_mcnemar_p": 1.3738677823789658e-06
+    },
+    "novel_subset": {
+      "parity_only_correct": 23,
+      "v2_only_correct": 56,
+      "exact_mcnemar_p": 0.000263636776465269
+    },
+    "glioma": {
+      "parity_only_correct": 9,
+      "v2_only_correct": 70,
+      "exact_mcnemar_p": 7.778844062771146e-13
+    }
+  }
+}

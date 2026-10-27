@@ -27,7 +27,7 @@ data/
 *.h5
 *.onnx
 *.npz
-models/temperature.json
+models/temperature*.json
 
 # ---------------------------------------------------------------------------
 # Secrets / credentials — MUST NOT be committed
@@ -59,3 +59,6 @@ CLAUDE.md
 # Personal interview-prep notes — must never be published
 fastflo_guide.md
 knowledge_doc.md
+
+# Training experiments (checkpoints + metadata) — never committed
+runs/

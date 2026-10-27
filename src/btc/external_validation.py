@@ -73,13 +73,9 @@ def _scan_external(root: Path):
 
 
 def _load_batch(paths):
-    from tensorflow.keras.preprocessing.image import load_img, img_to_array
+    from .preprocess import load_images
 
-    xs = []
-    for p in paths:
-        img = load_img(str(p), target_size=config.IMG_SIZE, color_mode="rgb")
-        xs.append(img_to_array(img))  # float32 [0,255], parity preprocessing
-    return np.asarray(xs, dtype="float32")
+    return load_images(paths)  # the serving preprocessing
 
 
 def evaluate_external() -> dict:

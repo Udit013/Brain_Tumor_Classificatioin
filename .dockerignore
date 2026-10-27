@@ -12,14 +12,17 @@ __pycache__/
 data/
 legacy/
 results/
+runs/
 space/
+scripts/
+tests/
 
 *.ipynb
 
 # Exclude docs, but NOT README.md — pyproject.toml declares
 # `readme = "README.md"`, so `pip install -e .` fails without it present.
 MODEL_CARD.md
-PROJECT_DOCUMENTATION.md
+PROJECT_DOCUMENTATION*.md
 fastflo_guide.md
 
 # Secrets — must never end up inside an image layer.
@@ -35,3 +38,7 @@ CLAUDE.md
 
 .DS_Store
 knowledge_doc.md
+
+# Debugging checkpoints — never served
+models/EfficientNetB3_raw_bnbroken.h5
+models/EfficientNetB3_recalibrated.h5

@@ -167,15 +167,17 @@ Brain_Tumor_Classificatioin/
 │   ├── monitoring.py                  input-drift detection stub (production monitoring)
 │   ├── robustness.py                  stress-tests the model against corrupted images
 │   ├── uncertainty.py                 Test-Time Augmentation-based uncertainty estimation
-│   ├── preprocess.py                  serving image preprocessing (shared with train_v2)
+│   ├── preprocess.py                  the one image preprocessing: serving, evaluation, train_v2
 │   ├── splits.py                      leakage-safe train/val split of Kaggle Training
-│   ├── train_v2.py                    EXPERIMENTAL improved training recipe (not yet trained)
+│   ├── train_v2.py                    improved two-stage recipe (v2: staged, not deployed)
 │   └── serve/
 │       ├── __init__.py
 │       └── app.py                     FastAPI REST service
 │
 ├── space/                             ← the live Gradio demo, deployed separately to HF Spaces
 │   ├── app.py                         self-contained Gradio application
+│   ├── logic.py                       its model-free logic (preprocess, TTA views, stability), unit-tested
+│   ├── examples/                      one test image per class (CC BY 4.0)
 │   ├── requirements.txt               pinned dependencies FOR THE SPACE (not the whole repo)
 │   └── README.md                      HF Spaces config header (YAML front-matter) + demo description
 │
@@ -189,7 +191,8 @@ Brain_Tumor_Classificatioin/
 │
 ├── tests/
 │   ├── test_core.py                   30 pure-logic unit tests (no TensorFlow/data/weights)
-│   └── test_api.py                    5 FastAPI contract tests (stubbed model, no TensorFlow)
+│   ├── test_api.py                    11 FastAPI contract tests (stubbed model, no TensorFlow)
+│   └── test_space.py                  23 tests of space/logic.py (no TensorFlow or Gradio)
 │
 ├── .github/workflows/ci.yml           GitHub Actions: runs tests on every push
 │
@@ -254,25 +257,27 @@ The four original Jupyter notebooks exist in **two identical copies**: one at th
 | InceptionV3 | 1,280 | 97.734% | 1,251 / 1,280 |
 | EfficientNetB3 | 640 | 99.844% | **639 / 640** |
 
-So the four-model comparison used different denominators. The EfficientNetB3 notebook's own `classification_report` on the full 1,311 images rounds to 0.99, so the magnitude is roughly right but the third decimal is unsupported. Separately, all four notebooks pass the test set as `validation_data` and keep the checkpoint with the best `val_accuracy` — the test set influenced model selection, which biases test metrics upward. `src/btc/train.py` reproduces both behaviours deliberately for parity; the fix (a validation split carved out of Training) is on the roadmap.
+So the four-model comparison used different denominators. The EfficientNetB3 notebook's own `classification_report` on the full 1,311 images rounds to 0.99, so the magnitude is roughly right but the third decimal is unsupported. Separately, all four notebooks pass the test set as `validation_data` and keep the checkpoint with the best `val_accuracy` — the test set influenced model selection, which biases test metrics upward. `src/btc/train.py` reproduces both behaviours deliberately for parity; NeuroClass v2 (§5.14) fixes the second by selecting on a leakage-safe validation split carved out of Training.
 
 ### 4b. Metal vs CPU: why every metric is measured on CPU
 
-**Simple:** the same trained model gave different answers depending on which chip computed it. The live demo uses the CPU answers, so the documentation does too.
+**Simple:** the same trained model gave different answers depending on how Apple's GPU backend ran it. The live demo runs on CPU, so every number in this documentation is measured on CPU too.
 
-**Technical:** on Apple Silicon, `tensorflow-metal` 1.1.0 runs Keras ops on the GPU. For these weights it produces materially different outputs from TensorFlow's CPU kernels: **93.94% vs 91.25%** accuracy, disagreeing on 2.9% of test images, with a maximum per-class probability difference of 0.76. Two independent CPU runtimes — TensorFlow-CPU and ONNX Runtime — agree with each other to 2.4e-5 (100% identical predictions), and CPU is what the deployed Space (ONNX Runtime) and any Linux/Docker host run. Metal is therefore the outlier, and earlier versions of this repo were reporting a number the deployed model doesn't achieve.
+**Technical:** on Apple Silicon, `tensorflow-metal` 1.1.0 computes the correct function in **eager** mode (it matches CPU to ~4e-6) but a different one in **graph** mode — `tf.function`, which Keras `predict` and `fit` use. For the deployed weights on the test set: CPU **90.25%**, Metal graph mode 93.81%, with 3.6% of predictions flipped and probabilities differing by up to 0.76. Disabling grappler's meta-optimizer (`tf.config.optimizer.set_experimental_options({"disable_meta_optimizer": True})`) makes Metal match CPU (max difference 1.2e-5, no flips), while disabling any single built-in pass (remapping, layout, arithmetic, constant folding) does not — which points at the plugin's own graph optimizer. Even with the workaround, Metal *gradients* differ from CPU (median 4.7% on per-variable gradient norms), so the improved recipe trains on CPU. The parity model itself was trained with `fit` on Metal, i.e. likely against the defective function, which would explain why that path scores higher than the deployed computation; the BatchNorm "collapse" that `train.py` repairs (§14) is plausibly the same defect.
 
-The fix is `config.configure_inference_device()`, called inside `model.load_trained_model()` — the single function every evaluation and serving path uses to load the model. It hides the GPU from TensorFlow (`tf.config.set_visible_devices([], "GPU")`) before any op runs, so all metrics come from CPU; `BTC_INFERENCE_DEVICE=gpu` opts out. Training still uses Metal for speed. Re-estimating the BatchNorm statistics on CPU was also tried and scored *lower* on CPU (89.19% vs 91.25%), so the existing weights — which are exactly what the Space serves — were kept.
+Two CPU runtimes — TensorFlow-CPU and ONNX Runtime — agree with each other, and CPU is what the deployed Space (ONNX Runtime) and any Linux/Docker host run. `config.configure_inference_device()`, called inside `model.load_trained_model()` — the single function every evaluation and serving path uses to load the model — hides the GPU before any op runs; `BTC_INFERENCE_DEVICE=gpu` opts out and applies `config.disable_metal_graph_optimizer()` instead. Pre-flight check 7 in `scripts/v2_sanity_checks.py` (graph mode == eager) fails on the defect.
 
-| Metric | On Metal (previously reported) | On CPU (deployed computation) |
-|---|---|---|
-| Accuracy | 93.94% | **91.25%** |
-| Macro ROC-AUC | 0.985 | 0.980 |
-| Near-dup vs leak-free accuracy | 98.9% vs 90.0% | **97.2% vs 86.5%** |
-| ECE before → after temperature scaling | 0.0425 → 0.0136 (T = 0.819) | **0.196 → 0.073** (T = 0.561) |
-| External OOD accuracy | 72.3% | 70.8% |
-| Clean / mean-corrupted accuracy | 93.0% / 72.5% | 90.5% / 68.3% |
-| TTA entropy, correct vs wrong | 0.36 vs 0.78 | 0.82 vs 1.00 |
+All numbers are now also measured with the **serving preprocessing** (§5.14), which moved them slightly:
+
+| Metric | Metal graph mode (first reported) | CPU, training-style resize | **CPU, serving preprocessing (current)** |
+|---|---|---|---|
+| Accuracy | 93.94% | 91.25% | **90.25%** |
+| Macro ROC-AUC | 0.985 | 0.980 | 0.981 |
+| Near-dup vs leak-free accuracy | 98.9% vs 90.0% | 97.2% vs 86.5% | **95.9% vs 85.7%** |
+| ECE before → after temperature scaling | 0.0425 → 0.0136 (T = 0.819) | 0.196 → 0.073 (T = 0.561) | **0.188 → 0.068** (T = 0.577) |
+| External OOD accuracy | 72.3% | 70.8% | **69.6%** |
+| Clean / mean-corrupted accuracy | 93.0% / 72.5% | 90.5% / 68.3% | **90.25% / 67.3%** |
+| TTA entropy, correct vs wrong | 0.36 vs 0.78 | 0.82 vs 1.00 | 0.81 vs 1.02 |
 
 ---
 
@@ -305,7 +310,7 @@ Every constant tagged `# PARITY` in a comment is one that must **never be change
 
 This file has two small functions. `ensure_dirs()` it creates the `models/`, `results/`, `results/figures/`, and `results/metrics/` directories if they don't already exist, using `Path.mkdir(parents=True, exist_ok=True)`. Every pipeline script calls this once at the start so it never has to worry about "directory doesn't exist yet" errors.
 
-`configure_inference_device()` pins TensorFlow inference to CPU by hiding the GPU (`tf.config.set_visible_devices([], "GPU")`) before any op runs, unless `BTC_INFERENCE_DEVICE=gpu` is set. It exists because Apple's Metal GPU backend computes materially different outputs for this model than CPU (§4b); if it's called after TensorFlow has already initialised its devices, it warns instead of silently measuring on the GPU.
+`configure_inference_device()` pins TensorFlow inference to CPU by hiding the GPU (`tf.config.set_visible_devices([], "GPU")`) before any op runs, unless `BTC_INFERENCE_DEVICE=gpu` is set. It exists because Apple's Metal backend computes a different function in graph mode (§4b); if it's called after TensorFlow has already initialised its devices, it warns instead of silently measuring on the GPU. `disable_metal_graph_optimizer()` is the workaround used when a GPU is deliberately enabled.
 
 **Why a dedicated config module instead of scattering constants across files?** If `IMG_SIZE` were hard-coded independently in `data.py`, `model.py`, and `explain.py`, a future change (or a copy-paste typo) could silently desynchronize preprocessing between training and inference — exactly the kind of bug that's invisible until it causes a real accuracy regression. Centralizing it means there is exactly one place to look, and one place to change, per concept.
 
@@ -544,24 +549,42 @@ This file has two small functions. `ensure_dirs()` it creates the `models/`, `re
 
 **Why Test-Time Augmentation instead of Monte Carlo Dropout (the other common lightweight uncertainty technique)?** Both are legitimate, cheap options that don't require retraining or a different architecture. TTA was chosen here specifically because it composes naturally with the ONNX Runtime serving path used in the live demo — it just means running the same exported ONNX model 6 times on 6 slightly different inputs, with no need to keep dropout layers "active" at inference time (which MC-Dropout requires, and which some inference runtimes, including ONNX Runtime by default, aren't set up to do easily, since dropout is normally disabled at inference for a reason). TTA is a pure, black-box, model-agnostic technique from the outside.
 
-### 5.14 `preprocess.py`, `splits.py`, `train_v2.py` — toward a better model
+### 5.14 `preprocess.py`, `splits.py`, `train_v2.py` — a better model
 
-**`preprocess.py`** holds the serving preprocessing: `to_model_input()` (PIL `convert("RGB").resize((256, 256))` → float32, raw [0, 255]) and `load_image()`/`load_images()`. The FastAPI service decodes uploads through it, and the Space repeats the same two PIL calls inline. It exists because of a measured **train/serve skew**: evaluation (`data.load_test_arrays`) resizes with Keras `load_img`, which is nearest-neighbour, while serving uses PIL's default, bicubic. Under the serving preprocessing the deployed model scores **90.25%** on the test set versus the reported 91.25%. The reported metrics deliberately stay on the committed evaluation path so they remain reproducible; moving evaluation onto `preprocess.py` is on the roadmap.
+**`preprocess.py`** is the single image preprocessing for serving *and* evaluation: `to_model_input()` (PIL `convert("RGB").resize((256, 256))` → float32, raw [0, 255]) and `load_image()`/`load_images()`. The FastAPI service decodes uploads through it; the Space's `space/logic.py` repeats the same PIL calls (it can't import `btc`), and `tests/test_space.py` asserts the two are byte-identical. Every evaluation loader — test arrays, external set, drift reference, single-image Grad-CAM — now uses it too, and a regression test fails if any of them imports Keras's image loader again. Before this, evaluation resized with Keras `load_img` (nearest-neighbour) while serving used PIL (bicubic), so the reported 91.25% described a computation no user was served; on the serving path the deployed model scores **90.25%**. The parity *training* generators still resize as published.
 
 **`splits.py`** builds a validation set the test set never influences, without the leakage a random split would have. `_cluster()` runs union-find over all Training images: two images join a cluster if their perceptual hashes are within Hamming distance 5 (computed blockwise with the same matmul identity as `leakage.py`) or their content hashes match. Whole clusters are then assigned to validation per class until each class reaches 15%. Measured: **43% of Training (2,399 images) sits in multi-image clusters**, the largest holding 22 slices; the result is 4,759 train / 841 val (about 210 per class), with **zero** near-duplicate pairs straddling the two (versus 714 test images that have a near-duplicate in Training). The split is written to `results/splits/train_val_split.json` and is deterministic for a given seed; `load_split()` returns absolute paths and integer labels.
 
-**`train_v2.py`** is an **experimental** improved recipe; no v2 model exists yet and no v2 metric is reported. It trains on CPU with the serving preprocessing, selects checkpoints on the validation split, freezes the backbone's BatchNorm (the usual practice for fine-tuning EfficientNet, which removes the BatchNorm-statistics problem at its source), uses full epochs, and augments with flips, small rotations/zooms/shifts, brightness/contrast, and Gaussian noise (aimed at the near-chance noise robustness). The architecture is unchanged, so the ONNX export, the API, and the Space would only need new weights. The first full run used the parity learning rate of 1e-3 and stayed at chance (27% train / 25% val after one 12-minute epoch). Rather than guess, four 60-step variants on a fixed 960-image subset isolated the cause:
+**`train_v2.py`** is the improved recipe: CPU, serving preprocessing, selection on the validation split, BatchNorm frozen, augmentation including Gaussian noise, and an unchanged architecture. It is the standard two-stage EfficientNet fine-tune:
 
-| Variant | Train acc (last 20 steps) | Val acc (256 imgs) |
+1. *Head only*, on cached features of the frozen ImageNet backbone (each training image plus its mirror; 2.5 min to compute), Adamax 1e-3, early-stopped on validation accuracy — 17 seconds.
+2. *Fine-tune from `block6a` up*, with augmentation, Adamax 1e-4 reduced on validation plateaus, the head's BatchNorm also frozen (an A/B on a 512-image subset: 86.1% vs 81.1% validation accuracy after one epoch). Backpropagation stops at 16×16 maps, so an epoch costs ~2.2 min on an M3 Pro CPU instead of ~6 for a full fine-tune.
+
+The whole run took **21.5 minutes**. Each run writes its config, seed, split hash, git revision, hardware, per-epoch history and checkpoints to `runs/<name>/` (gitignored), resumes from its last epoch, and never touches `models/`.
+
+How it got here, one variable at a time:
+
+| Step | Finding |
+|---|---|
+| First full-unfreeze run, lr 1e-3 | stayed at chance; the overfit test (`v2_sanity_checks.py`) reproduces it: a 32-image subset is memorised at lr 1e-4 (100%) but not at 1e-3 (31%) — with BatchNorm frozen, 1e-3 destroys the pretrained features |
+| 3-epoch run on Metal | Metal reported 73.8% validation accuracy for a checkpoint that scores 71.6% on CPU — the graph-mode defect (§4b); training moved to CPU |
+| Two-stage run, first evaluation | the CPU evaluator scored the head at 86.7%, not the 96.8% seen in training: EfficientNet gets an extra `Rescaling(1/sqrt(ImageNet std))` input layer only when built with `weights="imagenet"` (tensorflow#49930), and evaluation/serving build with `weights=None`. A suspected weight-ordering cause was tested and ruled out (bit-identical loads). `export_for_serving()` folds the layer into the `Normalization` variance — exact to 1e-6, checked on every export |
+
+**Selection, on validation only** (rule fixed before comparing: higher accuracy unless within 1 point, then higher mean accuracy under corruption): head-only 96.79% vs fine-tuned 96.31% — a 4-image gap — so robustness decided, 92.4% vs 79.2% under the 30 corruption conditions. Test-time augmentation changed validation accuracy by ±0.24 points and was not adopted.
+
+**One test-set comparison** (`results/metrics/v2_comparison.json`, via `scripts/evaluate_candidate.py` and `scripts/compare_models.py`):
+
+| Metric | Deployed parity | v2 |
 |---|---|---|
-| frozen BatchNorm, lr 1e-3, augmentation (the failed run) | 0.24 | 0.30 |
-| frozen BatchNorm, **lr 1e-4**, augmentation | 0.56 | **0.65** |
-| frozen BatchNorm, lr 1e-3, no augmentation | 0.66 | 0.57 |
-| parity recipe (trainable BatchNorm) on CPU | 0.84 | 0.64 |
+| Test accuracy | 90.25% | **93.44%** |
+| Novel subset (n=886) | 85.67% | **89.39%** |
+| Glioma recall / → `notumor` | 64.25% / 33 | **79.50% / 25** |
+| Cross-entropy | 0.496 | **0.204** |
+| ECE (raw) | 0.188 | **0.022** |
+| Mean accuracy, 30 corruptions | 67.3% | **90.7%** |
+| External OOD accuracy | 69.6% | **72.7%** |
 
-With BatchNorm frozen, nothing re-normalises activations, so 1e-3 scrambles the pretrained features; the default is now 1e-4. These are short-run diagnostics on small samples, not results.
-
-**Measured, not adopted: test-time augmentation.** Averaging the 6 augmented views the Space already computes for its uncertainty estimate, under the serving preprocessing, raised test accuracy from 90.25% to **92.31%**, leak-free accuracy from 85.7% to 87.6%, and glioma recall from 64.3% to **71.5%**, at 6 forward passes per image instead of 1.
+Exact McNemar on paired predictions: full test p = 1.4e-6 (81 vs 30 discordant images), novel subset p = 2.6e-4, glioma p = 7.8e-13. v2 used fewer training images (4,759 vs 5,600), and the parity checkpoint was selected on the test set, so the comparison if anything favours the parity model. v2 is staged in `models/` beside the deployed files (its ONNX export matches Keras-CPU to 5e-6 on all 1,600 test images) and is **not deployed**.
 
 ---
 
@@ -577,20 +600,19 @@ There are **two separate, independently-runnable ways** to actually use the trai
 **What "Gradio" is, simply:** Gradio is a Python library that lets you describe a web page's layout and behavior *entirely in Python* — no HTML, no CSS, no JavaScript required — and it automatically generates a real, interactive browser-based UI, complete with drag-and-drop file upload, image display, buttons, and text rendering. Technically, it wraps a FastAPI server underneath and serves a pre-built JavaScript frontend that talks to that server over HTTP/WebSocket, but none of that is visible to someone writing a Gradio app — you just describe components and wire up a Python function.
 
 **Startup sequence (runs once, when the Space container boots):**
-1. `hf_hub_download(MODEL_REPO, "efficientnetb3.onnx")` and `hf_hub_download(MODEL_REPO, "EfficientNetB3_model_weights.h5")` — these download the model artifacts from the Hugging Face Hub model repository, caching them locally inside the container.
+1. Reads which model to serve from three optional Space variables (`NEUROCLASS_ONNX`, `NEUROCLASS_WEIGHTS`, `NEUROCLASS_TEMPERATURE`; unset = the deployed parity model) and downloads those files from the Hugging Face Hub model repository. Switching to v2, or back, is a settings change, not a code change.
 2. An `onnxruntime.InferenceSession` is created from the downloaded ONNX file — this is the object that actually runs fast predictions.
-3. A second, full Keras model is separately rebuilt (architecture defined inline, duplicating `model.py`'s definition — see §15 for why) and its weights loaded from the downloaded `.h5` file. This Keras copy exists *purely* so Grad-CAM can be computed (ONNX Runtime doesn't support computing gradients, which Grad-CAM needs).
-4. The fitted calibration temperature is downloaded and parsed (falling back to `1.0`, i.e. "no calibration," if that file happens to be missing, rather than crashing).
-5. A `gr.Blocks()` layout is defined: a title, an upload `gr.Image`, a "Classify" `gr.Button`, an output `gr.Label` (for the 4-class probability bars), an output `gr.Image` (for the Grad-CAM overlay), and an output `gr.Markdown` block (for the free-text summary). The button's `.click(...)` event is wired to the `predict()` function.
+3. TensorFlow is pinned to CPU (Spaces hardware is CPU-only; this makes local runs on Apple Silicon compute the same function, see §4b), and a second, full Keras model is rebuilt (architecture defined inline, duplicating `model.py`'s definition — see §15 for why) with the downloaded `.h5` weights. This Keras copy exists *purely* so Grad-CAM can be computed (ONNX Runtime doesn't support computing gradients, which Grad-CAM needs).
+4. The fitted calibration temperature is downloaded and parsed (falling back to `1.0`, i.e. "no calibration," if that file is missing, rather than crashing).
+5. The `gr.Blocks()` layout: a title and a prominent not-a-medical-device notice; on the left the upload (file or clipboard), **Clear** and **Classify** buttons, four example images (one per class from the dataset's test split, CC BY 4.0, chosen as the first file of each class — the glioma example is one the deployed model gets wrong) and a "What can I upload?" note; on the right a plain-language summary, the probability bars, the Grad-CAM heatmap and a collapsed "Technical details" table; at the bottom an "About the model and its limitations" section. Columns have a 320 px minimum width, so on a phone they stack into one column (verified at 375 px with no horizontal scroll).
 
-**The `predict(image)` function — what runs on every single button click:**
-1. Converts the uploaded image (a NumPy array, as Gradio hands it over) to a PIL image, converts to RGB, resizes to 256×256 — matching the exact preprocessing used everywhere else in the project.
-2. Times and runs `_onnx_predict(x[None, ...])` — the fast path, using ONNX Runtime.
-3. Applies the loaded calibration temperature to get calibrated probabilities.
-4. Generates the 6 Test-Time-Augmentation views (`_tta_augment`) and runs them all through ONNX Runtime as one batched call, computes the mean probability distribution and its entropy.
-5. Runs Grad-CAM (`_gradcam`) using the separate Keras copy of the model, for the predicted class specifically.
-6. Formats everything — predicted class, calibrated and raw confidence, temperature value, entropy, latency, and the fixed medical disclaimer — into a single Markdown string.
-7. Returns three values: the probability dictionary (rendered by Gradio as a bar chart), the Grad-CAM overlay image, and the Markdown info string — these map directly onto the three `outputs=[...]` the button's click handler was wired to.
+**`space/logic.py`** holds everything that doesn't need TensorFlow, ONNX Runtime or Gradio, so `tests/test_space.py` can test it in CI: input validation (`InputError` with a user-facing message for missing, too-small or oddly shaped images), `preprocess()` (asserted byte-identical to `btc.preprocess` on all four examples), temperature scaling, the 6 TTA views, and `stability()` — a plain-language level fixed before looking at any data: **High** if all 6 slightly altered views agree and calibrated confidence is ≥ 90%, **Low** if half or more disagree or confidence is < 60%, otherwise **Moderate**. It flags fragile answers; a High level is not evidence the answer is right.
+
+**The `predict(image)` function — what runs on every click:**
+1. `logic.preprocess()` validates and resizes the upload; an unusable image raises `gr.Error`, which Gradio shows as a toast ("Can't use this image — Image is too small (10×10 px)…") instead of crashing.
+2. Runs the ONNX model once (timed), applies the temperature, and runs the 6 TTA views as one batch.
+3. Runs Grad-CAM for the predicted class; if that fails, the prediction is still returned and the details note it.
+4. Returns the summary (class, plain-language meaning, calibrated confidence, stability level and, unless stability is High, a "treat it as unreliable" note), the probabilities, the heatmap and the technical table (raw, calibrated and TTA-mean probabilities, temperature, entropy, latency).
 
 **A real deployment bug this file's comments document explicitly:** the very first deployment attempt used Gradio 4.44, which crashed on startup with a `TypeError` deep inside Gradio's own auto-generated API schema builder (`get_api_info()`), a known issue with that specific version when a `gr.Label` component with dictionary-style outputs is used. Upgrading to Gradio 5.50.0 and passing `show_api=False` to `demo.launch()` fixed it — this exact fix, and the reasoning behind it, is preserved as an inline code comment rather than silently changed with no trace.
 
@@ -602,8 +624,10 @@ There are **two separate, independently-runnable ways** to actually use the trai
 **Startup sequence:** unlike the Gradio Space, this app is designed to load its model **lazily** via an internal `_state` dictionary that starts out empty (`{"model": None, ...}`), populated by `_load()` either in the app's `lifespan` handler at startup (run in a worker thread so startup doesn't block the event loop), or — as a safety net — the first time `/predict` runs if startup loading didn't happen. Both paths take `_model_lock`, so two requests can never load the model twice, and the endpoint can never silently serve a `None` model.
 
 **Two endpoints:**
-- **`GET /health`** — returns `{"status": "ok", "model_loaded": bool, "calibrated": bool}`. A minimal liveness/readiness check, exactly the kind of endpoint the `Dockerfile`'s `HEALTHCHECK` directive calls automatically every 30 seconds.
+- **`GET /health`** — returns `{"status": "ok", "model_loaded": bool, "calibrated": bool}`, or **HTTP 503** with `"status": "error"` and the cause if the model failed to load. A minimal liveness/readiness check, exactly the kind of endpoint the `Dockerfile`'s `HEALTHCHECK` directive calls automatically every 30 seconds.
 - **`POST /predict`** — accepts a multipart file upload (`UploadFile`) and reads at most 10 MB + 1 byte of it. `_decode_upload()` rejects oversized uploads (413) and unreadable ones (400) *before* the model is ever touched, then opens and resizes the image with PIL into a raw float array (again, the *exact* same preprocessing everywhere: 256×256, RGB, no rescale), then hands the array to `_infer()` via `run_in_threadpool`. `_infer()` holds `_model_lock`, runs the *Keras* model directly (this app uses Keras throughout, not ONNX — see §15 for why the two serving apps differ here), applies calibration, computes the compiled Grad-CAM, base64-encodes the resulting PNG overlay so it can travel inside a JSON payload, and returns a single JSON object with the class name, class index, calibrated confidence, raw confidence, a `is_calibrated` boolean flag, the full per-class probability dictionary, the base64 Grad-CAM image, and a timing breakdown (`inference_ms`, `gradcam_ms`, `latency_ms`). Running `_infer()` in a worker thread is what keeps the event loop free: before this change, the CPU-bound work ran directly inside the `async` handler, and with 16 concurrent requests `/health` took up to 3.3 s to answer (now ≤57 ms).
+
+**Model-loading failures** don't crash the server: `_ensure_loaded()` records the error, `/predict` answers 503 ("Model unavailable; see /health") and `/health` turns 503, so the Docker healthcheck marks the container unhealthy instead of the process dying with no diagnosis. `_load()` builds everything before publishing it, so a half-loaded model is never used. The served model is chosen with `BTC_WEIGHTS` and `BTC_TEMPERATURE`.
 
 **Error handling:** if the uploaded file can't be opened as an image (corrupted upload, wrong file type, etc.), the code catches the exception explicitly and re-raises it as a proper `HTTPException(status_code=400, ...)` with a human-readable detail message — the API never returns a raw, unhandled Python traceback to a client.
 
@@ -646,7 +670,7 @@ Two small, standalone diagnostic/fix scripts written during the actual live debu
 ## 8. Tests & Continuous Integration
 
 ### 8.1 `tests/test_core.py` and `tests/test_api.py`
-35 fast tests in total. `test_core.py` holds 30 unit tests, using `pytest`, covering only the **pure-logic** parts of the codebase — code that doesn't need TensorFlow, a trained model, or the dataset to be present. This is a deliberate scope boundary: model- and data-dependent behavior (does training actually converge, does the pipeline reproduce the right accuracy) is validated separately by actually running `scripts/reproduce.sh`, which needs real data and takes much longer; CI is meant to catch *logic* regressions in seconds, not re-run the whole ML pipeline on every push.
+65 fast tests in total. `test_core.py` holds 31 unit tests, using `pytest`, covering only the **pure-logic** parts of the codebase — code that doesn't need TensorFlow, a trained model, or the dataset to be present. This is a deliberate scope boundary: model- and data-dependent behavior (does training actually converge, does the pipeline reproduce the right accuracy) is validated separately by actually running `scripts/reproduce.sh`, which needs real data and takes much longer; CI is meant to catch *logic* regressions in seconds, not re-run the whole ML pipeline on every push.
 
 Test groups:
 - **config** — sanity-checks the class names, count, and image shape constants.
@@ -655,18 +679,21 @@ Test groups:
 - **uncertainty** — checks that the TTA augmentation function produces at least 4 views of the correct shape, and that feeding a deterministic "stub" fake model (one that always predicts class 2 with 100% confidence) into `tta_predict` correctly reports class 2 with near-zero entropy — a test of the *aggregation logic* using a fake model, rather than needing the real 11.7-million-parameter network.
 - **leakage** — checks that two byte-identical images produce a perceptual-hash Hamming distance of exactly 0, and an identical content hash.
 - **preprocessing** — checks the shared serving preprocessing returns 256×256×3 float32 in raw [0, 255] for any input mode/size, and that the FastAPI decoder produces byte-identical arrays to it.
+- **evaluation preprocessing guard** — fails if any evaluation module imports Keras's image loader again (the cause of the old train/serve skew).
 - **splits** — checks the near-duplicate clustering behind the validation split: chained near-duplicates and exact (content-hash) duplicates join one cluster, and an image near nothing stays on its own.
 
 **Why "stub" a fake model instead of loading the real one in tests?** The real model is an 11.7M-parameter TensorFlow network requiring the actual trained weights file (tens of megabytes, not checked into git) and a full TensorFlow installation. A stub function that mimics the real model's *interface* (takes a batch, returns probabilities) but is instantaneous and deterministic lets the test suite verify the *aggregation and math logic* around the model (does TTA averaging work correctly, does entropy compute correctly) completely independently of whether the model itself is any good — a classic and valuable unit-testing technique called **mocking** or **stubbing**.
 
-`test_api.py` holds 5 HTTP contract tests for the FastAPI service. They exist because `/predict` once returned HTTP 500 on *every* request — an annotation FastAPI couldn't resolve — and nothing caught it, since no test ever made a request. They use FastAPI's `TestClient` without a `with` block, which skips the model-loading lifespan, and swap `_infer()` for a stub. That means routing, upload validation (413 for oversized, 400 for non-images), the threadpool dispatch, the response contract, and the parity preprocessing (256×256×3, float32, *not* rescaled to [0, 1]) are all exercised in milliseconds, with no TensorFlow installed.
+`test_space.py` holds 23 tests of the Space's logic: class order and display names, one example per class, preprocessing identical to `btc.preprocess`, grayscale/alpha inputs, rejection of unusable inputs, temperature scaling, TTA views, the stability rule and the summary text.
+
+`test_api.py` holds 11 HTTP contract tests for the FastAPI service (grayscale/RGBA/palette uploads, empty uploads 400, missing field 422, model-load failure 503 on `/predict` and `/health`, the lifespan surviving a load failure, temperature scaling). They exist because `/predict` once returned HTTP 500 on *every* request — an annotation FastAPI couldn't resolve — and nothing caught it, since no test ever made a request. They use FastAPI's `TestClient` without a `with` block, which skips the model-loading lifespan, and swap `_infer()` for a stub. That means routing, upload validation (413 for oversized, 400 for non-images), the threadpool dispatch, the response contract, and the parity preprocessing (256×256×3, float32, *not* rescaled to [0, 1]) are all exercised in milliseconds, with no TensorFlow installed.
 
 ### 8.2 `.github/workflows/ci.yml`
 A GitHub Actions workflow that runs automatically on every `push` or `pull_request` targeting `main`. It:
 1. Checks out the repository.
 2. Sets up Python 3.11.
 3. Installs only the lightweight dependencies the pure-logic tests actually need (`numpy`, `pillow`, `opencv-python-headless`, `imagehash`, `pytest`, plus `fastapi`, `python-multipart`, and `httpx` for the API contract tests) — deliberately **excluding TensorFlow**, which would push the job from under a minute to many minutes and require downloading gigabytes of data the logic tests don't touch.
-4. Runs `python -m py_compile` across every source file, as a fast syntax-correctness gate even for the modules that *do* import TensorFlow (this catches typos/syntax errors in those files without needing to actually execute or import them).
+4. Lints with `ruff check` (configured in `pyproject.toml`), then runs `python -m py_compile` across every source file, as a fast syntax-correctness gate even for the modules that *do* import TensorFlow (this catches typos/syntax errors in those files without needing to actually execute or import them).
 5. Runs the full `pytest` suite.
 
 This CI configuration has been run and **passed with a `success` conclusion**, confirmed by watching the actual GitHub Actions run to completion — the green badge on the README reflects a genuinely passing pipeline, not an unverified assumption.
@@ -831,7 +858,7 @@ Covered in §5.6 (perceptual hashing) and §5.11 (PSI, Mahalanobis) with full te
 ### Docker Containers
 
 **Simple:** a Docker container is a way to package an application together with its *entire* environment (exact OS libraries, exact Python version, exact dependency versions) into one portable unit, so it runs identically anywhere Docker itself is installed, instead of "works on my machine" uncertainty.
-**Technical:** this project's `Dockerfile` builds from `python:3.11-slim`, installs OS-level shared libraries OpenCV needs at import time (`libgl1`, `libglib2.0-0` — without these, `import cv2` crashes with a missing-shared-library error on a minimal base image), installs the pinned Python dependencies, copies in the application code and the trained model artifacts, and defines a `HEALTHCHECK` so an orchestrator (Docker Compose, Kubernetes, etc.) can automatically detect if the service becomes unresponsive. It has been **built and run**: on Docker 29.8 (linux/arm64) the image builds (981 MB), runs as the non-root `appuser`, serves a correct prediction, returns 413/400 for oversized/corrupt uploads, and Docker's healthcheck reports `healthy`. One practical gotcha found while building: Docker Desktop's credential helper (`docker-credential-desktop`) lives in `/Applications/Docker.app/Contents/Resources/bin`, which a non-login shell may not have on its PATH.
+**Technical:** this project's `Dockerfile` builds from `python:3.11-slim`, installs OS-level shared libraries OpenCV needs at import time (`libgl1`, `libglib2.0-0` — without these, `import cv2` crashes with a missing-shared-library error on a minimal base image), installs the pinned Python dependencies, copies in the application code and the trained model artifacts, and defines a `HEALTHCHECK` so an orchestrator (Docker Compose, Kubernetes, etc.) can automatically detect if the service becomes unresponsive. It has been **built and run**: on Docker 29.8 (linux/arm64) the image builds (981 MB), runs as the non-root `appuser`, serves a correct prediction, returns 413/400 for oversized/corrupt uploads, and Docker's healthcheck reports `healthy`. (That verification predates the October 2026 serving changes — 503 on model-load failure, env-selectable temperature; the image has not been rebuilt since, because Docker Desktop would not start on the updated macOS.) One practical gotcha found while building: Docker Desktop's credential helper (`docker-credential-desktop`) lives in `/Applications/Docker.app/Contents/Resources/bin`, which a non-login shell may not have on its PATH.
 
 ### Continuous Integration (CI)
 
@@ -1046,12 +1073,15 @@ actions/setup-python@v5 → installs Python 3.11
 pip install numpy pillow opencv-python-headless imagehash pytest
 pip install -e . --no-deps   (installs btc package, no TensorFlow)
  ↓
-python -m py_compile src/btc/*.py src/btc/serve/*.py space/app.py
+ruff check src tests space scripts
+   (lint)
+ ↓
+python -m py_compile src/btc/*.py src/btc/serve/*.py space/*.py scripts/*.py
    (syntax-checks every file, including TF-dependent ones, without importing them)
  ↓
 PYTHONPATH=src pytest tests/ -q
-   (35 tests run: 30 covering calibration math, corruption functions, TTA
-   aggregation logic, and hash equality — all without TensorFlow or real data)
+   (65 tests: pure logic, Space logic and the FastAPI contract — all without
+   TensorFlow or real data)
  ↓
 Workflow reports success/failure back to GitHub
  ↓

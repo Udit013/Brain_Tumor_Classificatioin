@@ -116,13 +116,12 @@ def overlay(x_single, heatmap, alpha=0.4):
 
 def explain_image(image_path, model=None):
     """Grad-CAM for a single arbitrary image. Returns (overlay_rgb, class_idx, probs)."""
-    from tensorflow.keras.preprocessing.image import load_img, img_to_array
     from .model import load_trained_model, find_last_conv_layer_name
+    from .preprocess import load_image
 
     model = model or load_trained_model()
     grad_model = _grad_model(model, find_last_conv_layer_name(model))
-    img = load_img(str(image_path), target_size=config.IMG_SIZE, color_mode="rgb")
-    x = img_to_array(img).astype("float32")
+    x = load_image(image_path)
     probs = model.predict(x[None, ...], verbose=0)[0]
     heatmap, class_idx = gradcam_heatmap(x, model, grad_model,
                                          class_idx=int(np.argmax(probs)))

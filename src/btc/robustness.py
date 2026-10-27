@@ -63,13 +63,19 @@ CORRUPTIONS = ["gaussian_noise", "gaussian_blur", "brightness",
                "contrast", "jpeg_compression", "rotation"]
 
 
-def evaluate_robustness(limit: int = 400) -> dict:
+def evaluate_robustness(limit: int = 400, model=None, x=None, y=None) -> dict:
+    """Accuracy under 6 corruptions x 5 severities on a balanced subset.
+
+    Defaults: the configured model on the test set. Pass a model and arrays to
+    score another split (e.g. validation, for model selection).
+    """
     from .model import load_trained_model
     from .data import load_test_arrays
 
     np.random.seed(config.SEED)
-    model = load_trained_model()
-    x, y, _ = load_test_arrays()
+    model = model or load_trained_model()
+    if x is None:
+        x, y, _ = load_test_arrays()
 
     # balanced subset for speed
     per = max(1, limit // config.NUM_CLASSES)

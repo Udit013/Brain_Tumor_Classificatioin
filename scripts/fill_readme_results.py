@@ -116,7 +116,7 @@ def build_robustness_block() -> str:
     for kind, accs in rob["corruptions"].items():
         lines.append(f"| {kind} | {accs[0]*100:.0f}% | {accs[2]*100:.0f}% | {accs[4]*100:.0f}% |")
     lines.append(f"| **mean corrupted** | | | **{rob['mean_corruption_accuracy']*100:.1f}%** |")
-    lines.append(f"\n![Robustness curves](results/figures/robustness_curves.png)\n")
+    lines.append("\n![Robustness curves](results/figures/robustness_curves.png)\n")
     lines.append(
         f"**Uncertainty (Test-Time Augmentation):** mean predictive entropy "
         f"**{unc['mean_entropy_correct']:.2f} on correct** vs "
@@ -153,6 +153,58 @@ def build_perclass_block() -> str:
     return "\n".join(lines)
 
 
+V2_BEGIN = "<!-- V2:BEGIN -->"
+V2_END = "<!-- V2:END -->"
+
+
+def build_v2_block() -> str:
+    """v2 vs parity, from results/metrics/v2_comparison.json (scripts/compare_models.py)."""
+    c = _load("v2_comparison.json")
+    if c is None:
+        return "_v2 comparison not run yet (scripts/compare_models.py)._"
+    p, v, sig = c["parity"], c["v2"], c["significance"]
+
+    def pct(x):
+        return f"{x * 100:.2f}%"
+
+    rows = [
+        ("Test accuracy (n=%d)" % c["n_test"], pct(p["test_accuracy"]), pct(v["test_accuracy"])),
+        ("Novel-image subset accuracy (n=%d)" % c["n_novel"],
+         pct(p["novel_subset_accuracy"]), pct(v["novel_subset_accuracy"])),
+        ("Near-duplicate subset accuracy", pct(p["near_duplicate_subset_accuracy"]),
+         pct(v["near_duplicate_subset_accuracy"])),
+        ("Macro F1", f"{p['macro_f1']:.3f}", f"{v['macro_f1']:.3f}"),
+        ("Glioma recall (novel subset)",
+         f"{pct(p['glioma_recall'])} ({pct(p['glioma_recall_novel_subset'])})",
+         f"{pct(v['glioma_recall'])} ({pct(v['glioma_recall_novel_subset'])})"),
+        ("Gliomas predicted `notumor` (of 400)", str(p["glioma_to_notumor"]),
+         str(v["glioma_to_notumor"])),
+        ("Cross-entropy (lower is better)", f"{p['cross_entropy']:.3f}",
+         f"{v['cross_entropy']:.3f}"),
+        ("ECE raw → temperature-scaled", f"{p['ece_raw']:.3f} → {p['ece_calibrated']:.3f}",
+         f"{v['ece_raw']:.3f} → {v['ece_calibrated']:.3f}"),
+        ("Mean accuracy over 30 corruptions (n=400)", pct(p["mean_corrupted_accuracy"]),
+         pct(v["mean_corrupted_accuracy"])),
+        ("External OOD accuracy (n=253)", pct(p["external_accuracy"]),
+         pct(v["external_accuracy"])),
+        ("External tumor recall / no-tumor specificity",
+         f"{pct(p['external_tumor_recall'])} / {pct(p['external_notumor_specificity'])}",
+         f"{pct(v['external_tumor_recall'])} / {pct(v['external_notumor_specificity'])}"),
+    ]
+    lines = ["| Metric (CPU, serving preprocessing) | Deployed (parity) | **v2** |",
+             "|---|---|---|"]
+    lines += [f"| {a} | {b} | {d} |" for a, b, d in rows]
+    lines.append("")
+    lines.append("Paired significance (exact McNemar): " + "; ".join(
+        f"{k.replace('_', ' ')}: {s['v2_only_correct']} images only v2 gets right vs "
+        f"{s['parity_only_correct']} only the parity model does, p = {s['exact_mcnemar_p']:.1e}"
+        for k, s in sig.items()) + ".")
+    lines.append("")
+    lines.append(f"Calibration: parity — {p['calibration_protocol']}; v2 — "
+                 f"{v['calibration_protocol']} (T = {c['v2_temperature']:.3f}).")
+    return "\n".join(lines)
+
+
 def _replace(text, begin, end, block):
     if begin not in text or end not in text:
         raise SystemExit(f"Markers {begin}/{end} not found in README.md")
@@ -164,8 +216,9 @@ def main() -> None:
     text = _replace(text, BEGIN, END, build_block())
     text = _replace(text, R2_BEGIN, R2_END, build_robustness_block())
     text = _replace(text, PC_BEGIN, PC_END, build_perclass_block())
+    text = _replace(text, V2_BEGIN, V2_END, build_v2_block())
     README.write_text(text)
-    print("README results, per-class and robustness tables updated from measured metrics.")
+    print("README results, per-class, robustness and v2 tables updated from measured metrics.")
 
 
 if __name__ == "__main__":

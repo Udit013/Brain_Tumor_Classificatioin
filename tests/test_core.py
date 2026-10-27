@@ -4,6 +4,8 @@ These run in CI on CPU in seconds. Model/data-dependent behaviour is validated
 separately by scripts/reproduce.sh (which needs the dataset + trained weights).
 """
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -169,3 +171,17 @@ def test_cluster_groups_near_duplicates_transitively():
     assert ids[4] == ids[0]              # exact (content-hash) duplicate joins a's cluster
     assert ids[3] == ids[4]              # d joins through its phash twin e
     assert ids[5] not in ids[:5]         # f is near nothing -> its own cluster
+
+
+def test_evaluation_uses_serving_preprocessing():
+    # Regression guard for the train/serve skew: any evaluation loader that
+    # resizes with Keras load_img (nearest-neighbour) instead of btc.preprocess
+    # (PIL bicubic, what serving does) measures a different computation.
+    src = Path(__file__).resolve().parents[1] / "src" / "btc"
+    for name in ("data.py", "external_validation.py", "monitoring.py", "explain.py",
+                 "evaluate.py", "calibration.py", "robustness.py", "uncertainty.py",
+                 "train_v2.py", "serve/app.py"):
+        text = (src / name).read_text()
+        if name == "data.py":   # only the parity training generators may use Keras I/O
+            text = text[text.index("def load_test_arrays"):]
+        assert "keras.preprocessing.image" not in text and ".flow_from_" not in text, name

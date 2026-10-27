@@ -14,3 +14,11 @@ where = ["src"]
 
 [tool.setuptools.package-dir]
 "" = "src"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["legacy", "*.ipynb"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E702"]   # compact one-line fixture setup

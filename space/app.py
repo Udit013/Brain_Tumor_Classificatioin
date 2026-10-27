@@ -4,36 +4,47 @@ Deployed on Hugging Face Spaces. For an uploaded MRI it returns:
   * predicted tumor class + temperature-calibrated confidence
   * full per-class probabilities
   * Grad-CAM attribution overlay
-  * TTA-based uncertainty (predictive entropy)
+  * a plain-language stability level from 6 test-time-augmentation views
   * ONNX-Runtime CPU inference latency
   * an explicit not-a-medical-device disclaimer
 
 Inference (class + confidence + uncertainty) runs on ONNX Runtime for efficient
 CPU serving; Grad-CAM uses the Keras model. Weights are pulled from the HF Hub
-model repo at startup. Preprocessing matches the published pipeline exactly:
-256x256 RGB, raw [0,255] pixels (EfficientNet rescales internally).
+model repo at startup. Preprocessing and all other model-free logic live in
+logic.py (unit-tested; identical to btc.preprocess): 256x256 RGB, raw [0,255]
+pixels (EfficientNet rescales internally).
 """
 
 from __future__ import annotations
 
 import json
+import os
 import time
+from pathlib import Path
 
 import numpy as np
 import gradio as gr
 from huggingface_hub import hf_hub_download
 
+import logic
+
 MODEL_REPO = "Udit013/brain-tumor-efficientnetb3"
-CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
-IMG_SIZE = (256, 256)
+# Which model files to serve. Defaults are the deployed parity model; set these
+# Space variables to switch models (and unset them to roll back) without a code
+# change. All three must come from the same model.
+ONNX_FILE = os.environ.get("NEUROCLASS_ONNX", "efficientnetb3.onnx")
+WEIGHTS_FILE = os.environ.get("NEUROCLASS_WEIGHTS", "EfficientNetB3_model_weights.h5")
+TEMPERATURE_FILE = os.environ.get("NEUROCLASS_TEMPERATURE", "temperature.json")
+CLASS_NAMES = logic.CLASS_NAMES
 
 # --------------------------------------------------------------------------- #
 # Load artifacts once at startup
 # --------------------------------------------------------------------------- #
-onnx_path = hf_hub_download(MODEL_REPO, "efficientnetb3.onnx")
-weights_path = hf_hub_download(MODEL_REPO, "EfficientNetB3_model_weights.h5")
+print(f"Serving {ONNX_FILE} / {WEIGHTS_FILE} / {TEMPERATURE_FILE} from {MODEL_REPO}")
+onnx_path = hf_hub_download(MODEL_REPO, ONNX_FILE)
+weights_path = hf_hub_download(MODEL_REPO, WEIGHTS_FILE)
 try:
-    temp_path = hf_hub_download(MODEL_REPO, "temperature.json")
+    temp_path = hf_hub_download(MODEL_REPO, TEMPERATURE_FILE)
     with open(temp_path) as f:
         TEMPERATURE = float(json.load(f)["temperature"])
 except Exception as exc:  # noqa: BLE001 — any failure here is non-fatal
@@ -41,7 +52,7 @@ except Exception as exc:  # noqa: BLE001 — any failure here is non-fatal
           f"uncalibrated (T=1.0): {exc}")
     TEMPERATURE = 1.0
 
-import onnxruntime as ort
+import onnxruntime as ort  # noqa: E402 — after the downloads it needs
 
 _sess = ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
 _in_name = _sess.get_inputs()[0].name
@@ -52,10 +63,15 @@ def _onnx_predict(batch: np.ndarray) -> np.ndarray:
 
 
 # TensorFlow model (Grad-CAM only) ------------------------------------------ #
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
-from tensorflow.keras import regularizers
+import tensorflow as tf  # noqa: E402
+
+# Spaces hardware here is CPU-only; pinning makes local runs compute the same
+# thing (on Apple Silicon, tensorflow-metal's graph mode computes a different
+# function — see btc.config.disable_metal_graph_optimizer).
+tf.config.set_visible_devices([], "GPU")
+from tensorflow.keras.models import Sequential  # noqa: E402
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization  # noqa: E402
+from tensorflow.keras import regularizers  # noqa: E402
 
 
 def _build_model():
@@ -80,20 +96,11 @@ def _build_model():
 _tf_model = _build_model()
 _tf_model.load_weights(weights_path)
 _base = _tf_model.get_layer("efficientnetb3")
-_last_conv = next(l.name for l in reversed(_base.layers)
-                  if len(getattr(l, "output_shape", ())) == 4)
+_last_conv = next(layer.name for layer in reversed(_base.layers)
+                  if len(getattr(layer, "output_shape", ())) == 4)
 _base_grad = tf.keras.models.Model(
     inputs=_base.input, outputs=[_base.get_layer(_last_conv).output, _base.output])
 _head_layers = _tf_model.layers[1:]
-
-
-def _apply_temperature(p: np.ndarray) -> np.ndarray:
-    if TEMPERATURE == 1.0:
-        return p
-    logits = np.log(np.clip(p, 1e-12, 1.0)) / TEMPERATURE
-    logits -= logits.max()
-    e = np.exp(logits)
-    return e / e.sum()
 
 
 # Compiled once (fixed input signature). ~9x faster than running the same
@@ -126,93 +133,152 @@ def _gradcam(x: np.ndarray, class_idx: int) -> np.ndarray:
     return np.uint8(np.clip(x, 0, 255) * 0.6 + heat * 0.4)
 
 
-def _tta_augment(x: np.ndarray) -> np.ndarray:
-    import cv2
 
-    h, w = x.shape[:2]
-    views = [x, x[:, ::-1, :]]
-    for angle in (-8, 8):
-        m = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
-        views.append(cv2.warpAffine(x, m, (w, h), borderMode=cv2.BORDER_REFLECT))
-    for f in (0.9, 1.1):
-        views.append(np.clip(x * f, 0, 255).astype("float32"))
-    return np.stack(views).astype("float32")
-
+EXAMPLES_DIR = Path(__file__).parent / "examples"
+EXAMPLES = sorted(str(p) for p in EXAMPLES_DIR.glob("*.jpg"))
 
 DISCLAIMER = (
-    "⚠️ **Research/education demo — NOT a medical device.** This model must not "
-    "be used for diagnosis or clinical decisions. It is trained on a public "
-    "Kaggle compilation with documented train/test leakage; real-world accuracy "
-    "on novel patients is materially lower than benchmark numbers."
+    "**Research and education demo — not a medical device.** Do not use it for "
+    "diagnosis, triage or any decision about a person's care. It was trained on "
+    "a public Kaggle compilation with documented train/test overlap, and its "
+    "accuracy on images unlike its training data is far lower than its "
+    "benchmark score."
 )
+
+UPLOAD_HELP = """
+**What to upload:** one 2-D slice of a brain MRI as a JPG or PNG — the kind
+of image in the examples below. The model was trained only on such slices and
+on four labels (glioma, meningioma, pituitary tumor, no tumor); any other image
+(a photo, a CT scan, a different organ) still gets one of those four labels,
+and that label is meaningless.
+
+**Privacy:** images are processed in memory to compute the result and are not
+saved by this app. Remove any patient-identifying information before uploading.
+"""
+
+ABOUT = """
+**Model.** EfficientNetB3 fine-tuned on the
+[Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
+(Masoud Nickparvar, CC BY 4.0), reproducing an
+[IEEE ICC-ROBINS 2024 paper](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941).
+Inference runs on ONNX Runtime (CPU); Grad-CAM uses the Keras model.
+
+**Known weaknesses (measured on CPU, see the
+[model card](https://github.com/Udit013/Brain_Tumor_Classificatioin/blob/main/MODEL_CARD.md)).**
+{weaknesses}
+- The heatmap shows which pixels influenced the score, not where a tumor is.
+
+**Example images** are from the dataset's test split (CC BY 4.0).
+"""
+
+# Measured test-set facts for each published model (MODEL_CARD.md); the About
+# panel must describe the model actually being served.
+WEAKNESSES = {
+    "efficientnetb3.onnx": """**Model in use:** the original reproduction (parity model).
+- It misses gliomas most often: about 1 in 3 glioma test images is labelled
+  something else, and about 1 in 12 is labelled *no tumor*.
+- Accuracy on test images with no near-copy in the training set is about 10
+  points lower than on images that have one (86% vs 96%).
+- On a different public MRI dataset it was right only about 70% of the time
+  (tumor vs no tumor), finding only half of the tumors.""",
+    "neuroclass_v2.onnx": """**Model in use:** NeuroClass v2 (retrained on a leakage-safe split).
+- It still misses gliomas most often: about 1 in 5 glioma test images is
+  labelled something else, and about 1 in 16 is labelled *no tumor*.
+- Accuracy on test images with no near-copy in the training set is about 9
+  points lower than on images that have one (89% vs 98%).
+- On a different public MRI dataset it was right about 73% of the time
+  (tumor vs no tumor), finding just over half of the tumors.""",
+}
+ABOUT = ABOUT.format(weaknesses=WEAKNESSES.get(
+    ONNX_FILE, f"**Model in use:** `{ONNX_FILE}` — see the model card for its measured limitations."))
+
+CSS = """
+.nc-disclaimer { border-left: 4px solid #b45309; padding: 10px 14px;
+                 border-radius: 6px; background: var(--block-background-fill); }
+.nc-result h2 { margin-top: 0; }
+"""
 
 
 def predict(image):
-    if image is None:
-        return None, None, "Please upload an MRI image."
-    from PIL import Image
-
-    # Any failure past this point (corrupt/unusual image data, a transient
-    # ONNX Runtime error, etc.) is reported back to the user in the UI rather
-    # than raised, so a single bad upload can never crash the shared demo
-    # process for every other visitor.
+    """Returns (summary_md, probabilities, gradcam_overlay, technical_md)."""
     try:
-        img = Image.fromarray(image).convert("RGB").resize(IMG_SIZE)
-        x = np.asarray(img, dtype="float32")  # [0,255], parity preprocessing
+        x = logic.preprocess(image)
+    except logic.InputError as exc:
+        raise gr.Error(str(exc), title="Can't use this image") from None
+    except Exception as exc:  # noqa: BLE001 — undecodable or unusual data
+        raise gr.Error("This file could not be read as an image. Try a JPG or PNG.",
+                       title="Can't use this image") from exc
 
+    # A failure past this point is reported to this user, never raised out of
+    # the handler, so one bad request cannot take the shared demo down.
+    try:
         t0 = time.perf_counter()
         raw = _onnx_predict(x[None, ...])[0]
         latency_ms = (time.perf_counter() - t0) * 1000.0
-        cal = _apply_temperature(raw)
+        cal = logic.apply_temperature(raw, TEMPERATURE)
         cls = int(cal.argmax())
+        tta_probs = _onnx_predict(logic.tta_views(x))
+    except Exception as exc:  # noqa: BLE001
+        print(f"ERROR: inference failed: {exc!r}")
+        raise gr.Error("The model failed on this image. Please try another one.",
+                       title="Inference error") from exc
 
-        # TTA uncertainty (ONNX, cheap)
-        views = _tta_augment(x)
-        tta_probs = _onnx_predict(views)
-        mean_p = tta_probs.mean(axis=0)
-        entropy = float(-(mean_p * np.log(np.clip(mean_p, 1e-12, 1.0))).sum())
-        std_top = float(tta_probs[:, cls].std())
-
+    try:
         overlay = _gradcam(x, cls)
-        probs_dict = {CLASS_NAMES[i]: float(cal[i]) for i in range(4)}
-    except Exception as exc:  # noqa: BLE001 — surface to the user, don't crash the app
-        return None, None, f"⚠️ Could not process that image: {exc}"
+    except Exception as exc:  # noqa: BLE001 — the prediction is still valid
+        print(f"WARNING: Grad-CAM failed: {exc!r}")
+        overlay = None
 
-    info = (
-        f"### Prediction: **{CLASS_NAMES[cls]}**\n"
-        f"- **Calibrated confidence:** {cal[cls]*100:.1f}%  "
-        f"(raw {raw[cls]*100:.1f}%, temperature T={TEMPERATURE:.3f})\n"
-        f"- **Uncertainty:** predictive entropy {entropy:.3f} "
-        f"(0 = certain, {np.log(4):.2f} = max); TTA std {std_top:.3f}\n"
-        f"- **Inference latency (ONNX-CPU):** {latency_ms:.1f} ms\n\n"
-        f"{DISCLAIMER}"
-    )
-    return probs_dict, overlay, info
+    level, reason = logic.stability(tta_probs, cls, float(cal[cls]))
+    probs = {logic.DISPLAY_NAMES[c]: float(cal[i]) for i, c in enumerate(CLASS_NAMES)}
+    return (logic.summary_markdown(cls, float(cal[cls]), level, reason),
+            probs, overlay,
+            logic.technical_markdown(raw, cal, TEMPERATURE, tta_probs, latency_ms,
+                                     overlay is not None))
 
 
-with gr.Blocks(title="NeuroClass — Brain Tumor MRI Classifier") as demo:
-    gr.Markdown(
-        "# 🧠 NeuroClass\n"
-        "### Brain tumor MRI classification (EfficientNetB3)\n"
-        "Upload a T1-weighted brain MRI to get the predicted tumor class, "
-        "calibrated confidence, uncertainty, and a Grad-CAM attribution map. "
-        "Extends an IEEE 2024 publication "
-        "([DOI](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941)) with "
-        "production evaluation, calibration, explainability and ONNX serving. "
-        "[Code](https://github.com/Udit013/Brain_Tumor_Classificatioin)."
-    )
-    with gr.Row():
-        with gr.Column():
-            inp = gr.Image(type="numpy", label="MRI image", height=300)
-            btn = gr.Button("Classify", variant="primary")
-            gr.Markdown("Classes: glioma · meningioma · notumor · pituitary")
-        with gr.Column():
+EMPTY_SUMMARY = "*Upload an image and press **Classify** to see the result here.*"
+
+with gr.Blocks(title="NeuroClass — Brain Tumor MRI Classifier",
+               theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"),
+               css=CSS) as demo:
+    gr.Markdown("# NeuroClass\nClassifies a brain MRI slice as glioma, meningioma, "
+                "pituitary tumor or no tumor, and shows how stable and how "
+                "confident that answer is.")
+    gr.Markdown("⚠️ " + DISCLAIMER, elem_classes="nc-disclaimer")
+
+    with gr.Row(equal_height=False):
+        with gr.Column(scale=1, min_width=320):
+            inp = gr.Image(type="numpy", label="Brain MRI slice (JPG or PNG)",
+                           sources=["upload", "clipboard"], height=320)
+            with gr.Row():
+                clear = gr.ClearButton(value="Clear")
+                btn = gr.Button("Classify", variant="primary")
+            if EXAMPLES:
+                gr.Examples(EXAMPLES, inputs=inp,
+                            label="Or try an example — one per class, in order glioma, "
+                                  "meningioma, no tumor, pituitary (picked as the first "
+                                  "file of each, not for being classified correctly)")
+            with gr.Accordion("What can I upload?", open=False):
+                gr.Markdown(UPLOAD_HELP)
+        with gr.Column(scale=1, min_width=320):
+            out_summary = gr.Markdown(EMPTY_SUMMARY, elem_classes="nc-result")
             out_label = gr.Label(num_top_classes=4, label="Calibrated probabilities")
-            out_cam = gr.Image(label="Grad-CAM attribution", height=300)
-    out_info = gr.Markdown()
-    btn.click(predict, inputs=inp, outputs=[out_label, out_cam, out_info])
+            out_cam = gr.Image(label="Grad-CAM: red = drove the score (not a tumor outline)",
+                               height=320, interactive=False, show_download_button=False)
+            with gr.Accordion("Technical details", open=False):
+                out_tech = gr.Markdown()
+
+    with gr.Accordion("About the model and its limitations", open=False):
+        gr.Markdown(ABOUT)
+
+    outputs = [out_summary, out_label, out_cam, out_tech]
+    btn.click(predict, inputs=inp, outputs=outputs, show_progress="full",
+              concurrency_limit=2)
+    clear.add([inp, out_label, out_cam, out_tech])
+    clear.click(lambda: EMPTY_SUMMARY, outputs=out_summary)
 
 if __name__ == "__main__":
     # server_name=0.0.0.0 so the HF Spaces proxy can reach it; show_api=False
-    # avoids a gradio 4.44 client schema bug in api_info generation.
+    # keeps the demo UI-only.
     demo.launch(server_name="0.0.0.0", server_port=7860, show_api=False)

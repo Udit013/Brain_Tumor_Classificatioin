@@ -6,7 +6,6 @@ re-estimated to match the data — WITHOUT any optimizer step, so learned weight
 are unchanged. Then evaluate in normal inference mode.
 """
 import numpy as np
-import tensorflow as tf
 from btc.model import load_trained_model
 from btc.data import make_generators, load_test_arrays
 from btc import config
@@ -14,7 +13,7 @@ from btc import config
 model = load_trained_model()
 
 # Lower BN momentum so stats converge within one pass, and reset accumulators.
-import tensorflow.keras.layers as L
+import tensorflow.keras.layers as L  # noqa: E402
 
 
 def _reset_bn(m):

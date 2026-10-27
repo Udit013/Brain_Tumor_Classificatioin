@@ -1,7 +1,7 @@
 {
   "n": 200,
-  "mean_predictive_entropy": 0.8292224840819835,
-  "mean_entropy_correct": 0.8163472817790124,
-  "mean_entropy_wrong": 1.0002787432500295,
+  "mean_predictive_entropy": 0.826420033276081,
+  "mean_entropy_correct": 0.811965819328062,
+  "mean_entropy_wrong": 1.018454590014049,
   "note": "Higher entropy on wrong predictions indicates useful uncertainty."
 }

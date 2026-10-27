@@ -54,7 +54,7 @@ app = None  # set below by _build_app()
 
 # Lazily-populated singletons.
 _state: dict = {"model": None, "grad_model": None, "temperature": 1.0,
-                "calibrated": False}
+                "calibrated": False, "load_error": None}
 # Serialises model loading and inference across worker threads: Keras models
 # are not documented as safe for concurrent predict()/GradientTape calls.
 _model_lock = threading.Lock()
@@ -64,12 +64,35 @@ def _load():
     from ..model import load_trained_model, find_last_conv_layer_name
     from ..explain import _grad_model
 
+    # Everything is built first and published last, so a failure part-way
+    # never leaves a half-loaded model that _ensure_loaded would accept.
     model = load_trained_model()
-    _state["model"] = model
-    _state["grad_model"] = _grad_model(model, find_last_conv_layer_name(model))
+    grad_model = _grad_model(model, find_last_conv_layer_name(model))
+    temperature, calibrated = 1.0, False
     if config.TEMPERATURE_PATH.exists():
-        _state["temperature"] = float(json.loads(config.TEMPERATURE_PATH.read_text())["temperature"])
-        _state["calibrated"] = True
+        temperature = float(json.loads(config.TEMPERATURE_PATH.read_text())["temperature"])
+        calibrated = True
+    _state.update(grad_model=grad_model, temperature=temperature, calibrated=calibrated,
+                  model=model)
+
+
+def _ensure_loaded() -> None:
+    """Load the model once; on failure record why and answer 503, not 500.
+
+    Must be called with _model_lock held. A load failure (missing or corrupt
+    weights, bad temperature file) is a server-side availability problem, so
+    clients get a clear 503 and /health reports the cause.
+    """
+    if _state["model"] is not None:
+        return
+    try:
+        _load()
+        _state["load_error"] = None
+    except Exception as exc:  # noqa: BLE001 — surfaced via /health and 503
+        _state["load_error"] = f"{type(exc).__name__}: {exc}"
+        print(f"ERROR: model failed to load: {_state['load_error']}")
+        raise HTTPException(status_code=503,
+                            detail="Model unavailable; see /health.") from exc
 
 
 def _apply_temperature(probs: np.ndarray) -> np.ndarray:
@@ -110,8 +133,7 @@ def _infer(x: np.ndarray) -> dict:
     import imageio.v2 as imageio
 
     with _model_lock:
-        if _state["model"] is None:
-            _load()
+        _ensure_loaded()
         t_start = time.perf_counter()
         raw_probs = _state["model"].predict(x[None, ...], verbose=0)[0]
         cal_probs = _apply_temperature(raw_probs)
@@ -148,10 +170,14 @@ def _infer(x: np.ndarray) -> dict:
 async def _lifespan(_api: FastAPI):
     # Load the model at startup (in a worker thread so startup itself doesn't
     # block the loop); _infer() lazily loads it too, as a fallback.
+    # A load failure does not stop the server: /health turns 503 with the
+    # cause (so a container healthcheck fails visibly) and /predict answers 503.
     def _load_locked():
         with _model_lock:
-            if _state["model"] is None:
-                _load()
+            try:
+                _ensure_loaded()
+            except HTTPException:
+                pass
     await run_in_threadpool(_load_locked)
     yield
 
@@ -162,8 +188,12 @@ def _build_app():
 
     @api.get("/health")
     def health():
-        return {"status": "ok", "model_loaded": _state["model"] is not None,
+        body = {"status": "ok", "model_loaded": _state["model"] is not None,
                 "calibrated": _state["calibrated"]}
+        if _state["load_error"]:
+            body.update(status="error", error=_state["load_error"])
+            return JSONResponse(body, status_code=503)
+        return body
 
     @api.post("/predict")
     async def predict(file: UploadFile = File(...)):

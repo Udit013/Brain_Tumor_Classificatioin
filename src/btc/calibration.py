@@ -46,7 +46,7 @@ def expected_calibration_error(probs, y_true, n_bins=N_BINS):
     pred = probs.argmax(axis=1)
     correct = (pred == y_true).astype(float)
     bins = np.linspace(0.0, 1.0, n_bins + 1)
-    ece, n = 0.0, len(y_true)
+    ece = 0.0
     bin_stats = []
     for i, (lo, hi) in enumerate(zip(bins[:-1], bins[1:])):
         # Half-open bins (lo, hi], except the first, which is closed [lo, hi]

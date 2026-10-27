@@ -46,7 +46,7 @@ V2_WEIGHTS_PATH = MODELS_DIR / "NeuroClass_v2_weights.h5"
 WEIGHTS_PATH = Path(os.environ.get("BTC_WEIGHTS", PARITY_WEIGHTS_PATH))
 ONNX_PATH = MODELS_DIR / "efficientnetb3.onnx"
 # Fitted temperature for calibration (single scalar saved as JSON).
-TEMPERATURE_PATH = MODELS_DIR / "temperature.json"
+TEMPERATURE_PATH = Path(os.environ.get("BTC_TEMPERATURE", MODELS_DIR / "temperature.json"))
 # Reference embedding statistics for drift monitoring.
 DRIFT_REFERENCE_PATH = MODELS_DIR / "drift_reference.npz"
 
@@ -114,22 +114,40 @@ PRIMARY_MODEL = "EfficientNetB3"
 SEED = 75
 
 
+def disable_metal_graph_optimizer() -> None:
+    """Work around a tensorflow-metal graph-mode defect (TF 2.15, plugin 1.1.0).
+
+    On Apple Silicon, Metal *eager* execution matches CPU to ~4e-6, but Metal
+    *graph* execution (tf.function, so also predict and fit) computes a
+    different function: the parity model scores 93.81% on the test set through
+    it versus 90.25% on CPU, with 3.6% of predictions flipped. Turning off
+    grappler's meta-optimizer removes the forward-pass difference (max 1.2e-5,
+    no flips); disabling individual built-in passes does not, which points at
+    the plugin's own graph optimizer. Gradients still differ from CPU (median
+    4.7% on per-variable gradient norms), so Metal training is not verified
+    equivalent even with this applied. A no-op on CPU-only machines.
+    """
+    import tensorflow as tf
+
+    if tf.config.list_physical_devices("GPU"):
+        tf.config.optimizer.set_experimental_options({"disable_meta_optimizer": True})
+
+
 def configure_inference_device() -> None:
     """Pin TensorFlow inference to CPU unless BTC_INFERENCE_DEVICE=gpu.
 
-    WHY: on Apple Silicon the tensorflow-metal GPU plugin computes materially
-    different outputs for this model than TensorFlow's CPU kernels — the same
-    weights score 93.94% on Metal but 91.25% on CPU, disagreeing on 2.9% of
-    test images (max probability difference 0.76). CPU TensorFlow and ONNX
-    Runtime agree with each other to 2.4e-5, and CPU is what the deployed
-    Space (ONNX Runtime) and any Linux/Docker environment actually run. So every
-    reported metric is measured on CPU, the reference implementation, so that the
-    numbers describe the model users are served. Training may still use a GPU.
+    WHY: CPU TensorFlow and ONNX Runtime agree with each other to 2.4e-5, and
+    CPU is what the deployed Space (ONNX Runtime) and any Linux/Docker
+    environment run, so every reported metric is measured on CPU. On Apple
+    Silicon the Metal plugin's graph mode computes a different function (see
+    disable_metal_graph_optimizer); with BTC_INFERENCE_DEVICE=gpu that
+    workaround is applied instead of hiding the GPU.
 
     Must run before TensorFlow initialises its devices (i.e. before the first
     op); if called too late it warns rather than silently measuring on GPU.
     """
     if os.environ.get("BTC_INFERENCE_DEVICE", "cpu").lower() == "gpu":
+        disable_metal_graph_optimizer()
         return
     import warnings
 

@@ -24,7 +24,7 @@ p_inf = model.predict(xs, batch_size=16, verbose=0)
 acc_inf = (p_inf.argmax(1) == ys).mean()
 
 # training=True -> BN uses batch statistics
-import tensorflow as tf
+import tensorflow as tf  # noqa: E402
 p_tr = model(tf.convert_to_tensor(xs), training=True).numpy()
 acc_tr = (p_tr.argmax(1) == ys).mean()
 

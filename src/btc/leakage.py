@@ -40,7 +40,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from collections import defaultdict
 
 import numpy as np
 

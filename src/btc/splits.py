@@ -94,7 +94,7 @@ def build_split(val_fraction: float = 0.15, seed: int = config.SEED) -> dict:
 
     val_idx = set()
     for cls in config.CLASS_NAMES:
-        quota = round(val_fraction * sum(1 for l in labels if l == cls))
+        quota = round(val_fraction * sum(1 for lab in labels if lab == cls))
         taken = 0
         for c in rng.permutation(by_class[cls]):
             if taken >= quota:

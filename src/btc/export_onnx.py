@@ -25,20 +25,21 @@ N_WARMUP = 5
 N_RUNS = 50
 
 
-def export(model=None) -> None:
+def export(model=None, output_path=None) -> None:
     import tensorflow as tf
     import tf2onnx
 
     from .model import load_trained_model
 
     model = model or load_trained_model()
+    output_path = output_path or config.ONNX_PATH
     spec = (tf.TensorSpec((None, *config.IMG_SHAPE), tf.float32, name="input"),)
     config.MODELS_DIR.mkdir(parents=True, exist_ok=True)
     tf2onnx.convert.from_keras(
         model, input_signature=spec, opset=13,
-        output_path=str(config.ONNX_PATH),
+        output_path=str(output_path),
     )
-    print(f"Exported ONNX -> {config.ONNX_PATH}")
+    print(f"Exported ONNX -> {output_path}")
 
 
 def _bench(fn, x):
@@ -60,7 +61,6 @@ def _bench(fn, x):
 
 def benchmark() -> dict:
     import onnxruntime as ort
-    import tensorflow as tf
 
     from .model import load_trained_model
 

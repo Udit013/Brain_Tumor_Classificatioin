@@ -55,14 +55,11 @@ def _embedder(model=None):
 
 
 def _embed_paths(paths, embedder, batch=32):
-    from tensorflow.keras.preprocessing.image import load_img, img_to_array
+    from .preprocess import load_images
 
     embs = []
     for i in range(0, len(paths), batch):
-        chunk = paths[i:i + batch]
-        xs = np.asarray(
-            [img_to_array(load_img(str(p), target_size=config.IMG_SIZE, color_mode="rgb"))
-             for p in chunk], dtype="float32")
+        xs = load_images(paths[i:i + batch])
         embs.append(embedder.predict(xs, verbose=0))
     return np.concatenate(embs, axis=0)
 

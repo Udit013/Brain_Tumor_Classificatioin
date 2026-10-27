@@ -18,8 +18,9 @@ clearly separated layers:
 · ![CI](https://github.com/Udit013/Brain_Tumor_Classificatioin/actions/workflows/ci.yml/badge.svg)
 
 Upload an MRI to get the predicted class, a temperature-calibrated confidence,
-test-time-augmentation uncertainty, a Grad-CAM overlay, and inference latency,
-alongside an explicit not-a-medical-device disclaimer. The Space runs on free
+a plain-language stability level (does the answer survive small changes to the
+image?), a Grad-CAM overlay, and inference latency, alongside an explicit
+not-a-medical-device disclaimer. The Space runs on free
 CPU hardware and sleeps when idle; the first request after a sleep takes 1–2
 minutes while it wakes.
 
@@ -79,15 +80,24 @@ the test set as `validation_data` and keep the checkpoint with the best
 > ### Headline findings
 > 1. **Train/test leakage inflates the benchmark.** A perceptual-hash audit
 >    finds **44.6%** of test images have a near-duplicate in training (plus
->    **114** exact pixel duplicates). The model scores **97.2%** on those leaked
->    images but **86.5%** on genuinely novel ones — a ~10.7-point gap. Patient
->    IDs aren't recoverable from the compilation, so this is a *lower bound*.
+>    **114** exact pixel duplicates). The deployed model scores **95.9%** on
+>    those leaked images but **85.7%** on genuinely novel ones — a ~10-point gap.
+>    Patient IDs aren't recoverable from the compilation, so this is a *lower
+>    bound*.
 > 2. **The published numbers were scored on partial test sets** (above).
-> 3. **Apple's Metal GPU backend computes a different model.** The same weights
->    score 93.94% on `tensorflow-metal` but **91.25% on CPU**, disagreeing on
->    2.9% of test images. CPU TensorFlow and ONNX Runtime agree with each other
->    to 2.4e-5, and CPU is what the deployed demo runs — so **every metric below
->    is measured on CPU**, the model users are actually served.
+> 3. **Apple's Metal backend computes a different function in graph mode.**
+>    The deployed weights score 93.81% through `tensorflow-metal`'s graph mode
+>    but **90.25% on CPU**; Metal's eager mode matches CPU. CPU TensorFlow and
+>    ONNX Runtime agree with each other, and CPU is what the deployed demo runs —
+>    so **every metric below is measured on CPU with the serving preprocessing**,
+>    the computation users are actually served.
+> 4. **A properly trained model (v2) is measurably better.** Selected on a
+>    leakage-safe validation split and scored once on the test set: accuracy
+>    **90.25% → 93.44%**, novel-image accuracy **85.7% → 89.4%**, glioma recall
+>    **64.3% → 79.5%**, mean accuracy under corruption **67.3% → 90.7%**,
+>    raw calibration error **0.188 → 0.022**; the accuracy gains are
+>    paired-significant (McNemar p ≤ 3e-4). It is staged beside the deployed
+>    model, not deployed — see *NeuroClass v2* below.
 
 The extension re-trains the published EfficientNetB3 recipe with exact parity,
 then layers the modules below. It never reports a number that wasn't measured:
@@ -108,7 +118,7 @@ from the JSON files a real run produces.
 | 8 | Drift monitoring stub (PCA + PSI) | [`monitoring.py`](src/btc/monitoring.py) | `models/drift_reference.npz`, `drift_log.jsonl` |
 | 9 | ONNX export + latency benchmark | [`export_onnx.py`](src/btc/export_onnx.py) | `models/efficientnetb3.onnx`, `latency.json` |
 | 10 | Serving: Gradio Space + FastAPI | [`space/app.py`](space/app.py), [`serve/app.py`](src/btc/serve/app.py) | live demo, REST API |
-| 11 | Packaging, tests, CI | [`Dockerfile`](Dockerfile), [`requirements.txt`](requirements.txt), [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml), [`MODEL_CARD.md`](MODEL_CARD.md) | pinned deps, 35 tests on every push, verified Docker image |
+| 11 | Packaging, tests, CI | [`Dockerfile`](Dockerfile), [`requirements.txt`](requirements.txt), [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml), [`MODEL_CARD.md`](MODEL_CARD.md) | pinned deps, lint + 65 tests on every push, verified Docker image |
 
 ### Results (measured on CPU)
 
@@ -117,14 +127,14 @@ from the JSON files a real run produces.
 
 | Metric | Value |
 |---|---|
-| Reproduced accuracy (full test set) | 91.25% |
+| Reproduced accuracy (full test set) | 90.25% |
 | Published reference (paper) | 99.844% |
-| Macro ROC-AUC / avg-precision | 0.980 / 0.961 |
+| Macro ROC-AUC / avg-precision | 0.981 / 0.963 |
 | Exact cross-split duplicates | 114 / 1600 (7.1%) |
 | Near-duplicates (phash≤5) | 714 / 1600 (44.6%) |
-| Accuracy on near-duplicate vs leak-free images | 97.2% vs 86.5% |
-| External OOD accuracy (binary collapse, n=253) | 70.8% |
-| ECE before → after temperature scaling | 0.1964 → 0.0733 (T=0.561) |
+| Accuracy on near-duplicate vs leak-free images | 95.9% vs 85.7% |
+| External OOD accuracy (binary collapse, n=253) | 69.6% |
+| ECE before → after temperature scaling | 0.1880 → 0.0683 (T=0.577) |
 | Single-image latency, Keras-CPU / ONNX-CPU / ONNX-CoreML | 79ms / 34ms / 18.6ms |
 <!-- RESULTS:END -->
 
@@ -133,12 +143,12 @@ from the JSON files a real run produces.
 <!-- PERCLASS:BEGIN -->
 | Class | Precision | Recall | F1 | ROC-AUC | Support |
 |---|---|---|---|---|---|
-| glioma | 0.996 | 0.677 | 0.807 | 0.937 | 400 |
-| meningioma | 0.792 | 0.990 | 0.880 | 0.987 | 400 |
-| notumor | 0.926 | 1.000 | 0.962 | 0.999 | 400 |
-| pituitary | 0.992 | 0.983 | 0.987 | 0.997 | 400 |
+| glioma | 1.000 | 0.642 | 0.782 | 0.939 | 400 |
+| meningioma | 0.771 | 0.985 | 0.865 | 0.989 | 400 |
+| notumor | 0.924 | 1.000 | 0.960 | 0.999 | 400 |
+| pituitary | 0.985 | 0.983 | 0.984 | 0.997 | 400 |
 
-**Weakest class: glioma.** Of 400 glioma test images, 97 are predicted as meningioma and **32 (8.0%) as `notumor`** — a missed-tumor error, the most consequential failure mode for any screening use.
+**Weakest class: glioma.** Of 400 glioma test images, 110 are predicted as meningioma and **33 (8.2%) as `notumor`** — a missed-tumor error, the most consequential failure mode for any screening use.
 <!-- PERCLASS:END -->
 
 ### Figures (generated by the run)
@@ -156,21 +166,21 @@ Per-class precision-recall curves: [`results/figures/pr_curves.png`](results/fig
 ### Robustness & uncertainty (measured)
 
 <!-- ROBUSTNESS:BEGIN -->
-**Robustness to common corruptions** (accuracy at severity 1 / 3 / 5; clean = 90.5%):
+**Robustness to common corruptions** (accuracy at severity 1 / 3 / 5; clean = 90.2%):
 
 | Corruption | sev 1 | sev 3 | sev 5 |
 |---|---|---|---|
-| gaussian_noise | 25% | 25% | 28% |
-| gaussian_blur | 86% | 43% | 36% |
-| brightness | 90% | 86% | 76% |
-| contrast | 90% | 90% | 71% |
-| jpeg_compression | 84% | 75% | 51% |
-| rotation | 89% | 90% | 86% |
-| **mean corrupted** | | | **68.3%** |
+| gaussian_noise | 25% | 31% | 24% |
+| gaussian_blur | 85% | 43% | 36% |
+| brightness | 89% | 84% | 71% |
+| contrast | 90% | 88% | 68% |
+| jpeg_compression | 83% | 75% | 52% |
+| rotation | 88% | 88% | 84% |
+| **mean corrupted** | | | **67.3%** |
 
 ![Robustness curves](results/figures/robustness_curves.png)
 
-**Uncertainty (Test-Time Augmentation):** mean predictive entropy **0.82 on correct** vs **1.00 on wrong** predictions (n=200) — the model is measurably less certain when it errs.
+**Uncertainty (Test-Time Augmentation):** mean predictive entropy **0.81 on correct** vs **1.02 on wrong** predictions (n=200) — the model is measurably less certain when it errs.
 <!-- ROBUSTNESS:END -->
 
 The uncertainty signal is real but weak on this model: entropy separates
@@ -193,41 +203,54 @@ its own.
   this repo's parity reproduction pick the checkpoint with the best
   `val_accuracy`, where validation *is* (part of) the test set. Reported test
   metrics are therefore optimistically biased. Carving a validation split out of
-  Training is the fix: `btc.splits` now builds a leakage-safe validation split
-  (see *Toward a better model* below), and retraining against it is next.
+  Training is the fix: `btc.splits` builds a leakage-safe validation split, and
+  NeuroClass v2 (below) is selected on it, never on the test set.
 
-- **Metal vs CPU numerics.** `tensorflow-metal` 1.1.0 is used only to make
-  training fast on Apple Silicon. Its kernels produce materially different
-  outputs for this model (93.94% vs 91.25%), so all evaluation and serving is
-  pinned to CPU by `config.configure_inference_device()`, which every model load
-  goes through. Set `BTC_INFERENCE_DEVICE=gpu` to opt out. Numbers previously
-  reported from Metal are superseded by the CPU numbers above.
+- **Metal graph-mode defect (root cause found).** On Apple Silicon,
+  `tensorflow-metal` 1.1.0 computes the right function in *eager* mode (matches
+  CPU to ~4e-6) but a different one in *graph* mode — `tf.function`, and so
+  Keras `predict` and `fit`. For the deployed weights on the test set: CPU
+  **90.25%**, Metal graph mode 93.81% (3.6% of predictions flipped). Turning off
+  grappler's meta-optimizer makes Metal match CPU exactly (max difference
+  1.2e-5, no flips); turning off any single built-in pass does not, which points
+  at the plugin's own graph optimizer. The parity model was trained with `fit`
+  on Metal, i.e. likely against the defective function, which would explain why
+  that function scores higher than the deployed one. All evaluation and serving
+  is pinned to CPU by `config.configure_inference_device()`;
+  `config.disable_metal_graph_optimizer()` is the workaround when a GPU is used.
+  Even with it, Metal gradients differ from CPU (median 4.7% on per-variable
+  gradient norms), so training defaults to CPU.
 
-- **Train/serve preprocessing skew.** Evaluation resizes images with Keras
-  `load_img` (nearest-neighbour, as in the published notebooks), but both
-  serving paths resize with PIL's default (bicubic). Under the serving
-  preprocessing the same model scores **90.25%** on the test set, a point below
-  the 91.25% reported above. The reported numbers stay on the committed
-  evaluation path so they remain reproducible; `btc/preprocess.py` is the shared
-  function evaluation should move onto.
+- **Train/serve preprocessing skew (fixed in evaluation).** Evaluation used to
+  resize with Keras `load_img` (nearest-neighbour, as in the published
+  notebooks) while both serving paths resize with PIL's default (bicubic), so
+  the reported 91.25% described a computation nobody was served. Every
+  evaluation loader now uses `btc/preprocess.py`, the serving function (a test
+  guards it, and another asserts the Space's preprocessing is byte-identical),
+  and the numbers above were re-measured on it: 91.25% → **90.25%**. The parity
+  *training* pipeline still resizes as published.
 
 - **BatchNorm recalibration.** Under the published recipe (momentum 0.99,
   batch 16) the backbone's BatchNorm running statistics did not converge on
   Metal, so raw inference collapsed toward one class. `train.py` re-estimates
   those statistics with forward passes over training data (no weight update).
   Re-estimating them on CPU instead was tried and scored lower on CPU (89.19% vs
-  91.25%), so the current weights were kept.
+  91.25%, both under the previous evaluation preprocessing), so the current
+  weights were kept. In hindsight the collapse is likely another symptom of the
+  Metal graph-mode defect, which `fit` trained through.
 
 - **Dataset drift since publication.** The live Kaggle dataset has been
   rebalanced since the paper: **5,600 train / 1,600 test (1,400 / 400 per
   class)** versus the paper's **5,712 / 1,311**. Reproduced numbers are on this
   different test set; `data.py` warns when counts differ.
 
-- **Calibration protocol.** By default the temperature is fit and scored on the
-  same test split. A stricter check — fit on a random half, score on the other
-  half, 5 seeds — gives ECE **0.196 → 0.074 ± 0.008** with T = 0.562 ± 0.006,
-  essentially the same as the default protocol, so it isn't materially
-  optimistic here. `python -m btc.calibration --holdout 0.5` runs that protocol.
+- **Calibration protocol.** For the parity model the temperature is fit and
+  scored on the test split (it trained on all of Kaggle Training, so there is no
+  clean validation data to fit on). A stricter check — fit on a random half,
+  score on the other half (`python -m btc.calibration --holdout 0.5`) — gives
+  ECE **0.194 → 0.065** with T = 0.607, close to the default protocol's
+  0.188 → 0.068 (T = 0.577), so it isn't materially optimistic here. v2 fits its
+  temperature on the validation split and reports ECE on the test set.
 
 - **Steps-per-epoch quirk (faithful reproduction).** The published notebook uses
   `steps_per_epoch = 5712 // 32 = 178` with batch size 16, so each epoch sees
@@ -237,7 +260,7 @@ its own.
   (tumor / no tumor), so the 4-class model is scored by collapsing its three
   tumor classes into one.
 
-### Toward a better model (in progress)
+### NeuroClass v2: a better model (measured, staged, not deployed)
 
 **A leakage-safe validation split.** `python -m btc.splits` carves 841
 validation images (about 210 per class) out of Kaggle Training. It first groups
@@ -248,29 +271,93 @@ so a random split would leak. Verified: **zero** near-duplicate pairs straddle
 train and validation (the official test set has 714). The split is saved to
 `results/splits/train_val_split.json`.
 
-**NeuroClass v2 (experimental, no model yet).** `btc/train_v2.py` targets each
-weakness measured above: it trains on CPU with the serving preprocessing,
-selects checkpoints on the validation split, freezes the backbone's BatchNorm,
-uses full epochs, and adds augmentation including Gaussian noise. The first
-full run used the parity learning rate (1e-3) and stayed at chance after one
-epoch. 60-step diagnostics on a subset traced that to the learning rate: with
-BatchNorm frozen, 1e-3 scrambles the pretrained features, while 1e-4 learns
-(65% validation accuracy after 60 steps, against 64% for the parity recipe).
-The recipe now defaults to 1e-4; a full run is next. No v2 metric is reported.
+**The recipe** ([`train_v2.py`](src/btc/train_v2.py)) targets each weakness
+measured above. It trains on CPU (the deployed computation) with the serving
+preprocessing, on the 4,759-image training side of the split, and selects every
+checkpoint, learning-rate step and early stop on validation. It is the standard
+two-stage EfficientNet fine-tune:
 
-**Measured, not yet adopted: test-time augmentation.** Averaging the 6
-augmented views the Space already computes for uncertainty, under the serving
-preprocessing, lifts test accuracy from 90.25% to **92.31%**, leak-free accuracy
-from 85.7% to 87.6%, and glioma recall from 64.3% to **71.5%**. It costs 6
-forward passes per image instead of 1.
+1. **Head only**, on cached features of the frozen ImageNet backbone (each
+   training image and its mirror), Adamax 1e-3 — 17 seconds once the features
+   are cached (2.5 min).
+2. **Fine-tune from `block6a` up** with flips, small rotations/zooms/shifts,
+   brightness/contrast and Gaussian noise, Adamax 1e-4 decayed on plateaus,
+   BatchNorm frozen throughout. Backpropagation stops at 16×16 feature maps, so
+   an epoch costs ~2.2 min on an M3 Pro CPU instead of ~6 for a full fine-tune.
+
+Total training time: **21.5 minutes on a laptop CPU**. Every run writes its
+config, seed, split hash, git revision, hardware, per-epoch history and
+checkpoints to a gitignored `runs/` directory and resumes after an
+interruption. [`v2_sanity_checks.py`](scripts/v2_sanity_checks.py) runs seven
+pre-flight checks first (label mapping, forward pass, frozen BatchNorm, finite
+gradients, augmentation, an overfit test, graph mode == eager).
+
+**Selection, on validation only.** Rule fixed before comparing: higher
+validation accuracy wins unless the gap is under 1 point, then higher mean
+accuracy under corruption. Head-only scored 96.79% vs 96.31% for the fine-tuned
+model (a 4-image gap), so robustness decided: **92.4% vs 79.2%** mean accuracy
+under the 30 corruption conditions on validation. Test-time augmentation moved
+validation accuracy by ±0.24 points (+0.24 for one candidate, −0.24 for the
+other) and was **not adopted**.
+
+**One test-set comparison** ([`v2_comparison.json`](results/metrics/v2_comparison.json),
+written by [`compare_models.py`](scripts/compare_models.py)):
+
+<!-- V2:BEGIN -->
+| Metric (CPU, serving preprocessing) | Deployed (parity) | **v2** |
+|---|---|---|
+| Test accuracy (n=1600) | 90.25% | 93.44% |
+| Novel-image subset accuracy (n=886) | 85.67% | 89.39% |
+| Near-duplicate subset accuracy | 95.94% | 98.46% |
+| Macro F1 | 0.898 | 0.933 |
+| Glioma recall (novel subset) | 64.25% (63.06%) | 79.50% (75.16%) |
+| Gliomas predicted `notumor` (of 400) | 33 | 25 |
+| Cross-entropy (lower is better) | 0.496 | 0.204 |
+| ECE raw → temperature-scaled | 0.188 → 0.065 | 0.022 → 0.024 |
+| Mean accuracy over 30 corruptions (n=400) | 67.32% | 90.68% |
+| External OOD accuracy (n=253) | 69.57% | 72.73% |
+| External tumor recall / no-tumor specificity | 50.32% / 100.00% | 56.13% / 98.98% |
+
+Paired significance (exact McNemar): full test: 81 images only v2 gets right vs 30 only the parity model does, p = 1.4e-06; novel subset: 56 images only v2 gets right vs 23 only the parity model does, p = 2.6e-04; glioma: 70 images only v2 gets right vs 9 only the parity model does, p = 7.8e-13.
+
+Calibration: parity — T fit on half the test set, ECE on the other half; v2 — T fit on the validation split, ECE on the full test set (T = 0.937).
+<!-- V2:END -->
+
+v2 needs little calibration: its raw ECE is already 0.022, and the temperature
+fit on validation (T = 0.937) leaves test ECE essentially unchanged (0.024).
+v2 had less training data than the parity model (4,759 vs 5,600 images; the rest
+is its validation split), and the parity model's checkpoint was chosen on the
+test set, which flatters it — so the comparison, if anything, favours the
+parity model. Glioma is still v2's weakest class: 25 of 400 glioma test images
+(6.25%) are called `notumor`.
+
+**Two silent bugs found on the way, both fixed and guarded:**
+- *Metal graph mode* (above): a first 3-epoch run on Metal reported 73.8%
+  validation accuracy for a checkpoint that scores 71.6% on CPU. Training now
+  defaults to CPU, and pre-flight check 7 fails on the defect.
+- *A Keras architecture quirk*: EfficientNet gets an extra input layer,
+  `Rescaling(1/sqrt(ImageNet std))`, only when built with
+  `weights="imagenet"` (tensorflow#49930). v2 trains from ImageNet weights; the
+  evaluation and serving code builds with `weights=None`, so v2 weights loaded
+  there silently scored 86.7% instead of 95.0% on a validation sample.
+  `export_for_serving()` folds the layer into the input `Normalization`
+  variance — an exact identity, verified to 1e-6 and checked on every export —
+  so v2 runs on the unchanged serving architecture. (The parity model never
+  had the layer at inference and is unaffected.)
+
+**Staged, not deployed.** `models/NeuroClass_v2_weights.h5`,
+`models/neuroclass_v2.onnx` (matches Keras-CPU to 5e-6 on all 1,600 test
+images) and `models/temperature_v2.json` sit beside the deployed artifacts,
+which are byte-for-byte unchanged. The Space and the API select their model
+through environment variables (below), so switching is reversible without a
+code change.
 
 ### Roadmap
-1. Train NeuroClass v2 to completion on the leakage-safe split; compare with the
-   parity model on the test set's leak-free subset.
-2. Move evaluation onto the shared serving preprocessing.
-3. Adopt test-time-augmentation averaging if it holds up on validation.
-4. Target glioma → `notumor` misses specifically (the 8% missed-tumor rate).
-5. Upgrade the Space to Gradio 6 to clear its remaining dependency advisories.
+1. Deploy v2 to the Space (upload its three files beside the current ones and
+   set the Space variables), after sign-off.
+2. Target the remaining glioma → `notumor` misses (6.25% on test).
+3. Report results over several training seeds instead of one.
+4. Upgrade the Space to Gradio 6 to clear its remaining dependency advisories.
 
 ---
 
@@ -278,7 +365,7 @@ forward passes per image instead of 1.
 
 The [Gradio Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
 runs on Hugging Face free-tier CPU. Inference (class + calibrated confidence +
-TTA uncertainty) uses **ONNX Runtime**; Grad-CAM uses the Keras model, compiled
+stability level from 6 test-time-augmentation views) uses **ONNX Runtime**; Grad-CAM uses the Keras model, compiled
 into a single graph. Weights are pulled from the
 [HF Hub model repo](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
 at startup, so the model is versioned separately from the app.
@@ -306,6 +393,17 @@ hf upload Udit013/brain-tumor-mri-classifier space/ . --repo-type space
 Keep `python_version: "3.11"` in the Space README — TensorFlow 2.15 doesn't
 support newer Python versions.
 
+**Choosing the served model.** The Space reads three optional variables
+(Space settings → Variables); unset, it serves the current parity model:
+
+| Variable | Parity (default) | v2 |
+|---|---|---|
+| `NEUROCLASS_ONNX` | `efficientnetb3.onnx` | `neuroclass_v2.onnx` |
+| `NEUROCLASS_WEIGHTS` | `EfficientNetB3_model_weights.h5` | `NeuroClass_v2_weights.h5` |
+| `NEUROCLASS_TEMPERATURE` | `temperature.json` | `temperature_v2.json` |
+
+The FastAPI service takes `BTC_WEIGHTS` and `BTC_TEMPERATURE` paths the same way.
+
 ### FastAPI service
 
 ```bash
@@ -319,7 +417,7 @@ curl -F "file=@some_mri.jpg" http://localhost:8000/predict
 |---|---|
 | `GET /health` | `{"status","model_loaded","calibrated"}` — used by the Docker `HEALTHCHECK` |
 | `POST /predict` | multipart `file` → class, calibrated + raw confidence, per-class probabilities, base64 Grad-CAM PNG, `inference_ms` / `gradcam_ms` / `latency_ms` |
-| errors | `413` upload over 10 MB (enforced on bytes read, not the client's `Content-Length`); `400` unreadable image |
+| errors | `413` upload over 10 MB (enforced on bytes read, not the client's `Content-Length`); `400` unreadable or empty image; `422` no `file` field; `503` model failed to load (the server stays up and `/health` returns 503 with the cause) |
 
 Measured on a laptop CPU (Apple M3 Pro, inference pinned to CPU), before → after
 this repo's serving fixes:
@@ -368,7 +466,9 @@ Verified on Docker 29.8 (linux/arm64): the image builds (981 MB), runs as the
 non-root `appuser`, installs the pinned stack (TF 2.15.0, FastAPI 0.142.2,
 Starlette 1.7.0, Pillow 12.3.0), serves a correct prediction, returns 413 for an
 oversized upload and 400 for a corrupt one, and Docker's own healthcheck
-reports **healthy**.
+reports **healthy**. That check predates the latest serving changes (503 on a
+model-load failure, `BTC_TEMPERATURE`), which are covered by the API tests but
+not yet by a rebuilt image.
 
 ## Environment & dependencies
 
@@ -395,14 +495,15 @@ src/btc/                    # production extension package
   config.py  data.py  model.py  train.py
   evaluate.py  leakage.py  external_validation.py  calibration.py
   explain.py  robustness.py  uncertainty.py  monitoring.py  export_onnx.py
-  preprocess.py             # serving image preprocessing (shared with train_v2)
+  preprocess.py             # the one image preprocessing: serving, evaluation, train_v2
   splits.py                 # leakage-safe train/val split of Kaggle Training
-  train_v2.py               # EXPERIMENTAL improved recipe (not yet trained)
+  train_v2.py               # EXPERIMENTAL improved recipe (runs go to runs/, gitignored)
   serve/app.py              # FastAPI service
-space/                      # Gradio app deployed to Hugging Face Spaces
-scripts/                    # setup_env, download_data, reproduce, fill_readme_results
-tests/                      # 35 tests: pure logic + FastAPI contract (no TF needed)
+space/                      # Gradio app (app.py), its tested logic (logic.py), examples
+scripts/                    # setup_env, download_data, reproduce, fill_readme_results,
+                            #   v2_sanity_checks, evaluate_candidate
+tests/                      # 65 tests: pure logic, Space logic, FastAPI contract (no TF)
 results/                    # metrics, figures, and the train/val split (generated, tracked)
 models/                     # weights, ONNX, temperature, drift reference (generated, ignored)
-Dockerfile  requirements*.txt  pyproject.toml  MODEL_CARD.md  PROJECT_DOCUMENTATION.md
+Dockerfile  requirements*.txt  pyproject.toml  MODEL_CARD.md  PROJECT_DOCUMENTATION_BrainTumor.md
 ```
