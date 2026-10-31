@@ -524,5 +524,5 @@ scripts/                    # setup_env, download_data, reproduce, fill_readme_r
 tests/                      # 65 tests: pure logic, Space logic, FastAPI contract (no TF)
 results/                    # metrics, figures, and the train/val split (generated, tracked)
 models/                     # weights, ONNX, temperature, drift reference (generated, ignored)
-Dockerfile  requirements*.txt  pyproject.toml  MODEL_CARD.md  PROJECT_DOCUMENTATION_BrainTumor.md
+Dockerfile  requirements*.txt  pyproject.toml  MODEL_CARD.md  PROJECT_DOCUMENTATION_NeuroClass.md
 ```
