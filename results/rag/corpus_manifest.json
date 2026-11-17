@@ -1,0 +1,2958 @@
+{
+  "license_rule": "Creative Commons licence declared in the article XML; ND excluded",
+  "queries": {
+    "brain_tumor_classification": "(\"brain tumor\"[tiab] OR \"brain tumour\"[tiab] OR glioma[tiab] OR meningioma[tiab] OR pituitary[tiab]) AND (MRI[tiab] OR \"magnetic resonance\"[tiab]) AND (\"deep learning\"[tiab] OR \"convolutional neural network\"[tiab] OR CNN[tiab]) AND classification[tiab]",
+    "transfer_learning": "\"transfer learning\"[tiab] AND (EfficientNet[tiab] OR VGG16[tiab] OR InceptionV3[tiab] OR ImageNet[tiab]) AND (\"medical image\"[tiab] OR \"medical images\"[tiab] OR MRI[tiab])",
+    "explainability": "(\"Grad-CAM\"[tiab] OR \"gradient-weighted class activation\"[tiab] OR saliency[tiab]) AND (\"medical imaging\"[tiab] OR radiology[tiab] OR MRI[tiab]) AND (explainab*[tiab] OR interpretab*[tiab])",
+    "calibration_uncertainty": "(calibration[tiab] OR \"temperature scaling\"[tiab] OR \"uncertainty estimation\"[tiab] OR \"predictive uncertainty\"[tiab] OR \"uncertainty quantification\"[tiab]) AND \"deep learning\"[tiab] AND (\"medical image\"[tiab] OR \"medical imaging\"[tiab])",
+    "data_leakage": "(\"data leakage\"[tiab] OR \"information leakage\"[tiab] OR \"patient-level\"[tiab] OR \"subject-level\"[tiab] OR \"duplicate images\"[tiab] OR \"train-test overlap\"[tiab]) AND (\"deep learning\"[tiab] OR \"machine learning\"[tiab]) AND (imaging[tiab] OR MRI[tiab] OR radiology[tiab])",
+    "generalization": "(\"domain shift\"[tiab] OR \"external validation\"[tiab] OR \"dataset shift\"[tiab] OR \"generalizability\"[tiab] OR \"generalisability\"[tiab]) AND \"deep learning\"[tiab] AND (MRI[tiab] OR \"medical imaging\"[tiab])",
+    "class_imbalance": "(\"class imbalance\"[tiab] OR \"imbalanced data\"[tiab] OR \"imbalanced dataset\"[tiab]) AND \"deep learning\"[tiab] AND (\"medical image\"[tiab] OR \"medical imaging\"[tiab])",
+    "robustness": "(\"test-time augmentation\"[tiab] OR \"image corruption\"[tiab] OR \"robustness\"[tiab] OR \"noise\"[tiab] OR \"perturbation\"[tiab]) AND \"deep learning\"[tiab] AND MRI[tiab] AND (classification[tiab] OR segmentation[tiab])",
+    "ood_detection": "(\"out-of-distribution\"[tiab] OR \"novelty detection\"[tiab] OR \"anomaly detection\"[tiab]) AND (\"medical imaging\"[tiab] OR MRI[tiab]) AND \"deep learning\"[tiab]",
+    "reporting_guidelines": "(CLAIM[tiab] OR TRIPOD[tiab] OR \"reporting guideline\"[tiab] OR checklist[tiab]) AND \"artificial intelligence\"[tiab] AND (radiology[tiab] OR \"medical imaging\"[tiab])"
+  },
+  "per_topic": 30,
+  "n_documents": 244,
+  "rejected": {
+    "license": 51,
+    "unparseable": 0,
+    "duplicate": 1
+  },
+  "documents": [
+    {
+      "id": "PMC10012410",
+      "title": "Large-scale transient peri-ictal perfusion magnetic resonance imaging abnormalities detected by quantitative image analysis",
+      "year": 2023,
+      "journal": "Brain Communications",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10012410/",
+      "content_sha256": "740610964101f9c4b85bd9d294afa59a02084f51573a86d627dc42c2f68865bd",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC10046932",
+      "title": "Grade Classification of Tumors from Brain Magnetic Resonance Images Using a Deep Learning Technique",
+      "year": 2023,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10046932/",
+      "content_sha256": "8b5b88ef8ff6a544d6e262650fa7a87effeda742768506e5cad54594f083c81a",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC10051877",
+      "title": "Generative Adversarial Networks Can Create High Quality Artificial Prostate Cancer Magnetic Resonance Images",
+      "year": 2023,
+      "journal": "Journal of Personalized Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10051877/",
+      "content_sha256": "d7d418b7f2af361252d7c64bad20a91911605979187c5aacf5dd5f37fca98384",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC10105653",
+      "title": "Assessment of artificial intelligence (AI) reporting methodology in glioma MRI studies using the Checklist for AI in Medical Imaging (CLAIM)",
+      "year": 2023,
+      "journal": "Neuroradiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10105653/",
+      "content_sha256": "1568af57e1a84620f852b5306e0a7f6e49561b2065f4e980dc9be1e7f97dcbad",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC10137171",
+      "title": "Automated Classification of Brain Tumors from Magnetic Resonance Imaging Using Deep Learning",
+      "year": 2023,
+      "journal": "Brain Sciences",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10137171/",
+      "content_sha256": "4dce647fbe63c8eed07a21dff924e1990d65cd9175149ec2db6e56a470bf3274",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC10233056",
+      "title": "Fully automating LI-RADS on MRI with deep learning-guided lesion segmentation, feature characterization, and score inference",
+      "year": 2023,
+      "journal": "Frontiers in Oncology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10233056/",
+      "content_sha256": "7cca852788f3bfe3a245b44ab7d76b967d66f3f22418aba115d9dbe0fd3d4e68",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC10244308",
+      "title": "Deep learning for predicting future lesion emergence in high-risk breast MRI screening: a feasibility study",
+      "year": 2023,
+      "journal": "European Radiology Experimental",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10244308/",
+      "content_sha256": "53c73b233101b185f641632b92e74afc2e8688120ca7661fb92730b62bd9df8e",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC10249293",
+      "title": "A systematic review of radiomics in giant cell tumor of bone (GCTB): the potential of analysis on individual radiomics feature for identifying genuine promising imaging biomarkers",
+      "year": 2023,
+      "journal": "Journal of Orthopaedic Surgery and Research",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10249293/",
+      "content_sha256": "f37dd0db4e03fdd3c5b869bcbe4e84f144b304eab6a6c08a9c69c78c8895dd95",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC10252483",
+      "title": "Brain Tumor Class Detection in Flair/T2 Modality MRI Slices Using Elephant-Herd Algorithm Optimized Features",
+      "year": 2023,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10252483/",
+      "content_sha256": "88b3d22f090738b73b4c4c9d9380828ab5b192fcd97af2e5536aa14141423cfb",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC10350097",
+      "title": "Direct segmentation of brain white matter tracts in diffusion MRI",
+      "year": 2023,
+      "journal": "ArXiv",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10350097/",
+      "content_sha256": "f546b23f7657242c961c9406cc18465fe8ba7847e8edf47272ea89b807d69862",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC10461732",
+      "title": "Deep learning approach for hyperspectral image demosaicking, spectral correction and high-resolution RGB reconstruction",
+      "year": 2021,
+      "journal": "Computer Methods in Biomechanics and Biomedical Engineering. Imaging & Visualization",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10461732/",
+      "content_sha256": "931d78b394b51e54953b5f3fc6f610651150fd1d0daf7990ebd34b94c057758a",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC10538057",
+      "title": "Deep-Learning-Aided Evaluation of Spondylolysis Imaged with Ultrashort Echo Time Magnetic Resonance Imaging",
+      "year": 2023,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10538057/",
+      "content_sha256": "35e59ca35559a8af159ec6672a80b7c6603734cb8da1888feead06530daff1ea",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC10557812",
+      "title": "Disease-driven domain generalization for neuroimaging-based assessment of Alzheimer’s disease",
+      "year": 2023,
+      "journal": "medRxiv",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10557812/",
+      "content_sha256": "865107b01b6b66133e5ccbfad7268097d6108521c41bbd14b4a08eb3bbbf910a",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC10560997",
+      "title": "Bayesian uncertainty estimation for detection of long-tailed and unseen conditions in medical images",
+      "year": 2023,
+      "journal": "Journal of Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10560997/",
+      "content_sha256": "850d39e9a7f5ff66579f03b1fa065d03d04bb4bdef577858ae199050537a181e",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC10574977",
+      "title": "Towards Building a Trustworthy Deep Learning Framework for Medical Image Analysis",
+      "year": 2023,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10574977/",
+      "content_sha256": "fcecc00b67952841c32900b64a92db06568032097bb53590c603098e16e69f29",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC10583453",
+      "title": "Interpreting deep learning models for glioma survival classification using visualization and textual explanations",
+      "year": 2023,
+      "journal": "BMC Medical Informatics and Decision Making",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10583453/",
+      "content_sha256": "2f4c5bcd095e764b5dca52e906a2dadf19f55711fd095e98a013a25773600e5c",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC10622563",
+      "title": "Multi-class glioma segmentation on real-world data with missing MRI sequences: comparison of three deep learning algorithms",
+      "year": 2023,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10622563/",
+      "content_sha256": "9242073d54e2ab275d6d72af5fcda3209a5378cb797211a2135289d1e182f857",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC10624834",
+      "title": "How intra-source imbalanced datasets impact the performance of deep learning for COVID-19 diagnosis using chest X-ray images",
+      "year": 2023,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10624834/",
+      "content_sha256": "6e4ff68308d45ba7db5813e890ba07706178c9dc7ead1dc98f67b8ce78d1820c",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC10663596",
+      "title": "Diffusion MRI anomaly detection in glioma patients",
+      "year": 2023,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10663596/",
+      "content_sha256": "43e12b6574c62ecf6cdbaec39b4ed7f4aae0b2cf87c535118ec28c2229910426",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC10666634",
+      "title": "A classifier model for prostate cancer diagnosis using CNNs and transfer learning with multi-parametric MRI",
+      "year": 2023,
+      "journal": "Frontiers in Oncology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10666634/",
+      "content_sha256": "734edd5d70864d9ec30f6c5403b255c7e413d6c9ed12b1dae7b05732e9bcaa3a",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC10701000",
+      "title": "Reporting Quality of Research Studies on AI Applications in Medical Images According to the CLAIM Guidelines in a Radiology Journal With a Strong Prominence in Asia",
+      "year": 2023,
+      "journal": "Korean Journal of Radiology",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10701000/",
+      "content_sha256": "e0dc4e9cce5a95f9f90004ca7655a7b645156826157ff392e571b04732c1f924",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC10717715",
+      "title": "The endorsement of general and artificial intelligence reporting guidelines in radiological journals: a meta-research study",
+      "year": 2023,
+      "journal": "BMC Medical Research Methodology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10717715/",
+      "content_sha256": "08fd242191d9a1c94c52e2ff1952838c9c825ba04fefceb819de7ebf2a841307",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC10740473",
+      "title": "Comparing the Robustness of ResNet, Swin-Transformer, and MLP-Mixer under Unique Distribution Shifts in Fundus Images",
+      "year": 2023,
+      "journal": "Bioengineering",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10740473/",
+      "content_sha256": "f8d8b97645779fc025f3965d717edc4a2916bee0f007f9d511cb57cc7e9d059b",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC10754828",
+      "title": "Detection and classification of brain tumor using hybrid deep learning models",
+      "year": 2023,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10754828/",
+      "content_sha256": "7311b52ab233e610c3f4979f5c6d7c318ac9f11c2c60db8fd6852ccd812a5631",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC10796447",
+      "title": "Empowering breast cancer diagnosis and radiology practice: advances in artificial intelligence for contrast-enhanced mammography",
+      "year": 2023,
+      "journal": "Frontiers in Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10796447/",
+      "content_sha256": "b014447f3a11e917edaa8a342858db9ce31ac916f213d00bbf07c33cffd67301",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC10832072",
+      "title": "Enhancing deep learning classification performance of tongue lesions in imbalanced data: mosaic-based soft labeling with curriculum learning",
+      "year": 2024,
+      "journal": "BMC Oral Health",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10832072/",
+      "content_sha256": "f51733ae6ddc938625db26e9a305b7d1d6a04a07eddaabec8f9e0ac5c9ea7656",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC10834960",
+      "title": "Brain tumor detection from images and comparison with transfer learning methods and 3-layer CNN",
+      "year": 2024,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10834960/",
+      "content_sha256": "882764f418f1432382fdeca5f97d12c12060e94ac7fa02550da1feb0d33ad56d",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC10853078",
+      "title": "Deep learning enables the differentiation between early and late stages of hip avascular necrosis",
+      "year": 2023,
+      "journal": "European Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10853078/",
+      "content_sha256": "83b050de5d266a1e4483ccf07fd64eb7e760e96e2177be15e564881b0382d7c5",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC10883197",
+      "title": "Brain tumour detection from magnetic resonance imaging using convolutional neural networks",
+      "year": 2023,
+      "journal": "Contemporary Oncology",
+      "license": "CC BY-NC-SA",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10883197/",
+      "content_sha256": "126eabb92af4e214343896ca0c442e030112b0fb53cdc9257a1d873562b250a3",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC10897162",
+      "title": "Exploiting macro- and micro-structural brain changes for improved Parkinson’s disease classification from MRI data",
+      "year": 2024,
+      "journal": "NPJ Parkinson's Disease",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10897162/",
+      "content_sha256": "5fe44014855056b1859387d0c07aeaf4590b2c3d0a63e80d008a0116aa814f48",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC10910262",
+      "title": "Optimising brain age estimation through transfer learning: A suite of pre‐trained foundation models for improved performance and generalisability in a clinical setting",
+      "year": 2024,
+      "journal": "Human Brain Mapping",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10910262/",
+      "content_sha256": "3df11aed424227017990a001db55f4de3602df1db513d4841f131c3a1af08e80",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC11059769",
+      "title": "Detection of Marchiafava Bignami disease using distinct deep learning techniques in medical diagnostics",
+      "year": 2024,
+      "journal": "BMC Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11059769/",
+      "content_sha256": "040bf23b835a1db1d40fc6185ecb12524be6576a4dd030c094f12e30f20807a7",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC11119260",
+      "title": "Dynamic Weighting Translation Transfer Learning for Imbalanced Medical Image Classification",
+      "year": 2024,
+      "journal": "Entropy",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11119260/",
+      "content_sha256": "7199439d9f7bda45770473fbb0ac31bc6ff03a3c5b19add0a7908fd9049a0c85",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC11157570",
+      "title": "CVG-Net: novel transfer learning based deep features for diagnosis of brain tumors using MRI scans",
+      "year": 2024,
+      "journal": "PeerJ Computer Science",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11157570/",
+      "content_sha256": "cc4145538584bd1fa907bdb877ca7bb21cf101d25022d5308e340da854b6e0e7",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC11168488",
+      "title": "Cortical thickness and grey-matter volume anomaly detection in individual MRI scans: Comparison of two methods",
+      "year": 2024,
+      "journal": "NeuroImage : Clinical",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11168488/",
+      "content_sha256": "a8c846d4a4dbe4329dd3d8d746f1e19f5dbfb6a2a141ffa63364e7a19521056a",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC11193223",
+      "title": "Saliency-driven explainable deep learning in medical imaging: bridging visual explainability and statistical quantitative analysis",
+      "year": 2024,
+      "journal": "BioData Mining",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11193223/",
+      "content_sha256": "2cd594349b7042e224ae259667e3b3fd294375b9bcf5c209119d0b2ed566038b",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC11199693",
+      "title": "Enhancing brain tumor classification in MRI scans with a multi-layer customized convolutional neural network approach",
+      "year": 2024,
+      "journal": "Frontiers in Computational Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11199693/",
+      "content_sha256": "fb5e5f119fa1a3dc157b449567ed22e029cd5d416cbaf51665ba3f8e292121a6",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC11221567",
+      "title": "Challenges in Reducing Bias Using Post-Processing Fairness for Breast Cancer Stage Classification with Deep Learning",
+      "year": 2024,
+      "journal": "Algorithms",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11221567/",
+      "content_sha256": "389540e9507e57e1db2e4b65002d837d5532a52424954091a0a6ffb148d82395",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC11264852",
+      "title": "Explainable lung cancer classification with ensemble transfer learning of VGG16, Resnet50 and InceptionV3 using grad-cam",
+      "year": 2024,
+      "journal": "BMC Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11264852/",
+      "content_sha256": "dd477d7fae15c6c208d9dadd848cf0f89cda8f079e51030ff6c89eb63b166877",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC11274019",
+      "title": "Brain Tumor MRI Classification Using a Novel Deep Residual and Regional CNN",
+      "year": 2024,
+      "journal": "Biomedicines",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11274019/",
+      "content_sha256": "9e3a7f5f18963c8a044ba3a9cadf70e547e16f6fe4ca7f08b575e7760aa7ddba",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC11284281",
+      "title": "A novel approach to brain tumor detection using K-Means++, SGLDM, ResNet50, and synthetic data augmentation",
+      "year": 2024,
+      "journal": "Frontiers in Physiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11284281/",
+      "content_sha256": "efef5d49c4dcc66da1ce84bf58b9ec638b54dfa055a5d5785961fed6cdac669c",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC11294512",
+      "title": "The accuracy and quality of image-based artificial intelligence for muscle-invasive bladder cancer prediction",
+      "year": 2024,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11294512/",
+      "content_sha256": "fd1f8804165803cef3f0884b5a242f2ad50994127918da34c8b877a975d7091a",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC11353848",
+      "title": "Machine-Learning-Enabled Diagnostics with Improved Visualization of Disease Lesions in Chest X-ray Images",
+      "year": 2024,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11353848/",
+      "content_sha256": "23ded714032bbbf1ed0bca6c11192e122c3c28aa6ec88c5d8f983c4b11dee755",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC11379197",
+      "title": "Precision meets generalization: Enhancing brain tumor classification via pretrained DenseNet with global average pooling and hyperparameter tuning",
+      "year": 2024,
+      "journal": "PLOS ONE",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11379197/",
+      "content_sha256": "85bd3cf7d825031d2b944a04735dd434c1875329e0a568d9061e784a432155b6",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC11432876",
+      "title": "An explainable ensemble approach for advanced brain tumor classification applying Dual-GAN mechanism and feature extraction techniques over highly imbalanced data",
+      "year": 2024,
+      "journal": "PLOS One",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11432876/",
+      "content_sha256": "7440b26201fc25316d83e65976923e4decf7bc98b7f8a7289689e7836d3590d5",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC11433524",
+      "title": "A Unified Pipeline for Simultaneous Brain Tumor Classification and Segmentation Using Fine-Tuned CNN and Residual UNet Architecture",
+      "year": 2024,
+      "journal": "Life",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11433524/",
+      "content_sha256": "f58b8ff8e3808690acdd1cc5631bb4668e60942458253501002b768591f854f7",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC11459499",
+      "title": "Brain tumor classification using fine-tuned transfer learning models on magnetic resonance imaging (MRI) images",
+      "year": 2024,
+      "journal": "Digital Health",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11459499/",
+      "content_sha256": "0c6dc43be6564b7a4d97ee24960f1daafd1299d2eb99798f7bb553356f854512",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC11527355",
+      "title": "Anatomic Interpretability in Neuroimage Deep Learning: Saliency Approaches for Typical Aging and Traumatic Brain Injury",
+      "year": 2024,
+      "journal": "Research Square",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11527355/",
+      "content_sha256": "10a919e57450fdb5687e052595f7e81e34da4ad05ef9cd15e3a8ee68e690951c",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC11585874",
+      "title": "Application of multimodal deep learning and multi-instance learning fusion techniques in predicting STN-DBS outcomes for Parkinson's disease patients",
+      "year": 2024,
+      "journal": "Neurotherapeutics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11585874/",
+      "content_sha256": "37862dde7bd386f6071b29f1967bb6e760c7bfc6ee38d921c8c5e877cafb334a",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC11590734",
+      "title": "Meta-research on reporting guidelines for artificial intelligence: are authors and reviewers encouraged enough in radiology, nuclear medicine, and medical imaging journals?",
+      "year": 2024,
+      "journal": "Diagnostic and Interventional Radiology",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11590734/",
+      "content_sha256": "b4813799af9c18da56f305a37087d1ac29dc81f773e5f7c594509e5426b2694d",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC11592902",
+      "title": "Novelty Classification Model Use in Reinforcement Learning for Cervical Cancer",
+      "year": 2024,
+      "journal": "Cancers",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11592902/",
+      "content_sha256": "e8b5743284a8a6d0a0788edabb381d3b8ab1719893b6abbf218fc93d554b1dce",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC11600534",
+      "title": "Automated lung segmentation on chest MRI in children with cystic fibrosis",
+      "year": 2024,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11600534/",
+      "content_sha256": "cb357a557e72fe7faf496e70e7b4148222adaa2c57ed075916e218368b96fd6f",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC11612063",
+      "title": "Selecting the Best Radiology Workflow Efficiency Applications",
+      "year": 2024,
+      "journal": "Journal of Imaging Informatics in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11612063/",
+      "content_sha256": "d1f82445555f67b74ddb6beaa36d664fba12782eec86f786a35e260ea4ac234a",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC11633800",
+      "title": "Ranking attention multiple instance learning for lymph node metastasis prediction on multicenter cervical cancer MRI",
+      "year": 2024,
+      "journal": "Journal of Applied Clinical Medical Physics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11633800/",
+      "content_sha256": "fb6b02c77c31ff036883d116338b54c8a1697d055cda4f8f4f10fdaad764ef88",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC11671476",
+      "title": "Deep learning-based automated diagnosis of temporomandibular joint anterior disc displacement and its clinical application",
+      "year": 2024,
+      "journal": "Frontiers in Physiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11671476/",
+      "content_sha256": "9850c32ff95052568f95ca1a3209fc5cf9c541e68c89a30205e729d99815e8ee",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC11696537",
+      "title": "DreamOn: a data augmentation strategy to narrow the robustness gap between expert radiologists and deep learning classifiers",
+      "year": 2024,
+      "journal": "Frontiers in Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11696537/",
+      "content_sha256": "2ece4ef5c617f7e20b1aa0261664c97a21cf394d04da00192ca26badbeb532a1",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC11704643",
+      "title": "AI in Dental Radiology—Improving the Efficiency of Reporting With ChatGPT: Comparative Study",
+      "year": 2024,
+      "journal": "Journal of Medical Internet Research",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11704643/",
+      "content_sha256": "6643d754490cbcd2f30b3fe09be8733342437555818ed5b7370dbfd609ad5f2a",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC11717658",
+      "title": "Enhanced neurological anomaly detection in MRI images using deep convolutional neural networks",
+      "year": 2024,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11717658/",
+      "content_sha256": "75a030ea712e0b16a8a93d71b5834b97979b7d5b45d164438711a98d54d0ad08",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC11719945",
+      "title": "Advanced Brain Tumor Classification in MR Images Using Transfer Learning and Pre-Trained Deep CNN Models",
+      "year": 2025,
+      "journal": "Cancers",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11719945/",
+      "content_sha256": "68615fee27399b26007e26bed0688cc249484d84ef229d7e32d4cd68a21d6d5e",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC11765457",
+      "title": "Deep Transfer Learning for Classification of Late Gadolinium Enhancement Cardiac MRI Images into Myocardial Infarction, Myocarditis, and Healthy Classes: Comparison with Subjective Visual Evaluation",
+      "year": 2025,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11765457/",
+      "content_sha256": "a532e4a95d880291c2aaa22e20a8304d789a83eb75face08553fc425de8724fa",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC11832365",
+      "title": "Generating multi-pathological and multi-modal images and labels for brain MRI",
+      "year": 2024,
+      "journal": "Medical Image Analysis",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11832365/",
+      "content_sha256": "7d96deb8c67046ab850e2056c79a34ddecb577f947501f5ec645b9509cdac63d",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC11898819",
+      "title": "Learning Architecture for Brain Tumor Classification Based on Deep Convolutional Neural Network: Classic and ResNet50",
+      "year": 2025,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11898819/",
+      "content_sha256": "32fc12732030d1cec00927476b2337808cfaaa765df85ad6a9059def1cc2b065",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC11903279",
+      "title": "Explainable AI in medical imaging: an interpretable and collaborative federated learning model for brain tumor classification",
+      "year": 2025,
+      "journal": "Frontiers in Oncology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11903279/",
+      "content_sha256": "f6e9f24771208438730086568194a06a5c3917e3511b79fcf98e64e03c86511f",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC11931281",
+      "title": "Deep learning analysis for rheumatologic imaging: current trends, future directions, and the role of human",
+      "year": 2025,
+      "journal": "Journal of Rheumatic Diseases",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11931281/",
+      "content_sha256": "fc5604c8f8b2eb42598759de8c0bc4254bf68459ec77773fa78f4713778bfdbf",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC11970440",
+      "title": "Employing Squeeze-and-Excitation Architecture in a Fine-Tuned Convolutional Neural Network for Magnetic Resonance Imaging Tumor Classification",
+      "year": 2025,
+      "journal": "Cureus",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11970440/",
+      "content_sha256": "beb388886f69d6f34bc7dce65ce51eb9869103233935f732063d3a03c60b15ac",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC11976239",
+      "title": "AI in radiological imaging of soft-tissue and bone tumours: a systematic review evaluating against CLAIM and FUTURE-AI guidelines",
+      "year": 2025,
+      "journal": "eBioMedicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11976239/",
+      "content_sha256": "a8f51c808cc189544816e45bc33feaae68f6d524bce1cab11370eccb78b7a86a",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC11988838",
+      "title": "AI-Guided Delineation of Gross Tumor Volume for Body Tumors: A Systematic Review",
+      "year": 2025,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11988838/",
+      "content_sha256": "9277e405fd7869b63e66c6eab1aa8c1890b18ade0694e1762a872db4daa7e153",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC12021832",
+      "title": "Improving radiologist detection of meniscal abnormality on undersampled, deep learning reconstructed knee MRI",
+      "year": 2025,
+      "journal": "Radiology Advances",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12021832/",
+      "content_sha256": "cd359633d78e28f9b0d3befb3e76a6329ddaa7043b52e0ad2da63759d72c4ee3",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12122209",
+      "title": "Integrating support vector machines and deep learning features for oral cancer histopathology analysis",
+      "year": 2025,
+      "journal": "Biology Methods & Protocols",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12122209/",
+      "content_sha256": "d09d9db4aa83fddd37724f479e5f31b5cc81288fbd42ad1e0764fb8b0fd5be0d",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC12154491",
+      "title": "A Narrative Review of Artificial Intelligence in MRI-Guided Prostate Cancer Diagnosis: Addressing Key Challenges",
+      "year": 2025,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12154491/",
+      "content_sha256": "9519de5dd737a8a1a5ceb07e721f4f14a1779229fdc25bed118c5a1243b66748",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12155260",
+      "title": "Explainable Artificial Intelligence in Radiological Cardiovascular Imaging—A Systematic Review",
+      "year": 2025,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12155260/",
+      "content_sha256": "c64381fc4c8e9c2a1516b2084c961fea1adf9e3aa44dcbd077b108d5e0a6abaf",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12179047",
+      "title": "Deep learning detects retropharyngeal edema on MRI in patients with acute neck infections",
+      "year": 2025,
+      "journal": "European Radiology Experimental",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12179047/",
+      "content_sha256": "5294fd8202a24f1b2bc83babea66407fe1b9de7135d7cbdf4f608740ccc83ac5",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC12180770",
+      "title": "Artificial Intelligence Applied to Ultrasound Diagnosis of Pelvic Gynecological Tumors: A Systematic Review and Meta-Analysis",
+      "year": 2025,
+      "journal": "Gynecologic and Obstetric Investigation",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12180770/",
+      "content_sha256": "72329168107f7fdc9332e573195bb50167895ed3fd1529f7801037cc5f920a5e",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC12190573",
+      "title": "LIU-NET: lightweight Inception U-Net for efficient brain tumor segmentation from multimodal 3D MRI images",
+      "year": 2025,
+      "journal": "PeerJ Computer Science",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12190573/",
+      "content_sha256": "1103095f0f8f154aaa1017b377d69bf15c3615806e013fa1e44996ee67c3b854",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC12227771",
+      "title": "Medical slice transformer for improved diagnosis and explainability on 3D medical images with DINOv2",
+      "year": 2025,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12227771/",
+      "content_sha256": "0ec3434a593b27b1111ea79fd1a51893dc05088b091b404b06b36d3a98e5bb90",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12258300",
+      "title": "Development and retrospective validation of an artificial intelligence system for diagnostic assessment of prostate biopsies: study protocol",
+      "year": 2025,
+      "journal": "BMJ Open",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12258300/",
+      "content_sha256": "6561556d22a3309cc0eebddd9bdb10b63d64cc3bee68c16ca99d00a9b049da80",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC12264328",
+      "title": "The impact of uncertainty estimation on radiomic segmentation reproducibility and scan–rescan repeatability in kidney MRI",
+      "year": 2025,
+      "journal": "Medical Physics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12264328/",
+      "content_sha256": "20a38eaecad397c3d48c375b9bd6cb60122431f2705cd50bc3a585af8d2b0b9c",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC12271072",
+      "title": "FlowMRI-Net: A generalizable self-supervised 4D flow MRI reconstruction network",
+      "year": 2025,
+      "journal": "Journal of Cardiovascular Magnetic Resonance",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12271072/",
+      "content_sha256": "be2e554f929e6cd3304a4f409bd40e00890aab7798e72f27343d37b8f59b04a6",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12286321",
+      "title": "Machine learning in dentistry: a scoping review",
+      "year": 2025,
+      "journal": "PLOS Digital Health",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12286321/",
+      "content_sha256": "aeb8186415b546dad8b0c85ab6e3cda3c13ccdcc8d9aac4857e14512a73de327",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC12288401",
+      "title": "Brain tumor segmentation and detection in MRI using convolutional neural networks and VGG16",
+      "year": 2025,
+      "journal": "Cancer Biomarkers: Section A of Disease Markers",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12288401/",
+      "content_sha256": "42fc13e9bb10ea9fff121f1bb76a1b30cb7343a2d47f0630eeeeed11f4fd1beb",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC12295062",
+      "title": "Optimizing Tumor Detection in Brain MRI with One-Class SVM and Convolutional Neural Network-Based Feature Extraction",
+      "year": 2025,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12295062/",
+      "content_sha256": "4933c98639f18b1a7c32e1f804cd97ffbf38fb0f62bed71462d2b1425867e61b",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12306816",
+      "title": "SNRAware: Improved Deep Learning MRI Denoising with SNR Unit Training and G-factor Map Augmentation",
+      "year": 2025,
+      "journal": "ArXiv",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12306816/",
+      "content_sha256": "779a72020b89f41dd9d26b234802f2881078176a9350eb3f7151a5e49e11af22",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12383719",
+      "title": "Robust Segmentation of Lung Proton and Hyperpolarized Gas MRI with Vision Transformers and CNNs: A Comparative Analysis of Performance Under Artificial Noise",
+      "year": 2025,
+      "journal": "Bioengineering",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12383719/",
+      "content_sha256": "41563994ab63f3ed8e39415c489859f0b8da88db646374da34f32e633c46be54",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC12388561",
+      "title": "A Web-Deployed, Explainable AI System for Comprehensive Brain Tumor Diagnosis",
+      "year": 2025,
+      "journal": "Neurology International",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12388561/",
+      "content_sha256": "cc34dc1c6ff43699486ada50f19c67e97e5b8aefa1c2d97243720d7ff4bba105",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12405159",
+      "title": "Novel deep learning for multi-class classification of Alzheimer’s in disability using MRI datasets",
+      "year": 2025,
+      "journal": "Frontiers in Bioinformatics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12405159/",
+      "content_sha256": "bccffb89be58d3806a16db6c3bf440fcfb65e9717bbc89fd2a215f6049ec2fde",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC12417678",
+      "title": "Weakly supervised deep learning for multimodal MRI-TRUS registration: Toward assisting prostate biopsy guidance",
+      "year": 2025,
+      "journal": "Digital Health",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12417678/",
+      "content_sha256": "2cb89cc15b5628a3df2254c7866f890f2620969977091b101462bce4eb893c28",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12443224",
+      "title": "Benchmarking and Explaining Deep Learning Cortical Lesion MRI Segmentation in Multiple Sclerosis",
+      "year": 2025,
+      "journal": "ArXiv",
+      "license": "CC BY-NC-SA",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12443224/",
+      "content_sha256": "c892628b437b67365f7760be305a437c3b60b3fe83f28ad0276de335b170f752",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12479381",
+      "title": "Deep-learning segmentation of the substantia nigra from multiparametric MRI: Application to Parkinson’s disease",
+      "year": 2025,
+      "journal": "Imaging Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12479381/",
+      "content_sha256": "03d52d069b2ac0e2626bd5ef2077fff6d18735ad37e328a9ecb369d471a51b4b",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12534769",
+      "title": "YOLOv12 Algorithm-Aided Detection and Classification of Lateral Malleolar Avulsion Fracture and Subfibular Ossicle Based on CT Images: Multicenter Study",
+      "year": 2025,
+      "journal": "JMIR Medical Informatics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12534769/",
+      "content_sha256": "c80241d13e17567258930fe8e0e856314321e0c59407ac46b83c1550aaf75961",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12582230",
+      "title": "Development of a multimodal vision transformer model for predicting traumatic versus degenerative rotator cuff tears on magnetic resonance imaging: A single‐centre retrospective study",
+      "year": 2025,
+      "journal": "Knee Surgery, Sports Traumatology, Arthroscopy",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12582230/",
+      "content_sha256": "85681d7c1c3b98e880d6d429cddc238f40d05cab9cd45970c99c3b3d1ba05707",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12602234",
+      "title": "More than just a heatmap: elevating XAI with rigorous evaluation metrics",
+      "year": 2025,
+      "journal": "Frontiers in Medical Technology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12602234/",
+      "content_sha256": "27beae68bb5dfb7f288a6e784e639fb7935bc0f71f362da13429dc58a0ccc51d",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12653668",
+      "title": "Are Image-Based Deep Learning Algorithms of Kidney Volume in Polycystic Kidney Disease Ready for Clinical Deployment? A Systematic Review and Meta-Analysis",
+      "year": 2025,
+      "journal": "Journal of Clinical Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12653668/",
+      "content_sha256": "fb01bc9e9dfe5bc411cab520a89a382c16a0d0738102c0f2436824bcbbab2cef",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC12663749",
+      "title": "Hierarchical classification of anterior cruciate ligament using deep learning for athletes healthcare",
+      "year": 2025,
+      "journal": "BioImpacts : BI",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12663749/",
+      "content_sha256": "82e7b99f69f4a4dcfc4cba30b0fd1e0e81cc63070991272a142982ca17127bcd",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC12675461",
+      "title": "XAI-BT-EdgeNet: explainable edge-aware deep learning with squeeze-and-excitation for brain tumor detection and prediction",
+      "year": 2025,
+      "journal": "Frontiers in Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12675461/",
+      "content_sha256": "5c68a16835226551c9939c0bedf2cb65cd24cdf2543cea0b23d2812e394eae7a",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12680082",
+      "title": "Benchmarking of deep learning methods for generic MRI multi-organ abdominal segmentation",
+      "year": 2025,
+      "journal": "Journal of Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12680082/",
+      "content_sha256": "f42270d5f305b45772dc07fa5c741e9151524db6bf835581ecb58506e8bc8063",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12694578",
+      "title": "Explainable 3D CNNs link regional and network level disruption in early Parkinson’s MRIs to symptom progression",
+      "year": 2025,
+      "journal": "bioRxiv",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12694578/",
+      "content_sha256": "3be5b1437ac7ce2d34798db56f58b8288b6666f069ce0b5ed804cb2e1769e69b",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12719480",
+      "title": "GAME-Net: an ensemble deep learning framework integrating Generative Autoencoders and attention mechanisms for automated brain tumor segmentation in MRI",
+      "year": 2025,
+      "journal": "Frontiers in Computational Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12719480/",
+      "content_sha256": "a1a54982fac1c001df1b3601360a6500a1cb0ce05aa563fa0bc206e61f9bb423",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC12729286",
+      "title": "A Review of Deep Learning Approaches Based on Segment Anything Model for Medical Image Segmentation",
+      "year": 2025,
+      "journal": "Bioengineering",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12729286/",
+      "content_sha256": "d95f0b0495891837dd9cb4cf9402eebdb5746a827767fdd30181ae764799d1e4",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC12736871",
+      "title": "Deep Learning for Tumor Segmentation and Multiclass Classification in Breast Ultrasound Images Using Pretrained Models",
+      "year": 2025,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12736871/",
+      "content_sha256": "d3d04813482ad1557d7b3262f3a4c75d9b89f68e8cc83b8ee68fb256bf5e978f",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC12740434",
+      "title": "High‐generalizability Deep Learning Framework for Early Detection of Mild Cognitive Impairment Progression to Alzheimer's Disease",
+      "year": 2025,
+      "journal": "Alzheimer's & Dementia",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12740434/",
+      "content_sha256": "c48231b9201e3f4d947ea55cfff4241dc376f8dad5e388871130fb89e9fcb2cd",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12794471",
+      "title": "Mod-SE(2): a geometric deep learning framework for brain tumor classification and segmentation in MRI images",
+      "year": 2026,
+      "journal": "Journal of Biomedical Science",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12794471/",
+      "content_sha256": "4574054ae8915c1bdf2d2fe47d25721c0ff63eb42167cd73743356df43fdccf9",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC12796762",
+      "title": "Application and performance of deep learning models for the automated diagnosis of cervical central spinal stenosis on MRI: a systematic review",
+      "year": 2025,
+      "journal": "Brain & Spine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12796762/",
+      "content_sha256": "a60574e812288503391865f19d0a6f425fefbeed60f70ee981489c5fc15f3d90",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12808615",
+      "title": "BRAIN-META: A reproducible CNN–vision transformer meta-ensemble pipeline for explainable brain tumor classification",
+      "year": 2025,
+      "journal": "MethodsX",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12808615/",
+      "content_sha256": "ac0d4e7b2fc971b3c99bc5ed1f933a074d3650d2f04a379a2f81bef0f13677db",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC12819959",
+      "title": "Consistent explainable image quality assessment for medical imaging",
+      "year": 2026,
+      "journal": "Health Information Science and Systems",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12819959/",
+      "content_sha256": "c74ee63feac0cc97360a801bc30f5ebf6e8a553c79dfdc44ec677f2f7e8612b3",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12823918",
+      "title": "Explainable AI-driven MRI-based brain tumor classification: a novel deep learning approach",
+      "year": 2025,
+      "journal": "Frontiers in Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12823918/",
+      "content_sha256": "9cc24af986c87d60ba1a3619ee98afcd22f3c1ce94c04d3cc39b0a8d34cd00be",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC12827600",
+      "title": "From radiomics to transformers in pancreatic cancer detection and prognosis",
+      "year": 2025,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12827600/",
+      "content_sha256": "50a14e4038432a484ed080da8ab92a050605b5eaca51ae93c1b00f0afb545353",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC12839833",
+      "title": "Domain Shift in Breast DCE-MRI Tumor Segmentation: A Balanced LoCoCV Study on the MAMA-MIA Dataset",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12839833/",
+      "content_sha256": "cba2c75a32de7566571720e9292b32ffc07fd35c63c5720c2df552e2dd44b04e",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12839941",
+      "title": "Multi-Task Deep Learning Model for Automated Detection and Severity Grading of Lumbar Spinal Stenosis on MRI: Multi-Center External Validation",
+      "year": 2026,
+      "journal": "Diseases",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12839941/",
+      "content_sha256": "ebf5fcc3a2d740bfa1749a48351ef9d09353452126acd69407c9133730d659f0",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12868042",
+      "title": "Generation of multimodal realistic computational phantoms as a test-bed for validating deep learning-based cross-modality synthesis techniques",
+      "year": 2025,
+      "journal": "Medical & Biological Engineering & Computing",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12868042/",
+      "content_sha256": "f57d2a7d58fe0c9324ea5943ddfbb5130fa2fd55831058bc195ca5bd9b37d5c7",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC12905774",
+      "title": "Deep Learning Artificial Intelligence and Restriction Spectrum Imaging for Patient-level Detection of Clinically Significant Prostate Cancer on Biparametric Magnetic Resonance Imaging",
+      "year": 2026,
+      "journal": "European Urology Open Science",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12905774/",
+      "content_sha256": "03eecf300247243eebf886b5f76912eecae5b3f1a66043ad81fbbfc294db9e06",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC12916819",
+      "title": "Instance-level quantitative saliency in multiple sclerosis lesion segmentation",
+      "year": 2026,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12916819/",
+      "content_sha256": "40d3b2e88ab9958329033e4fa59fd8ebdf2a3b7fa714cd7fceac539138e70275",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC12939663",
+      "title": "MRI-Based Bladder Cancer Staging via YOLOv11 Segmentation and Deep Learning Classification",
+      "year": 2026,
+      "journal": "Diseases",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12939663/",
+      "content_sha256": "0f0951a999a3d0f9ea096465dae76d93023eda929680e6e8aafaba551f1e1855",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC12952169",
+      "title": "Diagnostic accuracy of artificial intelligence models for temporomandibular joint anomalies on MRI: a systematic review and meta-analysis",
+      "year": 2026,
+      "journal": "BioMedical Engineering OnLine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12952169/",
+      "content_sha256": "32c73c70351412d9a6dea5c7c63bbdf33ac1b9212273fbc22d1c21e20de89a71",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC12984829",
+      "title": "TRIAGE: Trustworthy Reporting and Assessment for Clinical Gain and Effectiveness of AI Models",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12984829/",
+      "content_sha256": "a8a11873009fb1abeccabbb7f75120f41b2e9296d75b07d255a790ee4ddb08ae",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC12984958",
+      "title": "Liver Tumor Segmentation with Deep Learning: A Comparative Analysis of CNN-, Transformer-, and YOLO-Based Models on the ATLAS MRI",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12984958/",
+      "content_sha256": "526241f3b8ac040af49a58f917c059a09e5e9741b4127f0d96a2f19a49605728",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC12994475",
+      "title": "Reproducibility of echocardiographic measurements of left ventricular systolic function: a systematic review and meta-analysis comparing artificial intelligence and clinician estimates",
+      "year": 2025,
+      "journal": "European Heart Journal. Digital Health",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12994475/",
+      "content_sha256": "d52a8f7be82da12a7c10c81bb2e532d6f9195389ea3a60b2aee89a5ad6e58856",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13045702",
+      "title": "Diagnostic accuracy of artificial intelligence-assisted radiology assessment of cancer: a systematic review",
+      "year": 2025,
+      "journal": "BJR Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13045702/",
+      "content_sha256": "dd60b067b7fc036d0e214aca1a711f24e8c75fd39980635eb4ee037fc90c34e6",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13046515",
+      "title": "Advancing neuro-ophthalmic diagnostics: a multimodal imaging approach integrating OCT angiography and AI-enhanced MRI for improved visual pathway analysis",
+      "year": 2025,
+      "journal": "Frontiers in Neurology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13046515/",
+      "content_sha256": "4f262110c24bd9cb0f1f16adfa9417279167dd1708393a0a820bab0e26266a1a",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13057043",
+      "title": "Medical image pretraining-based transfer learning for generalizable and robust diagnosis of bone tumors on radiographs: a multi-center study",
+      "year": 2026,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13057043/",
+      "content_sha256": "e1f6d36c1a0fcc8f804f17a6b59fdf27f69b3e9b5dc254e74b88a19e2502550a",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13071485",
+      "title": "Multi‐parametric MRI synthesis for glioblastoma from quantitative MR fingerprinting: Quantitative synthetic neural network (QS‐Net)",
+      "year": 2026,
+      "journal": "Medical Physics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13071485/",
+      "content_sha256": "f14f5aee5bf0f3515f0ecde4b1917426f7697b244bfcb2229dcda56560bbf540",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13072043",
+      "title": "Hybrid CNN–GCN framework for brain tumor MRI classification: A graph‐based approach to smart healthcare diagnostics",
+      "year": 2026,
+      "journal": "Journal of Applied Clinical Medical Physics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13072043/",
+      "content_sha256": "ed6f6682dff28dee496eeba5e61fd87113c2b86d8286dff64d19a60997c7c280",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC13079346",
+      "title": "Few-shot deployment of pretrained MRI transformers in brain imaging tasks",
+      "year": 2026,
+      "journal": "Frontiers in Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13079346/",
+      "content_sha256": "607e060fba7e38989ac1b3038bd3874bad52183b4069db396ae4d814b26ffea9",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13084558",
+      "title": "Traumatic brain injury recovery prediction by harmonizing real brain CT and synthetic brain MRI: a pilot study",
+      "year": 2026,
+      "journal": "Brain Communications",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13084558/",
+      "content_sha256": "ebe69c0bdf3b96cd620d1118be6fac9c1be37dd52b0da825f2d90d3aec9c61ff",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13090948",
+      "title": "Lower limb and feet wound image dataset",
+      "year": 2026,
+      "journal": "Data in Brief",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13090948/",
+      "content_sha256": "2356fb19c3027e4f3d74127165be81c73aa226784675dbeac4767d0704ddfb63",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13091743",
+      "title": "Automatic segmentation of the urethra and prostate zones with deep learning on T2-weighted magnetic resonance imaging",
+      "year": 2026,
+      "journal": "Physics and Imaging in Radiation Oncology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13091743/",
+      "content_sha256": "9d01b0b941dc92d1af157dd222ac4950280e337b5de998842bbb8e59447e6957",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13106084",
+      "title": "An early evaluation of MedSigLIP in thyroid cytology: a comparative frozen-encoder benchmark against ImageNet-pretrained encoders",
+      "year": 2026,
+      "journal": "Frontiers in Endocrinology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13106084/",
+      "content_sha256": "9d41403df22e580ca8620dab5ae1191e0168036a40a764b007cb76ac79ae5401",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13117474",
+      "title": "A Systematic Review of Deep Learning Approaches for Hepatopancreatic Tumor Segmentation",
+      "year": 2026,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13117474/",
+      "content_sha256": "077e8d6a977784ea32d7a97726b2c8f0a4037fb1ee5917de335739facb083307",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13120325",
+      "title": "Imaging Through Scattering Tissue Using Near Infra-Red and a Convolutional Autoencoder",
+      "year": 2026,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13120325/",
+      "content_sha256": "31b7a20b0ee898a27f169d1eb6bbdb9e33aee0d067ecabe963c0be1bc7aae6d6",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13121271",
+      "title": "A calibration-aware hierarchical CNN-SWIN fusion framework for robust Cross-Dataset brain MRI analysis",
+      "year": 2026,
+      "journal": "Frontiers in Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13121271/",
+      "content_sha256": "365c5c82add519d59601d8a8c4ac547ae08d3824856a9b037147db594c46cf38",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13131096",
+      "title": "A deep learning based NeuroFusionNet approach for automated brain tumor diagnosis from MRI",
+      "year": 2026,
+      "journal": "Frontiers in Neuroinformatics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13131096/",
+      "content_sha256": "6b48c4235c3c74ef50b5a41d730500cbdc729ea5ea3d21b13f003a853a19ef9b",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13138640",
+      "title": "Reducing annotation burden in medical imaging with ADGNET: A semi-supervised deep learning strategy",
+      "year": 2026,
+      "journal": "PLOS One",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13138640/",
+      "content_sha256": "f6c19029940a197444ce52d2e01f46be1ca71fa8a0ada7e65e237c889f55a010",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13162655",
+      "title": "Artificial Intelligence-Enhanced Multiparametric MRI and VI-RADS in Bladder Cancer: Current Evidence, Clinical Opportunities and Barriers to Translation",
+      "year": 2026,
+      "journal": "Cancers",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13162655/",
+      "content_sha256": "496ad46ea8f62ddbb8b61349397e2eae0fde89bf5b08b87c354161406eb922bf",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13164521",
+      "title": "Are AI Neuroimaging Models Ready for Clinical Use? A Systematic Methodological Review",
+      "year": 2026,
+      "journal": "Journal of Clinical Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13164521/",
+      "content_sha256": "449b7f36a7a31266359c29a0c346f4800c6c70559fc139deb2fafac6bb83bee3",
+      "topics": [
+        "calibration_uncertainty",
+        "data_leakage",
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13166009",
+      "title": "Multi-Chaotic HEOA for Hardware-Aware Neural Architecture Search: Brain Tumor Classification on FPGA",
+      "year": 2026,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13166009/",
+      "content_sha256": "de939d3314cf0335b986022399545f4be2d8d270cd7c60a6390fff2896e49d41",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC13201642",
+      "title": "Deep optimization-guided hybrid neural network for accurate detection and segmentation of white matter hyperintensities in clinical MRI images",
+      "year": 2026,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13201642/",
+      "content_sha256": "6603d9864b054caef725500fa68c8045dc74eaa61362268c5c7608c044a9bcb3",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13204197",
+      "title": "Advancing Brain Tumor Diagnosis Using Deep Learning: A Systematic and Critical Review on Methodological Approaches to Glioma Segmentation and Classification Through Multiparametric MRI",
+      "year": 2026,
+      "journal": "Brain Sciences",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13204197/",
+      "content_sha256": "f0208380116cac6a7f6d7d80b34c1bffdf8ac11643d4684af9f25007c84fc693",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13212816",
+      "title": "Radiologist burnout: AI’s true black box",
+      "year": 2026,
+      "journal": "European Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13212816/",
+      "content_sha256": "79c228768a01d747b96a4dd6906a2306cc080d6c64b71efeb4273db51cf1651d",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13223080",
+      "title": "ASLNet: an explainable deep learning framework for glioma grading and survival prediction",
+      "year": 2026,
+      "journal": "Frontiers in Oncology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13223080/",
+      "content_sha256": "ab3e1f1d39b94f6dd6445e692b7f8b27ad82149a1d9417fa2df69ce46cce6bdd",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13229759",
+      "title": "PruDensNet: a parameter efficient depthwise separable CNN for MRI-based brain tumor classification",
+      "year": 2026,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13229759/",
+      "content_sha256": "c1ceedc8f2eebaa9304e6c79e17cb3620de516141d2d1df6084cd210f2221dfa",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC13230358",
+      "title": "Decision Strategies in AI-Based Ensemble Models in Opportunistic Alzheimer’s Detection from Structural MRI",
+      "year": 2025,
+      "journal": "Journal of Imaging Informatics in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13230358/",
+      "content_sha256": "316151645a52796720ae5ad2a96cdcd1f013118d4acd993acf30aeda4017b935",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13230449",
+      "title": "Lightweight Transfer Learning Models for Multi-Class Brain Tumor Classification: Glioma, Meningioma, Pituitary Tumors, and No Tumor MRI Screening",
+      "year": 2025,
+      "journal": "Journal of Imaging Informatics in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13230449/",
+      "content_sha256": "a87045c2c8753417ea452416273d11d32075b630a6e1433b9548ddf765dcf62a",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC13244632",
+      "title": "Artificial intelligence framework for multi-pathology risk assessment from retinal fundus images: deep learning approach to 15-disease screening",
+      "year": 2026,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13244632/",
+      "content_sha256": "7264755778bf6eb5a6cffa77e32c1b97afc5ed9ecefc2a97a15be0360f5fe5e6",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13246415",
+      "title": "Semi-supervised medical image captioning via anatomical collaborative evidence network",
+      "year": 2026,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13246415/",
+      "content_sha256": "390385a2e3c384e12c2728026ae1c0dde2ad2be8a3c92ea8087efb13ad2d45a5",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13247371",
+      "title": "Dual concatenated transfer learning with attention fusion: An ensemble-enhanced approach for skin lesion classification",
+      "year": 2026,
+      "journal": "Digital Health",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13247371/",
+      "content_sha256": "9e1f0d686d3a88df3006ee604e8d3e132a2a588f828e87fc74a338a7fcc75399",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13251776",
+      "title": "A comparative study of deep learning for cortical lesion MRI segmentation with explainability analysis in multiple sclerosis",
+      "year": 2026,
+      "journal": "NeuroImage: Clinical",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13251776/",
+      "content_sha256": "db61fb706359b5739136f800f366720016fb83be3507abb0090ef62245cfa69b",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13254353",
+      "title": "AttnEffNet-B4: an attention-augmented EfficientNet-B4 framework with fourier transformation for robust multi-disease diagnosis",
+      "year": 2026,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13254353/",
+      "content_sha256": "647467d1f0cc74e0378bc29320a05e60b75686ac54a92a25d30f94e1cf7f122d",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13256239",
+      "title": "Brain Tumor Classification and Segmentation in MR Images Using EfficientNet and U-Net++ Models",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13256239/",
+      "content_sha256": "de0040e4aca56cdc506125d0faa5101875232b88c81a9c85374ac4691d230a7a",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13256354",
+      "title": "Deep Feature–Based Detection of Chiari Malformation Type I from Sagittal T2-Weighted MRI Using a Hybrid CNN–Machine Learning Framework",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13256354/",
+      "content_sha256": "cefddf28e5b5f996010c42277b9e9abc75fb1e282af1d94fc2150e4763f4655c",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13264623",
+      "title": "Decision processes in 3D structural MRI schizophrenia classification evaluated with saliency maps",
+      "year": 2026,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13264623/",
+      "content_sha256": "f85b69ae8fe0ef8be66ba43ec2184c69faaec1633a523dfeabf9b6b2adb49623",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13298221",
+      "title": "An Explainable Multi-Scale Deep Learning Framework for Multi-Class Brain MRI Classification",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13298221/",
+      "content_sha256": "276c449820913968ebbf377ce47c1d8f740f577542282fac7aa379f9eadda012",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13301762",
+      "title": "Brain Tumor Classification in MRI Images Using Combined Transfer Learning and Convolutional Neural Networks",
+      "year": 2026,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13301762/",
+      "content_sha256": "a5321f9133c7a9b0b373479e19c83c1d4ab92a5fdd9c8b1bd664280bf963556c",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13318738",
+      "title": "Integrating augmentation-aware manifold smoothing and momentum-adjusted loss for handling class imbalance in thoracic disease detection",
+      "year": 2026,
+      "journal": "Frontiers in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13318738/",
+      "content_sha256": "a13d5d5a4466a2d6964bf5a6888e2677d21ad803059802601bc3a8ae705e10c6",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13354193",
+      "title": "KneeXNet-2.5D: a clinically-oriented and explainable deep learning framework for MRI-based knee cartilage and meniscus segmentation",
+      "year": 2026,
+      "journal": "npj Health Systems",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13354193/",
+      "content_sha256": "51aab6b9c5cde788c1fd807b0293a0af25e4178e6bc71875dc06cc75030842cd",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13356410",
+      "title": "Assessment of Robustness of MRI Radiomic Features in Four Abdominal Organs: Impact of Deep Learning Reconstruction and Segmentation",
+      "year": 2026,
+      "journal": "Journal of Magnetic Resonance Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13356410/",
+      "content_sha256": "997237ffc20249d3fc19b6bb530865454f73b5f8795874f6f9a1d3041bb1051c",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13359782",
+      "title": "DriverNet: A Clinical and MRI-Based Framework for Noninvasive Pre-Treatment Molecular Triage in NSCLC Brain Metastases",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13359782/",
+      "content_sha256": "3488f5f04bd74487fb4f8b5a82f3e69142ccdc9c3ef1d043ffe58f5c8da32014",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13360828",
+      "title": "Multicenter Validation of an Integrated DCE-MRI Radiomics, Deep Learning, and S-II Model for Predicting Axillary Lymph Node Metastasis in Breast Cancer",
+      "year": 2026,
+      "journal": "Journal of Multidisciplinary Healthcare",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13360828/",
+      "content_sha256": "ab83a272a11c77ee55ce74da495d011a579bf019ef3201ecafd64c14f803e455",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13366612",
+      "title": "PANDA: Patch-based unsupervised deep learning for brain anomaly detection via age prediction in fetal MRI",
+      "year": 2026,
+      "journal": "Imaging Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13366612/",
+      "content_sha256": "f2913fbacc72ee226d51bfffc7dcf8a80fae9bff0a7d43d6a9c991e012b79564",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13366622",
+      "title": "A hybrid deep learning framework for accurate breast cancer classification using MRI images",
+      "year": 2026,
+      "journal": "BMC Medical Informatics and Decision Making",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13366622/",
+      "content_sha256": "864d49440a4386ec7d7dea31b59aba6abfdb755e4d1b2b1263619cf839e955fc",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13381494",
+      "title": "PredatorNet: a clinically trustworthy deep learning framework for multi-class Alzheimer's disease classification using MRI",
+      "year": 2026,
+      "journal": "Frontiers in Aging Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13381494/",
+      "content_sha256": "33ad32784ec4e64bb12e682d0011056d46cb35e28557662bce1480c9ed81e7d6",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13388429",
+      "title": "Zero-TE MRI-based attenuation correction for bone components on chest [18F] FDG PET/MRI: accuracy, repeatability, and external validation of an unsupervised deep learning approach using unpaired PET/CT data",
+      "year": 2026,
+      "journal": "Annals of Nuclear Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13388429/",
+      "content_sha256": "bc07a01dc151694e6054396aa988ea297d2c7766418c8616bf9c665e58ecb892",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13422431",
+      "title": "Responsible artificial intelligence in medical imaging: a systematic review",
+      "year": 2026,
+      "journal": "Frontiers in Digital Health",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13422431/",
+      "content_sha256": "ab724a7a0bf18de35226392ba45cafcab9f9b2c5fe5bf250524ec20bed973a33",
+      "topics": [
+        "calibration_uncertainty",
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13439183",
+      "title": "A multi-level attention CNN-transformer based framework for the detection of brain tumor using regional dual-score explainability",
+      "year": 2026,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13439183/",
+      "content_sha256": "506d33b2136b83681114759b4b29333994028b31c425c98b555d8ef004ddef8b",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13481968",
+      "title": "A comprehensive framework for multi-class prostate cancer classification using biparametric MRI: a multi-center retrospective study",
+      "year": 2026,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13481968/",
+      "content_sha256": "03d3a93dc642e0211b166455ddc851d87e0308df71d141922cf217b65ccaab79",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13484519",
+      "title": "Benchmarking Generalizability in Deep Learning-Based White Matter Tract Segmentation",
+      "year": 2026,
+      "journal": "bioRxiv",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13484519/",
+      "content_sha256": "657c43af56b5f394ddfb543c57e44ff45fdbe7e3a229037adc6a8d6c90e70df8",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13498801",
+      "title": "A Multimodal Graph Neural Network Based on MRI Radi-omics for Prognostic Prediction in Locally Advanced Cervical Squamous Cell Carcinoma",
+      "year": 2026,
+      "journal": "Cancer Control: Journal of the Moffitt Cancer Center",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13498801/",
+      "content_sha256": "106e14c73c20e7b1ebae3e0f3b022d3da47f00a4c73fb754f89c779c788719ee",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13504196",
+      "title": "AI-assisted segmentation-based fusion model integrating deep learning, radiomics, and clinical parameters for identifying coronary heart disease risk in patients with MAFLD",
+      "year": 2026,
+      "journal": "Frontiers in Endocrinology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13504196/",
+      "content_sha256": "963afff47446f1177ab8347a692a692ef001759738899c2a93bec95d5d2f481c",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13511939",
+      "title": "Benchmarking Class Imbalance Mitigation Strategies Across Deep CNN Architectures for Skin Cancer Classification",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13511939/",
+      "content_sha256": "8fefeaccde39ec4f8eb379bc0cb7845c20ddd1b46367bcc13474c0607f8190b2",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13514988",
+      "title": "Uncertainty Quantification in Medical Image Segmentation: A Comprehensive Survey",
+      "year": 2026,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13514988/",
+      "content_sha256": "e3e528483dbc67f9fa347ca6ff4d67650b40684779583327cf5fac40952046f6",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13519356",
+      "title": "Current evidence of generative artificial intelligence specifically developed for dental and maxillofacial radiology: a systematic review",
+      "year": 2026,
+      "journal": "Dentomaxillofacial Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13519356/",
+      "content_sha256": "e4a8561f81a5193938eca22f089480b097c68e5098b944bbb188cc8a2e5d4893",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13530434",
+      "title": "Deep learning and generative AI for medical imaging and clinical decision support systems: a structured critical review",
+      "year": 2026,
+      "journal": "Frontiers in Digital Health",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13530434/",
+      "content_sha256": "29225c8737f4b131c597ddf9a2ff91734033fe86b46d15a6f33eda9e6dcedeb0",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13533978",
+      "title": "Rheumatoid arthritis classification using hybrid pretrained quantum convolutional neural network",
+      "year": 2026,
+      "journal": "Frontiers in Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13533978/",
+      "content_sha256": "4d2745eb0effe87a9cbb2896b4cb1ae3c3c8d20d6009634b341c536a5dc960ec",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13566852",
+      "title": "Saliency-Curated Deep Learning for Predicting Receptor Status in Breast Cancer Brain Metastases",
+      "year": 2026,
+      "journal": "Journal of Clinical Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13566852/",
+      "content_sha256": "fd177d0a70affae5c361c8b8cee428e7e72da608259992be9b921d23807fb8d3",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13583082",
+      "title": "Explainable 3D deep learning from full-head MRI suggests scalp and skull involvement in Alzheimer's disease",
+      "year": 2026,
+      "journal": "Journal of Alzheimer's Disease",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13583082/",
+      "content_sha256": "196f5b5adf749d467ea2be7a9d52ae90d7511f59736b8816fe02d81161528109",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13590703",
+      "title": "Automated chest X-ray disease screening using large language models and deep convolutional neural networks on the MIMIC-CXR dataset",
+      "year": 2026,
+      "journal": "Frontiers in Digital Health",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13590703/",
+      "content_sha256": "edb48774d21d70d2817c46b49b5d5a389f040fc02d2a750a72e5f49aa4ed6140",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13595142",
+      "title": "Deep learning-based detection of focal cortical dysplasia in children: External validation of the MELD Graph and 3D-nnUNet pipelines",
+      "year": 2026,
+      "journal": "Neuroimage: Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13595142/",
+      "content_sha256": "e46132699d20928339a4cf42bd06b365939f08c61d838b651aec1ddd34ba41fb",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13598749",
+      "title": "Artificial intelligence-assisted endoscopic diagnosis of esophageal squamous cell carcinoma",
+      "year": 2026,
+      "journal": "Frontiers in Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13598749/",
+      "content_sha256": "b7fa9d9527143638e0a48a3264d2abaca7870dc8a0225e8b56221a3044163eb1",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13605318",
+      "title": "Artificial Intelligence Reporting Guidelines in Radiology: A Systematic Review",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13605318/",
+      "content_sha256": "15b452524229f2f0e861b1b2b5a4c4bca42baaa11eaa677b445a164e1226b86b",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13613299",
+      "title": "Detection and Classification of Pancreatic Cancer Nodules on CT Images using U-Net and Ensemble Models",
+      "year": 2026,
+      "journal": "Current Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13613299/",
+      "content_sha256": "63a920afb3dc17855a4e4e7c64a3518a14d286ce0f48e0cc11d519d6a978e1f6",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13632042",
+      "title": "The application of deep neural networks to the detection of lumbar hernias: results from the approaches based on convolutional networks and transformers",
+      "year": 2026,
+      "journal": "Frontiers in Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13632042/",
+      "content_sha256": "4d0b4d06d1fc0e7a5b8b855414c28e51800996beae3887442b16f7c59e60895b",
+      "topics": [
+        "data_leakage",
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13635888",
+      "title": "Radiomics and deep learning for immune checkpoint inhibitor outcomes: imaging-derived immune phenotyping and clinical translation across solid tumors",
+      "year": 2026,
+      "journal": "Frontiers in Immunology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13635888/",
+      "content_sha256": "8662f27ad9fa7f43ebe98a09765f3e3c6e149a5222cfd766ba8eebb516c1a100",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13637711",
+      "title": "Predicting brain tumour enhancement from non-contrast MRI with artificial intelligence: a multicohort, retrospective, diagnostic accuracy study",
+      "year": 2026,
+      "journal": "The Lancet Medical Imaging & Theranostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13637711/",
+      "content_sha256": "ab1a2a2f6e163f70bcf64ccab4ca1cd3ffee5a46bdc61018f13e9e0c107a21d7",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13647561",
+      "title": "Integrating MRI radiomics and deep learning for predicting pathologic complete response to neoadjuvant chemotherapy in breast cancer: a multicenter study",
+      "year": 2026,
+      "journal": "BMC Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13647561/",
+      "content_sha256": "74339ac05469c7f0592746e7704d7557f93cf77817998dbcaef2968e3e46b58b",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13649701",
+      "title": "Differentiating early Parkinson’s disease from multiple system atrophy on multimodal PET/MRI using atlas-guided segmentation and vision transformer classification",
+      "year": 2026,
+      "journal": "Frontiers in Aging Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13649701/",
+      "content_sha256": "67926697603e3e3d4ec1bba99a8dc1ce6451700e4a707caf81dbac4c4c5f4b37",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC13663269",
+      "title": "A diffusion-conditioned representation learning framework for disease classification in medical imaging",
+      "year": 2026,
+      "journal": "BMC Research Notes",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13663269/",
+      "content_sha256": "7eae6f39dee5192f1337c2a53a6db047a90efa4b8a35eb2ce892ac4ab41b4044",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC13680298",
+      "title": "Deep learning in acute ischemic stroke imaging: a systematic review of CT- and MRI-based segmentation, triage, and prognostic modeling",
+      "year": 2026,
+      "journal": "Neuroradiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13680298/",
+      "content_sha256": "b4e5b3b6ffba84c00d9de714c7f5741a2f583db7ae9ee0b80f500feb7c404e08",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13692960",
+      "title": "A web modular AI interface for brain tumor MRI classification using deep learning models",
+      "year": 2026,
+      "journal": "BMC Biomedical Engineering",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13692960/",
+      "content_sha256": "d4b205dc3b257820f1a6e332ef4fc364613bfbbc15474edaddb3e32b0029371e",
+      "topics": [
+        "brain_tumor_classification",
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC13701413",
+      "title": "Deep Learning Approaches for Classification of Honeycombing and Ground Glass Opacity in Lung CT Imaging: A Systematic Review",
+      "year": 2026,
+      "journal": "Bioengineering",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13701413/",
+      "content_sha256": "ead26445b12f80fb8a504c81c290261ef550ed69e054b005bfbf4075a235d700",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC13703154",
+      "title": "Empirical Evaluation of Post Hoc Interpretability Methods for Clinical Trust in Deep Learning Diagnostics",
+      "year": 2026,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13703154/",
+      "content_sha256": "e84908eddbd8712ce11dde56da7e2f7ca52377b57e3d3f44fc333626a0b41fe7",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC13705964",
+      "title": "Variational Autoencoders for Medical Image Segmentation: A Review",
+      "year": 2026,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13705964/",
+      "content_sha256": "6ad5d4f7a7d410daed57fe696ab854ddabadd2006f3f619258553d00d4d0b84a",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13706082",
+      "title": "ImageNet, RadiologyNET, or RadImageNet? Evaluating Pretraining Across CT, MRI, and X-Ray Classification",
+      "year": 2026,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13706082/",
+      "content_sha256": "70aa763cd583a1c195c0375ff48d617292052529f4ae43d17bee0e8b20563226",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC13723297",
+      "title": "Code-Free Automated Machine-Learning (AutoML) Classification of Curated MRI Images Labeled for Rare Neurological Diseases: An Image-Level Proof-of-Concept Study",
+      "year": 2026,
+      "journal": "Cureus",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13723297/",
+      "content_sha256": "63fb03b51527b0db60d6dc7a243c04664af53d0977ceabc29b42f34c0d0fbd6d",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC13723797",
+      "title": "Operationalising digital and AI pathology in translational research and drug development: an infrastructure and regulatory perspective from biobank to companion diagnostic",
+      "year": 2026,
+      "journal": "BMJ Oncology",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13723797/",
+      "content_sha256": "f77d5ecacb5f604ab7749efc912585babe5ddd1bb23b180abb4591a885e97563",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC13734182",
+      "title": "PedDx: An End-to-End Deep Learning Framework for Pediatric Posterior Fossa Tumor Diagnosis with Agentic AI–Enabled Independent External Evaluation",
+      "year": 2026,
+      "journal": "medRxiv",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13734182/",
+      "content_sha256": "cc05a4805e7999164ed757e22d2369432551ef9a316bd1fc8855078fc6c93d32",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13736230",
+      "title": "A Bio-Inspired Antigen-Antibody Optimization Approach for MRI-Based Stroke Lesion Segmentation",
+      "year": 2026,
+      "journal": "Current Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13736230/",
+      "content_sha256": "9232473f7f8da19013424577f2f2a4c78c82a43e40154c3d3fa4cd7883e42e34",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC13744269",
+      "title": "Deep learning-based self-supervised detection and localization of magnetic resonance imaging anomalies in artificial intelligence-supported radiotherapy workflows",
+      "year": 2026,
+      "journal": "Physics and Imaging in Radiation Oncology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13744269/",
+      "content_sha256": "c04f94087b145282946d1c3dddd2f21903e13977e1c5985cac0d8d6b8033fe1e",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC13750015",
+      "title": "Advancing Parkinson’s detection from MRI: a deep learning comparison of classical and quantum architectures",
+      "year": 2026,
+      "journal": "BMC Medical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13750015/",
+      "content_sha256": "c560ac4ed9d2b6a590b42088ba28fdeb80b20f65b0479943a8c3e15266db4023",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC6589968",
+      "title": "A Transfer Learning Approach for Malignant Prostate Lesion Detection on Multiparametric MRI",
+      "year": 2019,
+      "journal": "Technology in Cancer Research & Treatment",
+      "license": "CC BY-NC",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6589968/",
+      "content_sha256": "2717507f19662387c0f9d613f4586276e10cbe3f07c8a28f9f2fd82780884af0",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC7183515",
+      "title": "Artificial intelligence abstracts from the European Congress of Radiology: analysis of topics and compliance with the STARD for abstracts checklist",
+      "year": 2020,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7183515/",
+      "content_sha256": "94992474ebaa2897c0c4245580808d5b4fad0f77d74b7b6004e7936a33e35e5a",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC7616424",
+      "title": "Addressing Deep Learning Model Calibration Using Evidential Neural Networks And Uncertainty-Aware Training",
+      "year": 2023,
+      "journal": "Proceedings. IEEE International Symposium on Biomedical Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7616424/",
+      "content_sha256": "ab9bc23ae43bc1ef645897a0f23b57e4108ea94be60eb869e424ad7a5c507d52",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC7652888",
+      "title": "Diagnostic accuracy of deep-learning with anomaly detection for a small amount of imbalanced data: discriminating malignant parotid tumors in MRI",
+      "year": 2020,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7652888/",
+      "content_sha256": "68b228386a15067b36a5e4ead56641a08bf2432ad94aeca1a5cf8a6199ea1a93",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC8005102",
+      "title": "Imbalanced Loss-Integrated Deep-Learning-Based Ultrasound Image Analysis for Diagnosis of Rotator-Cuff Tear",
+      "year": 2021,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8005102/",
+      "content_sha256": "7a4c0f1c0230bfc9e9e527992fdf9eace42559409e3529f232c939e44ad52198",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC8116893",
+      "title": "Transductive Transfer Learning for Domain Adaptation in Brain Magnetic Resonance Image Segmentation",
+      "year": 2021,
+      "journal": "Frontiers in Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8116893/",
+      "content_sha256": "ea36171b4bf9002ed7f4cae9610199c3f963ee5eaa632210de0a74603ae519d7",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC8143310",
+      "title": "A Novel Deep Learning Method for Recognition and Classification of Brain Tumors from MRI Images",
+      "year": 2021,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8143310/",
+      "content_sha256": "727c73ecfb8094ab3cab61dfd3541e78f6df41ba071c94ba67ecbff69add49dd",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC8216797",
+      "title": "A Calibrated Multiexit Neural Network for Detecting Urothelial Cancer Cells",
+      "year": 2021,
+      "journal": "Computational and Mathematical Methods in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8216797/",
+      "content_sha256": "4d428d8e1fa0d87d3be7979bc53bf34a5903ba0f0392c41cd7bb9d5d41320e81",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC8321054",
+      "title": "Fully Automated 3D Cardiac MRI Localisation and Segmentation Using Deep Neural Networks",
+      "year": 2020,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8321054/",
+      "content_sha256": "937f17800e9d15af682c6f01177131cb0f9f0bf208870afa138ecf11a1d234cd",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC8354959",
+      "title": "Three-dimensional deep learning with spatial erasing for unsupervised anomaly segmentation in brain MRI",
+      "year": 2021,
+      "journal": "International Journal of Computer Assisted Radiology and Surgery",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8354959/",
+      "content_sha256": "d5d9aefaaca11ed5905b5922b9f394a85319f190035a1f1064ebf938459ba745",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC8452579",
+      "title": "Systematic review of research design and reporting of imaging studies applying convolutional neural networks for radiological cancer diagnosis",
+      "year": 2021,
+      "journal": "European Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8452579/",
+      "content_sha256": "cf74bb4a46514a71d00dcbfbbb6ff24d49f66de63ec81c52fb6cc0ffc2796620",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC8613326",
+      "title": "Saliency-based 3D convolutional neural network for categorising common focal liver lesions on multisequence MRI",
+      "year": 2021,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8613326/",
+      "content_sha256": "60e8d17988957a1633384a1573ab8e4e2503b9a2955b79352df7b4f0dd961ff4",
+      "topics": [
+        "explainability"
+      ]
+    },
+    {
+      "id": "PMC8698892",
+      "title": "BreastNet18: A High Accuracy Fine-Tuned VGG16 Model Evaluated Using Ablation Study for Diagnosing Breast Cancer from Enhanced Mammography Images",
+      "year": 2021,
+      "journal": "Biology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8698892/",
+      "content_sha256": "3c9e546ed352461df0239f4a322e2c5befb592032eecf567b827c2e4c2dd7f73",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC8749789",
+      "title": "Brain Tumor/Mass Classification Framework Using Magnetic-Resonance-Imaging-Based Isolated and Developed Transfer Deep-Learning Model",
+      "year": 2022,
+      "journal": "Sensors (Basel, Switzerland)",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8749789/",
+      "content_sha256": "3865d98737f755fa3f1a8fae16fe1f62190b2c433be1a57ad3ce618cd2310a6e",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC8755769",
+      "title": "Training calibration-based counterfactual explainers for deep learning models in medical image analysis",
+      "year": 2022,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8755769/",
+      "content_sha256": "aa7ee864b1ce6434b84d8113b95b9af5bb96042dcb36a477946c312d91c30075",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC8775102",
+      "title": "A Novel Multistage Transfer Learning for Ultrasound Breast Cancer Image Classification",
+      "year": 2022,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8775102/",
+      "content_sha256": "fc7b2dcf30a35ce9ef025e3417dcd7961fea173c24f05b9341d0af49a0f67ade",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC8785124",
+      "title": "Unified Focal loss: Generalising Dice and cross entropy-based losses to handle class imbalanced medical image segmentation",
+      "year": 2022,
+      "journal": "Computerized Medical Imaging and Graphics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8785124/",
+      "content_sha256": "1b4002e3c0460c9de8ffc614c8aeefd2d9cdee631fcb4dd31e5d611066b9c75d",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC8794113",
+      "title": "Deep learning model calibration for improving performance in class-imbalanced medical image classification tasks",
+      "year": 2022,
+      "journal": "PLoS ONE",
+      "license": "CC0",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8794113/",
+      "content_sha256": "3aebfed00a77da5e83ea108482ecd3cc96f4218cbb0ecc6d4f731be0e2e86856",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC8949584",
+      "title": "A Novel MRI Diagnosis Method for Brain Tumor Classification Based on CNN and Bayesian Optimization",
+      "year": 2022,
+      "journal": "Healthcare",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8949584/",
+      "content_sha256": "138915bbb1a483a25155328904376f1c911d678a7e75cb6ac11de1059a6a774a",
+      "topics": [
+        "brain_tumor_classification",
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC8960511",
+      "title": "Comparative performance of fully-automated and semi-automated artificial intelligence methods for the detection of clinically significant prostate cancer on MRI: a systematic review",
+      "year": 2022,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8960511/",
+      "content_sha256": "0e54a9f52047ddabe0bc05e1139af524f09dd3658a2404d6a7ba5ff53ed3e332",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC8964286",
+      "title": "Explanation-Driven Deep Learning Model for Prediction of Brain Tumour Status Using MRI Image Data",
+      "year": 2022,
+      "journal": "Frontiers in Genetics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8964286/",
+      "content_sha256": "04e22033b675f73fa101b8f6595055772db8bbb06cf28c06666c9cccc7d4f53c",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC8972161",
+      "title": "Fetal Organ Anomaly Classification Network for Identifying Organ Anomalies in Fetal MRI",
+      "year": 2022,
+      "journal": "Frontiers in Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8972161/",
+      "content_sha256": "793eed3b3e972be9261d7dd6df43dba276fbc846580c31fb2591ad3a5dff39a2",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "PMC9091071",
+      "title": "Benign and malignant diagnosis of spinal tumors based on deep learning and weighted fusion framework on MRI",
+      "year": 2022,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9091071/",
+      "content_sha256": "b10e60eded58d9a529b1571c6c548e3c3187365f4c4a17c074a249150f8c8301",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC9208116",
+      "title": "Towards a guideline for evaluation metrics in medical image segmentation",
+      "year": 2022,
+      "journal": "BMC Research Notes",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9208116/",
+      "content_sha256": "6c1d308047401daac5d92540f25c1185da7c44767e4126c27f4febfc609c4045",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC9222774",
+      "title": "A Hybrid Deep Learning Model for Brain Tumour Classification",
+      "year": 2022,
+      "journal": "Entropy",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9222774/",
+      "content_sha256": "fcaadf4bf3a3966a5605495daa72f598aa1c91a365de7068b7b97ebcc59d2ad0",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC9239800",
+      "title": "CNN Based Multiclass Brain Tumor Detection Using Medical Imaging",
+      "year": 2022,
+      "journal": "Computational Intelligence and Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9239800/",
+      "content_sha256": "6e709f8a22e7e666872918f8f25e245b135603cf71cf1a4571ee94e9ea714e84",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC9298878",
+      "title": "Multi-Coil MRI Reconstruction Challenge—Assessing Brain MRI Reconstruction Models and Their Generalizability to Varying Coil Configurations",
+      "year": 2022,
+      "journal": "Frontiers in Neuroscience",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9298878/",
+      "content_sha256": "172f730f9a1abf13c6978e0b915d9d943d7c57a2f5f4e77ebce932641bb05029",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC9324573",
+      "title": "Quality of Multicenter Studies Using MRI Radiomics for Diagnosing Clinically Significant Prostate Cancer: A Systematic Review",
+      "year": 2022,
+      "journal": "Life",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9324573/",
+      "content_sha256": "b7e2b5091b7c9686227c3221127c6ccde080f3fb72baba484819b1d5c4e33c73",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC9334661",
+      "title": "Quality of reporting in AI cardiac MRI segmentation studies – A systematic review and recommendations for future studies",
+      "year": 2022,
+      "journal": "Frontiers in Cardiovascular Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9334661/",
+      "content_sha256": "f96af56cd3e368aac67fede214ef0806a9be7f375c5c3c817f544f2a7a3beed7",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC9392674",
+      "title": "An updated systematic review of radiomics in osteosarcoma: utilizing CLAIM to adapt the increasing trend of deep learning application in radiomics",
+      "year": 2022,
+      "journal": "Insights into Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9392674/",
+      "content_sha256": "a67549efe45b0b9e65ed7c51cfaf55924b70d50df208bd3aafb8fa49889d8568",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC9400402",
+      "title": "A Hybrid Approach Based on Deep CNN and Machine Learning Classifiers for the Tumor Segmentation and Classification in Brain MRI",
+      "year": 2022,
+      "journal": "Computational and Mathematical Methods in Medicine",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9400402/",
+      "content_sha256": "18b1d59b615ea133021baad009a2974957461884973b43954c986923f62856b6",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC9468505",
+      "title": "Accurate brain tumor detection using deep convolutional neural network",
+      "year": 2022,
+      "journal": "Computational and Structural Biotechnology Journal",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9468505/",
+      "content_sha256": "7ad93720e2a7204615fcddfde4b674ac34a13c8b274f074ab7647525f153aec1",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC9515025",
+      "title": "Tackling the class imbalance problem of deep learning-based head and neck organ segmentation",
+      "year": 2022,
+      "journal": "International Journal of Computer Assisted Radiology and Surgery",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9515025/",
+      "content_sha256": "ab740e521eb580c8b73ca613546e378a284bf673caa0a63e28003e85a8ea55f1",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC9527336",
+      "title": "Validation of Artificial Intelligence Cardiac MRI Measurements: Relationship to Heart Catheterization and Mortality Prediction",
+      "year": 2022,
+      "journal": "Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9527336/",
+      "content_sha256": "01b1667ee74ea55c7a7f9a3fe5fd4d6d4188f804b4c85624a9add14d7569136d",
+      "topics": [
+        "generalization"
+      ]
+    },
+    {
+      "id": "PMC9530758",
+      "title": "RadImageNet: An Open Radiologic Deep Learning Research Dataset for Effective Transfer Learning",
+      "year": 2022,
+      "journal": "Radiology: Artificial Intelligence",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9530758/",
+      "content_sha256": "f7dcf88d622100c1aae0cc3d28e5a95d986f8203e0b093c7ac6b645e71cabcc0",
+      "topics": [
+        "transfer_learning"
+      ]
+    },
+    {
+      "id": "PMC9537186",
+      "title": "Robustness of radiomics to variations in segmentation methods in multimodal brain MRI",
+      "year": 2022,
+      "journal": "Scientific Reports",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9537186/",
+      "content_sha256": "f52f0366a646c7fd6eb8bc5d596d81f61dbc482cc86131f7301cd875c81c14f3",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC9578635",
+      "title": "Data augmentation based on multiple oversampling fusion for medical image segmentation",
+      "year": 2022,
+      "journal": "PLoS ONE",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9578635/",
+      "content_sha256": "92d349295b0d28181059a3e993dc212e22d682e734d2030ea682fe52993d6535",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC9668167",
+      "title": "Calibrated bagging deep learning for image semantic segmentation: A case study on COVID-19 chest X-ray image",
+      "year": 2022,
+      "journal": "PLOS ONE",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9668167/",
+      "content_sha256": "c6dabf30c003dc151495268c50f66e0bde3512c89741d6aac0e7355b4f539107",
+      "topics": [
+        "calibration_uncertainty"
+      ]
+    },
+    {
+      "id": "PMC9775139",
+      "title": "Exploiting the Generative Adversarial Network Approach to Create a Synthetic Topography Corneal Image",
+      "year": 2022,
+      "journal": "Biomolecules",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9775139/",
+      "content_sha256": "1ea5f451ec5e7f8fe3a799f0a4c673938b5e70049433494f0fe90983d592cfbf",
+      "topics": [
+        "class_imbalance"
+      ]
+    },
+    {
+      "id": "PMC9865827",
+      "title": "RETRACTED: A Feature Extraction Using Probabilistic Neural Network and BTFSC-Net Model with Deep Learning for Brain Tumor Classification",
+      "year": 2022,
+      "journal": "Journal of Imaging",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9865827/",
+      "content_sha256": "9ec9f7455e8b832c35b3cfdd394d2c60e6562528d4977006afc078ac8ef9dbcb",
+      "topics": [
+        "robustness"
+      ]
+    },
+    {
+      "id": "PMC9872362",
+      "title": "MRI-based brain tumor detection using convolutional deep learning methods and chosen machine learning techniques",
+      "year": 2023,
+      "journal": "BMC Medical Informatics and Decision Making",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9872362/",
+      "content_sha256": "c96f3de414a490e8be6f5bcb460155c9ee6a68d8bce655d5be11ac41a0a3af50",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC9889424",
+      "title": "How do providers of artificial intelligence (AI) solutions propose and legitimize the values of their solutions for supporting diagnostic radiology workflow? A technography study in 2021",
+      "year": 2022,
+      "journal": "European Radiology",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9889424/",
+      "content_sha256": "2a5433a76626bc97057ad5b7b65f879406d369633606c5f9e4aa797cbe7cb295",
+      "topics": [
+        "reporting_guidelines"
+      ]
+    },
+    {
+      "id": "PMC9933351",
+      "title": "Brain tumor magnetic resonance images classification based machine learning paradigms",
+      "year": 2022,
+      "journal": "Contemporary Oncology",
+      "license": "CC BY-NC-SA",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9933351/",
+      "content_sha256": "292902458376c358cf6172cb919d7937f4086ca9fd6ac92307ea0dc9e3be0150",
+      "topics": [
+        "brain_tumor_classification"
+      ]
+    },
+    {
+      "id": "PMC9955952",
+      "title": "Joint Cancer Segmentation and PI-RADS Classification on Multiparametric MRI Using MiniSegCaps Network",
+      "year": 2023,
+      "journal": "Diagnostics",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9955952/",
+      "content_sha256": "b3f8a475173bf2e5e2baa6d0de7468757dce6b539a99791d350400ba43417ed5",
+      "topics": [
+        "data_leakage"
+      ]
+    },
+    {
+      "id": "PMC9980829",
+      "title": "Adversarial confound regression and uncertainty measurements to classify heterogeneous clinical MRI in Mass General Brigham",
+      "year": 2023,
+      "journal": "PLOS ONE",
+      "license": "CC BY",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9980829/",
+      "content_sha256": "1df7b4d28452be355db59874ad0a360352509f5fe345817d05b080c9b29d6f98",
+      "topics": [
+        "ood_detection"
+      ]
+    },
+    {
+      "id": "project:readme",
+      "title": "NeuroClass README — research foundation, audit and results",
+      "year": 2026,
+      "journal": null,
+      "license": "MIT",
+      "source_url": "https://github.com/Udit013/Brain_Tumor_Classificatioin/blob/main/README.md",
+      "content_sha256": "72d9785cc15af874f79f962741ec303985329ea254f4d3ee3a37272551da721a",
+      "topics": [
+        "project"
+      ]
+    },
+    {
+      "id": "project:model_card",
+      "title": "NeuroClass model card",
+      "year": 2026,
+      "journal": null,
+      "license": "MIT",
+      "source_url": "https://github.com/Udit013/Brain_Tumor_Classificatioin/blob/main/MODEL_CARD.md",
+      "content_sha256": "1b6c8df27b54cfff14420efe4905f79cf832f60d39090cef72a57f013f6a52be",
+      "topics": [
+        "project"
+      ]
+    },
+    {
+      "id": "project:documentation",
+      "title": "NeuroClass project documentation",
+      "year": 2026,
+      "journal": null,
+      "license": "MIT",
+      "source_url": "https://github.com/Udit013/Brain_Tumor_Classificatioin/blob/main/PROJECT_DOCUMENTATION_NeuroClass.md",
+      "content_sha256": "4be7b50715aad95f19f4f900fde9587f586cdd3f7f48511254eb7092a5720958",
+      "topics": [
+        "project"
+      ]
+    }
+  ]
+}

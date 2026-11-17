@@ -1,0 +1,24 @@
+{
+  "question": "Does upgrading Pillow 12.3.0 -> 13.0.0 (42 known vulnerabilities fixed) change the deployed model's predictions?",
+  "model": "models/serving/neuroclass_serving.onnx (2026.10-finetune)",
+  "preprocessing": "btc.preprocess",
+  "decision": "upgrade to 13.0.0: zero prediction changes on 2,441 images",
+  "results": {
+    "test": {
+      "n": 1600,
+      "accuracy_pillow_12_3": 0.934375,
+      "accuracy_pillow_13_0": 0.934375,
+      "prediction_changes": 0,
+      "images_with_any_probability_change": 55,
+      "max_abs_probability_change": 0.020503520965576172
+    },
+    "val": {
+      "n": 841,
+      "accuracy_pillow_12_3": 0.9631391200951248,
+      "accuracy_pillow_13_0": 0.9631391200951248,
+      "prediction_changes": 0,
+      "images_with_any_probability_change": 28,
+      "max_abs_probability_change": 0.013540148735046387
+    }
+  }
+}

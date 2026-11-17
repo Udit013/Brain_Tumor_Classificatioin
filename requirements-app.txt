@@ -1,0 +1,32 @@
+# NeuroClass platform (API, agent, retrieval) — no TensorFlow.
+# Python 3.11. Install: pip install -r requirements-app.txt && pip install -e . --no-deps
+# Pillow 13.0.0: decodes some dataset JPEGs differently from Pillow 10.3/12.3 but changes
+# no prediction on 2,441 images (results/metrics/decoder_parity.json); golden hashes guard it.
+alembic==1.20.1
+anthropic==2.10.0
+fastapi==0.163.2
+fastembed==0.9.1
+langgraph==1.2.22
+langgraph-checkpoint==4.3.2
+langgraph-checkpoint-postgres==3.2.1
+langgraph-checkpoint-sqlite==3.1.3
+lxml==6.1.3
+mcp==2.3.0
+numpy==2.4.6
+onnxruntime==1.32.0
+opencv-python-headless==5.1.0.95
+pgvector==0.5.1
+pillow==13.0.0
+psycopg==3.3.9
+psycopg-binary==3.3.9
+psycopg-pool==3.3.3
+pydantic==2.14.3
+PyJWT==2.15.1
+python-multipart==0.0.34
+SQLAlchemy==2.1.9
+uvicorn==0.54.0
+
+# test-only
+httpx==0.28.1
+pytest==9.2.0
+pytest-asyncio==1.5.0

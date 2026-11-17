@@ -1,0 +1,84 @@
+{
+  "rules_version": "2026.11-r1",
+  "model_version": "2026.10-finetune",
+  "reliability_levels": {
+    "val": {
+      "standard": {
+        "n": 809,
+        "coverage": 0.9619500594530321,
+        "accuracy": 0.9752781211372065
+      },
+      "caution": {
+        "n": 27,
+        "coverage": 0.03210463733650416,
+        "accuracy": 0.7037037037037037
+      },
+      "unreliable": {
+        "n": 5,
+        "coverage": 0.005945303210463734,
+        "accuracy": 0.4
+      },
+      "all": {
+        "n": 841,
+        "accuracy": 0.9631391200951248
+      }
+    },
+    "test": {
+      "standard": {
+        "n": 1516,
+        "coverage": 0.9475,
+        "accuracy": 0.9597625329815304
+      },
+      "caution": {
+        "n": 78,
+        "coverage": 0.04875,
+        "accuracy": 0.47435897435897434
+      },
+      "unreliable": {
+        "n": 6,
+        "coverage": 0.00375,
+        "accuracy": 0.5
+      },
+      "all": {
+        "n": 1600,
+        "accuracy": 0.934375
+      }
+    }
+  },
+  "input_shift": {
+    "threshold": 71.42723618415151,
+    "auroc_test_vs_external_mri": 0.5171739130434783,
+    "auroc_test_vs_synthetic_non_mri": 0.9502875,
+    "flag_rate": {
+      "val": 0.01070154577883472,
+      "test": 0.01375,
+      "external": 0.039525691699604744,
+      "synthetic": 0.8
+    },
+    "flag_rate_by_synthetic_kind": {
+      "checkerboard": 1.0,
+      "gradient": 1.0,
+      "noise": 1.0,
+      "solid_color": 1.0,
+      "tinted_mri": 0.0
+    },
+    "median_distance": {
+      "val": 46.40132818705323,
+      "test": 45.49934315599701,
+      "external": 46.898454209014986,
+      "synthetic": 103.50183101578574
+    }
+  },
+  "level_counts_external": {
+    "standard": 208,
+    "caution": 34,
+    "unreliable": 11
+  },
+  "n": {
+    "val": 841,
+    "test": 1600,
+    "external": 253,
+    "synthetic": 100
+  },
+  "seconds": 785
+}

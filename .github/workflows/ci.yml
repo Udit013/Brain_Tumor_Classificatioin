@@ -7,7 +7,9 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  research:
+    # Research package (btc) and the Space logic: pure-logic tests, no TensorFlow,
+    # no dataset, no weights.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,11 +20,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install test dependencies
-        # Only the lightweight deps needed for the pure-logic tests; TensorFlow
-        # and the dataset are intentionally excluded so CI stays fast (< 1 min).
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pillow opencv-python-headless imagehash pytest ruff==0.15.20
+          pip install numpy "pillow==13.0.0" opencv-python-headless imagehash pytest ruff==0.15.20
           # FastAPI contract tests (tests/test_api.py) — still no TensorFlow.
           pip install fastapi python-multipart httpx
           pip install -e . --no-deps
@@ -31,7 +31,49 @@ jobs:
         run: ruff check src tests space scripts
 
       - name: Syntax check (all modules)
-        run: python -m py_compile src/btc/*.py src/btc/serve/*.py space/*.py scripts/*.py
+        run: python -m compileall -q src space scripts
 
       - name: Run tests
-        run: PYTHONPATH=src pytest tests/ -q
+        run: PYTHONPATH=src pytest tests/ -q --ignore=tests/app_tests
+
+  platform:
+    # API, agent graph, retrieval, migrations — against PostgreSQL + pgvector.
+    # Deterministic fakes replace the model bundle, embeddings and the LLM, so
+    # no download, GPU or paid API call is needed.
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg17
+        env:
+          POSTGRES_USER: neuroclass
+          POSTGRES_PASSWORD: neuroclass
+          POSTGRES_DB: neuroclass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U neuroclass" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-app.txt
+
+      - name: Install platform dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-app.txt
+          pip install -e . --no-deps
+
+      - name: Dependency audit
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements-app.txt --progress-spinner off
+
+      - name: Run platform tests (SQLite + PostgreSQL/pgvector)
+        env:
+          DATABASE_URL_TEST: postgresql://neuroclass:neuroclass@localhost:5432/neuroclass
+        run: PYTHONPATH=src pytest tests/app_tests -q

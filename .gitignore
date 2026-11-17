@@ -62,3 +62,7 @@ knowledge_doc.md
 
 # Training experiments (checkpoints + metadata) — never committed
 runs/
+
+# Platform environment and runtime data
+.venv-app/
+var/

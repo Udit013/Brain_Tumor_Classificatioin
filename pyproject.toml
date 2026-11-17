@@ -26,3 +26,7 @@ select = ["E4", "E7", "E9", "F"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E702"]   # compact one-line fixture setup
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["ignore::jwt.warnings.InsecureKeyLengthWarning"]

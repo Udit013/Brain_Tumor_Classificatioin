@@ -15,7 +15,7 @@ numpy==1.26.4            # TF 2.15 requires numpy<2
 pandas==2.2.2
 
 # --- imaging / preprocessing ---
-pillow==12.3.0
+pillow==13.0.0
 opencv-python-headless==4.9.0.80
 imageio==2.34.1
 imagehash==4.3.1        # perceptual hashing for leakage analysis

@@ -1,0 +1,49 @@
+{
+  "model_name": "neuroclass-efficientnetb3",
+  "model_version": "2026.10-finetune",
+  "source_weights": "EfficientNetB3_model_weights.h5",
+  "source_weights_sha256": "d2ba7de13b7d1f1ae9aa609403a52a4e41ed8f045d7995c60942d6bf59fbc2dd",
+  "hub_repo": "Udit013/brain-tumor-efficientnetb3",
+  "class_names": [
+    "glioma",
+    "meningioma",
+    "notumor",
+    "pituitary"
+  ],
+  "input": {
+    "shape": [
+      256,
+      256,
+      3
+    ],
+    "dtype": "float32",
+    "range": [
+      0,
+      255
+    ],
+    "preprocessing": "PIL convert('RGB').resize((256, 256)) \u2014 btc.preprocess"
+  },
+  "temperature": 0.936868686868687,
+  "ood": {
+    "method": "Mahalanobis distance of pooled backbone features to the training distribution (Ledoit-Wolf shrinkage)",
+    "threshold": 71.42723618415151,
+    "threshold_rule": "99th percentile on the leakage-safe validation split",
+    "shrinkage": 0.00786173997953742,
+    "n_reference": 4759
+  },
+  "files": {
+    "head.npz": "f17cbe8442c148595fe496eaf7bcec779f5e0e1e9571338f8b600d0a8d996ebf",
+    "neuroclass_serving.onnx": "3c8964207a8d6bd9cc2eb4456bad9c4bf4095b573db846751bff7c7e568c78af",
+    "ood_reference.npz": "aa24361c89d4c1e9c85e1152f0ccefcb77364c41711acdcaa24e34148cacf64b"
+  },
+  "verification": {
+    "n_test_images": 1600,
+    "probs_max_abs_diff_vs_tensorflow": 4.947185516357422e-06,
+    "argmax_disagreements_vs_tensorflow": 0,
+    "test_accuracy_onnx": 0.934375,
+    "n_gradcam_checked": 64,
+    "gradcam_max_abs_diff_vs_tensorflow": 9.000301361083984e-06,
+    "head_probs_max_abs_diff_vs_onnx": 2.1890476659125468e-07
+  },
+  "exported_at": "2026-11-17T14:51:22"
+}
