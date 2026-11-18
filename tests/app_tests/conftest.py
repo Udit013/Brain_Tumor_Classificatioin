@@ -161,12 +161,15 @@ def make_client(tmp_path, monkeypatch):
         app = create_app(settings, services=services, run_migrations=False)
         client = TestClient(app)
         client.__enter__()
-        created.append(client)
+        created.append((client, services))
         return client, services
 
     yield factory
-    for c in created:
+    for c, services in created:
         c.__exit__(None, None, None)
+        # The app's shutdown doesn't wait for running analyses; a straggler thread
+        # would otherwise write into the next test's freshly created database.
+        services.pool.shutdown(wait=True)
     db_session.get_engine.cache_clear()
     db_session._factory.cache_clear()
 
