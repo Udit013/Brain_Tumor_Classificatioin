@@ -64,7 +64,7 @@ The owner's budget is zero, permanently. That ruled out the obvious stack
 |---|---|---|
 | TensorFlow only needed for Grad-CAM, but it made the image 3.3 GB | export one ONNX graph with the last conv map; compute Grad-CAM in closed form through the dense head; refuse to export unless it matches TensorFlow | 41 ms vs 89 ms per image, 262 MB vs 803 MB RSS, 0.24 s vs 7 s load; probabilities within 5e-6 of TF on all 1,600 test images |
 | No paid LLM, no key | provider abstraction; extractive mode as a first-class product; Gemini free tier as an option behind a quota guard; paid provider refused unless explicitly allowed | the platform is fully usable with no LLM; an exhausted quota degrades, never bills |
-| No paid host; HF requires PRO for new Spaces | reuse the existing free Space; one process serves the FastAPI platform at `/api` and the demo at `/` | live, free; Gradio 5 → 6 upgrade also cleared dependency advisories |
+| No paid host; HF requires PRO for new Spaces | reuse the existing free Space as an API-only backend (FastAPI at `/api`, a small landing page at `/`) | live, free; Gradio 5 → 6 upgrade also cleared dependency advisories |
 | No managed queue or Redis | in-process worker + database job state + SSE; checkpoints make restarts resumable | a review paused before a restart resumes after it (verified on Postgres) |
 | Embedding APIs cost money | local ONNX embeddings, chosen by evaluation | routed hybrid search reaches recall@10 = 1.00 on the labelled set at 27 ms |
 
@@ -90,8 +90,9 @@ The owner's budget is zero, permanently. That ruled out the obvious stack
 
 ## 7. Trade-offs I would defend in review
 
-- SQLite on the free Space (history resets) instead of a paid database — with
-  an honest UI warning and a one-variable switch to free Neon.
+- Free Neon Postgres (history, reviews, checkpoints, pgvector) behind a
+  fallback: if Neon suspends at its free limit, retrieval drops to the
+  in-memory index and the API answers 503 where data is needed — never a bill.
 - Extractive answers as the default — less fluent, but every sentence is a
   verifiable quotation.
 - Lexical verification — cheap, deterministic, explainable; not a semantic judge.

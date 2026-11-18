@@ -68,13 +68,15 @@ export default function HistoryPage() {
               {shown.map((r) => (
                 <tr key={r.id} className="border-b border-line last:border-0 hover:bg-sunken">
                   <td className="px-4 py-2">
-                    <Link href={`/analyses/${r.id}`}>{new Date(r.created_at).toLocaleString()}</Link>
+                    <Link href={`/analyses/${r.id}`} className="whitespace-nowrap">
+                      {new Date(r.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                    </Link>
                   </td>
                   <td className="px-4 py-2 text-ink-2">{r.sample_id ? `Example: ${r.sample_id}` : "Upload"}</td>
                   <td className="px-4 py-2">{r.predicted_class ? DISPLAY[r.predicted_class as keyof typeof DISPLAY] : "—"}</td>
                   <td className="px-4 py-2 tabular-nums">{pct(r.calibrated_confidence)}</td>
                   <td className="px-4 py-2"><LevelBadge level={r.reliability_level} /></td>
-                  <td className="px-4 py-2 text-ink-2">{r.status.replace("_", " ")}</td>
+                  <td className="px-4 py-2 capitalize text-ink-2">{r.status.replace("_", " ")}</td>
                 </tr>
               ))}
             </tbody>

@@ -1220,10 +1220,11 @@ optional human review, and a downloadable report — and it runs for **$0**.
 |---|---|
 | Web app (Next.js, Vercel Hobby) | https://neuroclass-gilt.vercel.app |
 | API (FastAPI on the HF Space) | https://udit013-brain-tumor-mri-classifier.hf.space/api/docs |
-| Demo (Gradio, same Space) | https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier |
+| Space page (API landing, no classifier UI) | https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier |
+| Database | Neon Free, project `neuroclass`, branch `production` (Postgres + pgvector) |
 
 Decision records: `docs/adr/0001-platform-architecture.md` and
-`docs/adr/0002-zero-cost-deployment.md`.
+`docs/adr/0002-zero-cost-deployment.md` and `docs/adr/0003-neon-and-api-only-space.md`.
 
 ## 23. Platform Components
 
@@ -1238,11 +1239,11 @@ Decision records: `docs/adr/0001-platform-architecture.md` and
 | LLM layer | `agent/llm.py`, `llm_gemini.py`, `llm_anthropic.py` | provider contract, QuotaGuard; Gemini free tier (default when keyed); Claude adapter refused unless paid use is explicitly allowed; extractive composer otherwise |
 | Persistence | `src/neuroclass/db/` | SQLAlchemy 2 + Alembic: users, analyses, reviews, trace events, LLM usage ledger, index versions/documents/chunks (pgvector) |
 | API | `src/neuroclass/api/` | FastAPI: analyses (+ SSE, reports, reviews), research search/ask, benchmarks, models, samples, auth; request ids, JSON logs, security headers, rate limits, idempotency |
-| Auth | `src/neuroclass/auth/security.py`, `api/deps.py` | scrypt hashes, HS256 JWT, anonymous `X-Client-Id` (hashed), owner scoping (404 for others), reviewer role by configured email |
+| Auth | `src/neuroclass/auth/security.py`, `api/deps.py`, `api/routers/auth.py` | scrypt hashes, HS256 JWT, anonymous `X-Client-Id` (hashed), owner scoping (404 for others), reviewer role = listed email **and** the operator's reviewer code |
 | Web | `web/` | Next.js 16 App Router + TypeScript + Tailwind v4: landing, workbench, analysis detail, research assistant, history, benchmarks (accessible charts with table views), system status, review queue, login |
 | MLOps | `src/neuroclass/registry.py`, `models/registry.json` | registry of deployed versions, promotion gate (tolerances + paired McNemar), Hub tags for rollback |
 | MCP | `src/neuroclass/mcp_server.py` | local, read-only tools over benchmarks, model info, reproducibility, literature |
-| Space entrypoint | `deploy/hf_space/app.py`, `build.py` | one uvicorn process: FastAPI at `/api`, Gradio demo at `/` (client-side rendering) |
+| Space entrypoint | `deploy/hf_space/app.py`, `build.py` | one uvicorn process: FastAPI at `/api`, a minimal landing page at `/` (no Gradio UI) |
 
 ## 24. Zero-Cost Architecture: Every Service, Limit and Safeguard
 
@@ -1253,7 +1254,7 @@ Checked on the providers' own pages on 2026-11-17 (full table and links:
 |---|---|---|---|---|---|---|---|
 | Hosting (API + demo) | Hugging Face Space, existing Gradio Space | CPU Basic free: 2 vCPU, 16 GB RAM, 50 GB disk | no | no | no metered limit; requests queue | sleeps after ~48 h idle; disk not persistent | — |
 | Frontend | Vercel Hobby | 100 GB transfer, 1M invocations, 4 CPU-h/month; non-commercial | no | no ("no billing cycles") | feature paused (~30 days) | — | Space demo + API docs |
-| Database | SQLite on the Space; Neon Free optional | Neon: 100 CU-h/project/month, 1 GB/project, scale-to-zero after 5 min | no (do not add one) | no | Neon suspends compute until next month; writes fail above 1 GB; data kept | Neon wakes in under a second; SQLite resets on restart | SQLite |
+| Database + vectors | Neon Free (configured): Postgres + pgvector | 100 CU-h/project/month, 1 GB/project, scale-to-zero after 5 min; verified Free plan, $0, no card | no (none added) | no | Neon suspends compute until next month; writes fail above 1 GB; data kept; API answers 503 for data features, retrieval falls back to memory | Neon wakes in under a second | in-memory retrieval; SQLite if `DATABASE_URL` removed |
 | LLM | Gemini API free tier | free models incl. `gemini-3.5-flash-lite` (default), `gemini-3.8-flash`; RPM/RPD per project in AI Studio; daily reset midnight Pacific | no | no on an unbilled project (429 instead); tier upgrades only after billing is linked | NeuroClass stops calling and goes extractive | free-tier content may be used to improve Google products; images never sent | extractive answers |
 | Embeddings | fastembed bge-small (local ONNX) | open model | — | — | — | — | — |
 | Auth | built in | — | — | — | — | — | — |
@@ -1281,19 +1282,21 @@ for one, the step is not needed. Full commands: `docs/DEPLOYMENT.md`.
    a requirements file that satisfies `gradio[oauth,mcp]`'s pins).
 2. **Upload to the existing Space**: `hf upload Udit013/brain-tumor-mri-classifier build/hf_space . --repo-type space`.
    Keep CPU Basic; no persistent storage.
-3. **Space settings**: secret `NEUROCLASS_JWT_SECRET` (random); variables
-   `NEUROCLASS_EPHEMERAL_STORAGE=true`, `NEUROCLASS_LLM_PROVIDER=auto`,
-   `NEUROCLASS_CORS_ORIGINS` and `NEUROCLASS_WEB_URL` = the Vercel URL.
+3. **Space settings**: secrets `NEUROCLASS_JWT_SECRET` (random), `DATABASE_URL`
+   (Neon), `GEMINI_API_KEY`; variables `NEUROCLASS_LLM_PROVIDER=auto`,
+   `NEUROCLASS_CORS_ORIGINS` and `NEUROCLASS_WEB_URL` = the Vercel URL. For
+   reviewers: `NEUROCLASS_REVIEWER_EMAILS` plus the secret `NEUROCLASS_REVIEWER_CODE`.
 4. **Check** `/api/ready`: vision and retrieval ok, `paid_allowed: false`.
-5. **Frontend**: in `web/`, `vercel link --project neuroclass`, add
-   `NEXT_PUBLIC_API_URL=<space>/api` for production, `vercel deploy --prod`.
-   `web/vercel.json` pins the Next.js preset.
+5. **Frontend**: the Vercel project is connected to GitHub (Root Directory
+   `web`, Next.js, Node 24) and deploys on every push to `main`;
+   `NEXT_PUBLIC_API_URL=<space>/api` is a production variable.
 6. **Optional Gemini**: create a key in an AI Studio project *without billing*;
    add `GEMINI_API_KEY` as a Space secret; set `NEUROCLASS_LLM_RPM` /
    `NEUROCLASS_LLM_DAILY_CAP` below the limits AI Studio shows.
-7. **Optional Neon**: Free project, autoscaling capped at 0.25 CU; put the
-   connection string in the `DATABASE_URL` secret; set
-   `NEUROCLASS_EPHEMERAL_STORAGE=false`.
+7. **Neon**: Free project, autoscaling capped at 0.25 CU; connection string in
+   the `DATABASE_URL` secret (pooled or direct). Migrations and the pgvector
+   index sync run on start. Neon's CLI template (`neon init`/`neon deploy`,
+   Neon Auth) is not used.
 8. **Rollback**: Space tags `tf-gradio5-2026-10` (TensorFlow app) and
    `parity-2024` (previous model); `hf download --revision <tag>` then upload.
 
@@ -1314,17 +1317,18 @@ models must pass `python -m neuroclass.registry gate`.
 - **Throughput.** Two analysis workers and two concurrent demo predictions;
   beyond that, requests queue; a client sending more than 10 analyses a minute
   gets 429.
-- **History.** Without Neon, SQLite lives on the Space's temporary disk: history,
-  accounts and review queues reset on restart. The web app says so on History
-  and System.
+- **History.** Stored in Neon, so it survives Space restarts and sleeps
+  (verified with a paused review across a restart). Without `DATABASE_URL` the
+  API falls back to SQLite on the temporary disk and the UI says so.
 - **LLM.** With a key: at most 4 calls/min and 100/day by default (2 per
   request), set below the project's free limits. When the local budget or
   Google's quota is used up, answers become extractive with the reason shown,
   until the minute window passes or the daily quota resets at midnight Pacific.
   Without a key: always extractive.
 - **Neon.** If the monthly compute allowance runs out, the database suspends
-  until next month; analyses fail with a clear error while benchmarks and
-  research search keep working; remove `DATABASE_URL` to fall back to SQLite.
+  until next month (no charge on Free). The API answers 503 "temporarily
+  unavailable" for history, accounts and new analyses; research search and
+  answers continue on the in-memory index; benchmarks need no database.
 - **Vercel.** Usage over the Hobby allowance pauses the affected feature; the
   Space's demo and API docs remain available.
 - **Modest traffic, not production.** This is a free public demo. It never
@@ -1353,7 +1357,7 @@ Measured 2026-11-17 (details: `docs/EVALUATION.md`).
   incomplete, so recall and precision are lower bounds. The indexed project
   documents are the 2026-11-17 snapshot taken before this documentation update.
 - Free deployment: cold starts, temporary history without Neon, modest traffic.
-- No email verification; in-process rate limits; tokens in `localStorage`; no
+- No email verification (reviewer role additionally needs the operator's code); in-process rate limits; tokens in `localStorage`; no
   CSP yet (see `docs/SECURITY.md`).
 - The model's own limitations are unchanged: single seed, glioma recall 79.5%,
   72.7% on an external dataset, no clinical validation.

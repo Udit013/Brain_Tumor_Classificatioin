@@ -14,6 +14,7 @@ person's care. Do not upload images that identify a patient.
 | Malicious uploads (bombs, wrong types) | size cap before decoding (10 MB), pixel cap (25 MP), format whitelist by content (JPEG/PNG), minimum size, decoding errors mapped to 400 |
 | Reading other people's analyses | every analysis has an owner key (user id or a hash of the anonymous client id); other owners get 404 |
 | Account attacks | scrypt password hashing (stdlib), HS256 JWTs with issuer and expiry, rate-limited sign-up/login, production refuses to start without a secret |
+| Privilege escalation to reviewer | reviewer role requires a listed email **and** the operator's secret reviewer code; without a configured code nobody becomes a reviewer |
 | Abuse / resource exhaustion | per-client sliding-window rate limits, inference and LLM timeouts, bounded retries, bounded agent loops, LLM call budgets |
 | Unexpected spend | no paid provider unless `NEUROCLASS_ALLOW_PAID_LLM=true`; free-tier quota guard; see [FREE_TIER.md](FREE_TIER.md) |
 | Secrets in the repository | keys are environment variables or Space secrets; `.env*`, `.vercel/`, credentials and local notes are gitignored |
@@ -22,8 +23,7 @@ person's care. Do not upload images that identify a patient.
 ## Privacy and data handling
 
 - **Images.** The API stores an upload (mode 0600) only while its analysis runs
-  and deletes it after 24 h (hourly job). The Gradio demo keeps images in
-  memory only. Images are never logged and never sent to an LLM. The Grad-CAM
+  and deletes it after 24 h (hourly job). Images are never logged and never sent to an LLM. The Grad-CAM
   overlay is stored with the analysis.
 - **Logs.** Structured JSON access logs carry request id, method, path, status
   and duration — no bodies, file names or image data.
@@ -38,8 +38,11 @@ person's care. Do not upload images that identify a patient.
 
 ## Known limitations (stated, not hidden)
 
-- **No email verification.** Reviewer rights are granted by email at sign-up,
-  so the operator should register the reviewer address before sharing the site.
+- **No email verification.** Emails are not verified (that would need a mail
+  provider). The reviewer role therefore needs both a listed email and the
+  operator's reviewer code (`NEUROCLASS_REVIEWER_CODE`, compared in constant
+  time); a listed email alone grants nothing, so registering someone else's
+  address first gains no privilege. Ordinary accounts only see their own data.
 - **Rate limits are per process and trust forwarded addresses.** Behind the HF
   proxy the client address comes from `X-Forwarded-For`, which a client can
   influence; limits slow casual abuse but are not a security boundary. LLM

@@ -24,14 +24,14 @@ clearly separated layers:
 
 **🌐 Web app:** [neuroclass-gilt.vercel.app](https://neuroclass-gilt.vercel.app)
 · **⚙️ API:** [udit013-brain-tumor-mri-classifier.hf.space/api/docs](https://udit013-brain-tumor-mri-classifier.hf.space/api/docs)
-· **🧪 Demo:** [HF Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
+· **🧪 Backend:** [HF Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
 · **🤗 Model:** [Udit013/brain-tumor-efficientnetb3](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
 · **📄 Paper:** [DOI 10.1109/ICC-ROBINS60238.2024.10533941](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941)
 · ![CI](https://github.com/Udit013/Brain_Tumor_Classificatioin/actions/workflows/ci.yml/badge.svg)
 
 The backend runs on a free Hugging Face Space that sleeps when idle: the first
-request after a quiet period can take a minute or two. History is temporary on the
-free deployment (see [docs/FREE_TIER.md](docs/FREE_TIER.md)).
+request after a quiet period can take a minute or two. Data lives in a free Neon
+Postgres database (see [docs/FREE_TIER.md](docs/FREE_TIER.md)).
 
 ```mermaid
 flowchart LR
@@ -47,7 +47,7 @@ flowchart LR
     GM --> VF[Citation verifier]
     X --> VF
     VF --> H[Human review<br/>interrupt + checkpoint]
-    G <--> DB[(SQLite or<br/>Neon Postgres)]
+    G <--> DB[(Neon Postgres<br/>+ pgvector)]
 ```
 
 | Platform result (measured 2026-11-17) | Value |
@@ -435,10 +435,10 @@ the engineering story: [docs/CASE_STUDY.md](docs/CASE_STUDY.md).
 
 | Layer | Service (free plan) | Without it |
 |---|---|---|
-| API + demo | existing Hugging Face Space, CPU Basic | — |
-| Web app | Vercel Hobby | the Space's own demo and API docs |
-| Durable database (optional) | Neon Free | SQLite on the Space disk (resets on restart) |
-| LLM (optional) | Gemini API free tier, unbilled project | extractive answers |
+| API | existing Hugging Face Space, CPU Basic (API-only) | — |
+| Web app | Vercel Hobby (deploys on push to `main`) | the API docs |
+| Database + pgvector | Neon Free | in-memory retrieval and 503 for data features if Neon is suspended |
+| LLM | Gemini API free tier, unbilled project (configured) | extractive answers |
 | Embeddings | local ONNX (fastembed) | — |
 
 No paid plan, card or add-on is used, and free-tier exhaustion degrades a

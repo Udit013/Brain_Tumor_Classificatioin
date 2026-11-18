@@ -12,7 +12,7 @@ flowchart LR
       W[Next.js app<br/>Vercel Hobby]
     end
     subgraph Space["Hugging Face Space · CPU Basic (free)"]
-      D[Gradio demo /]
+      D[Landing page /]
       A[FastAPI /api]
       G[LangGraph workflow]
       V[Vision service<br/>ONNX Runtime + NumPy Grad-CAM]
@@ -22,10 +22,9 @@ flowchart LR
       L[LLM layer<br/>QuotaGuard → Gemini adapter]
       C[Extractive composer]
     end
-    DB[(SQLite /tmp<br/>or Neon Postgres)]
+    DB[(Neon Postgres + pgvector<br/>or SQLite locally)]
     GEM[[Gemini API<br/>free tier, optional]]
     W -- fetch + SSE --> A
-    D --> V & R
     A --> G
     G --> V --> R --> Q --> L --> X
     L -. quota / error / none .-> C --> X
@@ -115,8 +114,10 @@ only see the `Explainer` protocol, so changing providers touches neither.
 - Search: BM25 and bge-small dense scores fused with reciprocal rank fusion
   (k = 60); project-question routing by pattern; at most two chunks per
   document; optional cross-encoder rerank (off: see the evaluation).
-- Stores: in-process exact search (default, also on the Space) or pgvector HNSW
-  with iterative scan; they return the same results (tested).
+- Stores: pgvector HNSW with iterative scan (on the Space, synced from the
+  bundled index on first start, idempotent) with the in-process exact search as
+  an automatic fallback when the database is unreachable; locally, the in-process
+  store. They return the same results (tested).
 
 ## Data and storage
 
@@ -131,8 +132,7 @@ only see the `Explainer` protocol, so changing providers touches neither.
 | LangGraph checkpoint tables | graph state for pause/resume | with the run |
 
 Uploaded files are written with mode 0600 for the duration of a run and deleted
-by an hourly job after `NEUROCLASS_UPLOAD_RETENTION_HOURS` (24). The Gradio demo
-processes images in memory and stores nothing.
+by an hourly job after `NEUROCLASS_UPLOAD_RETENTION_HOURS` (24).
 
 ## Failure modes
 
@@ -141,6 +141,6 @@ processes images in memory and stores nothing.
 | Model bundle missing/corrupt | checksum check fails; `/ready` 503 with cause; benchmarks and literature still served |
 | Literature index unavailable | analyses run without passages; `/ready` shows retrieval down |
 | No LLM, LLM budget used, provider 429/5xx/timeout/refusal/bad JSON | extractive explanation, `fallback_reason` shown |
-| Database down (e.g. Neon suspended) | `/ready` 503; analyses fail clearly; static data still served |
+| Database down (e.g. Neon suspended) | API answers 503 "temporarily unavailable" where data is needed; retrieval falls back to the in-memory index; research answers, benchmarks and samples keep working; tracing and the LLM ledger degrade silently (the in-process quota guard still applies) |
 | Process restart mid-run | runs resume from the checkpoint; paused reviews stay paused |
 | Space asleep | first request wakes it (cold start) |

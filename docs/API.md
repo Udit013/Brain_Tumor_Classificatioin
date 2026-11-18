@@ -15,7 +15,7 @@ diagnoses.
 |---|---|---|
 | Anonymous browser | `X-Client-Id: <≥16 random chars>` (the web app generates one per browser) | its own analyses; review off |
 | Signed-in user | `Authorization: Bearer <JWT>` from `/auth/signup` or `/auth/login` | its own analyses; can request review |
-| Reviewer | signed in with an email listed in `NEUROCLASS_REVIEWER_EMAILS` | the review queue; can approve / request revision / reject |
+| Reviewer | an email listed in `NEUROCLASS_REVIEWER_EMAILS` **and** the operator's `NEUROCLASS_REVIEWER_CODE`, given at sign-up (`reviewer_code`) or later via `POST /auth/reviewer` | the review queue; can approve / request revision / reject |
 
 Requests without either header get 401 on owned resources. Another owner's
 analysis is a 404, not a 403.
@@ -40,13 +40,15 @@ analysis is a 404, not a 403.
 | GET | `/metrics/benchmarks` | the paper's reported table and the measured evaluations, kept separate |
 | GET | `/models/current`, `/models/manifest` | model version, checksums, export verification |
 | GET | `/samples`, `/samples/{id}/image` | example images (test split, CC BY 4.0) |
-| POST | `/auth/signup`, `/auth/login`; GET `/auth/me` | accounts |
+| POST | `/auth/signup` (`email`, `password`, optional `reviewer_code`), `/auth/login`; GET `/auth/me` | accounts |
+| POST | `/auth/reviewer` | `{"code": ...}` — upgrades the signed-in account to reviewer if its email is listed and the code matches; 403 otherwise |
 
 Status codes worth knowing: 413 upload too large; 400 unusable image (with a
 machine-readable `code`: `empty_file`, `file_too_large`,
 `unsupported_format`, `too_many_pixels`, `corrupt_image`, `too_small`); 422 neither or both of `file`/`sample_id`; 403
 review requested without signing in; 409 report or review requested in the
-wrong state; 429 rate
+wrong state; 503 `the database is temporarily unavailable` (e.g. Neon suspended at its
+free limit — benchmarks and literature search keep working); 429 rate
 limited (per client: 10 analyses/min, 60 research calls/min), 503 subsystem
 unavailable.
 

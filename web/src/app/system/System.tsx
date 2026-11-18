@@ -28,21 +28,27 @@ export function System() {
         {error && <ErrorState error={error} />}
         {!ready && !error && <Spinner label="Checking subsystems…" />}
         {ready && (
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {Object.entries(ready.checks).map(([k, v]) => (
-              <li key={k} className="rounded-lg border border-line px-3 py-2 text-sm">
-                <span className="flex items-center justify-between">
-                  <span className="font-medium">{label[k] ?? k}</span>
-                  <span className={v.ok ? "text-good-ink" : "text-critical-ink"}>
-                    <span aria-hidden>{v.ok ? "● " : "■ "}</span>{v.ok ? "available" : "unavailable"}
+          <>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {Object.entries(ready.checks).map(([k, v]) => (
+                <li key={k} className="rounded-lg border border-line bg-surface/50 px-4 py-3">
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium text-ink">{label[k] ?? k}</span>
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${v.ok ? "text-good-ink" : "text-critical-ink"}`}>
+                      <span aria-hidden>{v.ok ? "●" : "■"}</span>{v.ok ? "Operational" : "Unavailable"}
+                    </span>
                   </span>
-                </span>
-                <span className="mt-1 block font-mono text-xs text-muted">
-                  {flatten(v).join(" · ")}
-                </span>
-              </li>
-            ))}
-          </ul>
+                  <span className="mt-1 block text-sm text-ink-2">{describe(k, v)}</span>
+                </li>
+              ))}
+            </ul>
+            <details className="mt-3 text-sm">
+              <summary className="cursor-pointer text-ink-2 hover:text-ink">Raw readiness data</summary>
+              <pre className="mt-2 overflow-x-auto rounded-lg bg-sunken p-3 font-mono text-xs text-ink-2">
+                {JSON.stringify(ready, null, 2)}
+              </pre>
+            </details>
+          </>
         )}
         <p className="mt-3 text-sm text-ink-2">
           {ready?.checks.database?.persistent === false && (
@@ -120,4 +126,25 @@ function flatten(v: Record<string, unknown>, prefix = ""): string[] {
     if (val && typeof val === "object" && !Array.isArray(val)) return flatten(val as Record<string, unknown>, `${prefix}${key}.`);
     return val === null || val === undefined ? [] : [`${prefix}${key}: ${String(val)}`];
   });
+}
+
+function describe(key: string, v: Record<string, unknown>): string {
+  if (!v.ok) return String(v.error ?? "Not available");
+  const n = (x: unknown) => (typeof x === "number" ? x.toLocaleString("en-US") : String(x));
+  switch (key) {
+    case "database":
+      return `${v.backend === "postgresql" ? "PostgreSQL" : "SQLite"} · ${v.persistent ? "persistent" : "temporary — resets on restart"}`;
+    case "vision":
+      return `EfficientNetB3 · ${v.model_version} · ONNX Runtime on CPU`;
+    case "retrieval":
+      return `${n(v.documents)} documents · ${n(v.chunks)} passages · ${v.backend === "pgvector" ? "pgvector" : String(v.backend)}`;
+    case "llm": {
+      if (!v.enabled) return "No language model configured — explanations quote retrieved passages";
+      const b = (v.budget ?? {}) as Record<string, unknown>;
+      const paused = b.paused_until ? " · paused (free-tier limit reached)" : "";
+      return `${v.model} (free tier) · ${n(b.used_today ?? 0)} of ${n(b.per_day_limit)} calls today${paused}`;
+    }
+    default:
+      return flatten(v).join(" · ");
+  }
 }

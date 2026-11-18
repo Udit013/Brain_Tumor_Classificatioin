@@ -8,13 +8,15 @@ export default function AssistantPage() {
   return (
     <>
       <PageHeader eyebrow="Research assistant" title="Ask the literature">
-        Answers are assembled from 241 openly licensed PubMed Central articles and the project&apos;s own documents.
-        Every statement cites a passage, and a deterministic check removes any statement its sources do not support.
-        When the deployment enables the Gemini API free tier, your question and the retrieved public passages are sent
-        to Google to draft the answer, and Google may use free-tier content to improve its products: don&apos;t include
-        personal information. Without it, answers are quoted passages and nothing leaves the server.
+        Answers come from 241 openly licensed PubMed Central articles and the project&apos;s own documents. Every
+        statement cites a passage; a deterministic check removes anything its sources don&apos;t support.
       </PageHeader>
       <Assistant />
+      <p className="mt-6 max-w-3xl text-xs leading-relaxed text-muted">
+        Privacy: when the language model is enabled, your question and the retrieved public passages are sent to the
+        Gemini API free tier, whose terms let Google use that content to improve its products. Don&apos;t include
+        personal information. Without it, answers are quoted passages and nothing leaves the server.
+      </p>
     </>
   );
 }

@@ -15,9 +15,8 @@ guarantee.
 | Layer | Choice | Plan | Required? | Fallback when absent or exhausted |
 |---|---|---|---|---|
 | Backend API + demo | Hugging Face Space (existing Gradio Space) | CPU Basic (free) | yes | — (the Space wakes on the next visit) |
-| Web app | Vercel | Hobby (free) | no | the Space's own demo at `/` and API docs at `/api/docs` |
-| Database | SQLite on the Space disk | — | default | — |
-| Durable database | Neon Postgres | Free | optional | SQLite (history resets on restart) |
+| Web app | Vercel | Hobby (free) | no | the API docs at `/api/docs` |
+| Database + vectors | Neon Postgres + pgvector (project `neuroclass`, branch `production`) | Free | yes (deployed) | API returns 503 for data features; retrieval uses the in-memory index; SQLite if `DATABASE_URL` is removed |
 | LLM | Gemini API | Free tier, unbilled project | optional | extractive answers (quoted, cited passages) |
 | Embeddings | fastembed, `BAAI/bge-small-en-v1.5`, local ONNX | — (open model) | yes | — (no API, no quota) |
 | Auth | built in (scrypt + HS256 JWT) | — | yes | — (no auth provider) |
@@ -79,6 +78,12 @@ Source: [neon.com/docs/introduction/plans](https://neon.com/docs/introduction/pl
 | At the limit | compute **suspended** until next month when CU-hours or transfer run out; writes fail above 1 GB; data is not deleted |
 | Footprint | analyses, reviews, trace events, checkpoints; the optional pgvector copy of the index is ~20 MB |
 
+Verified in the Neon console on 2026-11-17: organisation on the **Free Plan, $0 /
+month**, no payment method or prepaid credits; project `neuroclass` (AWS US East 2)
+with one branch (`production`), one database and one compute; Neon Auth,
+object storage, functions and the AI gateway are **not** provisioned (NeuroClass
+keeps its own auth). Usage after deployment and tests: 0.05 CU-hours, 33 MB.
+
 Recommended setting: in the Neon console, cap autoscaling at 0.25 CU so the
 100 CU-hours last ~400 active hours a month. If Neon suspends, set
 `DATABASE_URL` empty (or leave it; `/api/ready` reports the database as down and
@@ -135,6 +140,6 @@ and the pgvector service container.
 This is a free **public demo with modest traffic**, not a free production
 service. Expect: a cold start after idle periods; two concurrent demo
 predictions; a small daily LLM budget (when a key is configured at all); and,
-without Neon, history that resets on restart. A burst of visitors makes
+Neon's monthly compute allowance. A burst of visitors makes
 requests queue or hit the per-client rate limit — it never makes anyone pay.
 Scaling beyond this needs paid infrastructure, which this project does not use.

@@ -131,10 +131,24 @@ while ONNX Runtime warms up.
 
 | Suite | Result (2026-11-17) |
 |---|---|
-| Platform, SQLite (`tests/app_tests`) | 71 passed, 1 skipped (Postgres-only test) |
-| Platform, PostgreSQL 17 + pgvector 0.8.1 | 72 passed |
-| Platform on the HF Space dependency set (pydantic 2.12.5, no MCP/Claude SDK) | 62 passed, 5 skipped |
+| Platform, SQLite (`tests/app_tests`) | 81 passed, 3 skipped (Postgres-only tests) |
+| Platform, PostgreSQL 17 + pgvector 0.8.1 | 84 passed — incl. history and a paused review surviving an app restart, pgvector store selection |
+| Platform on the HF Space dependency set (pydantic 2.12.5, no MCP/Claude SDK) | 72 passed, 7 skipped (SQLite); 75 passed, 4 skipped (PostgreSQL) — skips are the Claude-SDK and Postgres-only tests |
 | Research (`tests/`, no TensorFlow) | 65 passed |
 | Web unit/component (Vitest) | 8 passed |
-| Browser journeys (Playwright, desktop + Pixel 7) vs dev stack, Docker Compose stack, and the live deployment | 12 / 12 passed on each |
+| Browser journeys (Playwright, desktop + Pixel 7) | 12 / 12 against the dev stack, the Docker Compose stack and the live deployment |
 | Dependency audit | pip-audit: no known vulnerabilities in `requirements-app.txt`; npm audit (prod): 0 |
+
+## 6. Live verification on production (Neon + Gemini)
+
+| Check | Result |
+|---|---|
+| `/api/ready` | PostgreSQL via Neon's pooled endpoint; `retrieval.backend: pgvector` (7,355 chunks synced); Gemini `gemini-3.5-flash-lite` enabled; `paid_allowed: false` |
+| Research answer through Gemini | "What share of test images have a near-duplicate in training?" → 44.6%, cited to the project README, verified, 0 statements removed; 2 calls, 7,740 input / 141 output tokens, $0 |
+| Reviewer privilege | signing up with a listed email but no code → role `user`; claiming with the code → `reviewer` |
+| Restart persistence | analysis with `review_mode=always` → `awaiting_review`; Space restarted; still in history and the review queue; approved → `completed`, explanation drafted by Gemini |
+| Neon plan | Free, $0/month, no payment method; 0.05 CU-hours and 33 MB used after these tests |
+
+Test accounts `student-check@neuroclass.test` and `review-check@neuroclass.test`
+and their analyses remain in the database; the temporary reviewer settings used
+for this check were removed from the Space afterwards.

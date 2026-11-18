@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, ApiError, DISPLAY, useSession, type ClassName } from "@/lib/api";
 import { AnalysisRunner } from "@/components/analysis/AnalysisRunner";
-import { Card, ErrorState, Notice, Spinner } from "@/components/ui";
+import { buttonClass, Card, ErrorState, Notice, Spinner } from "@/components/ui";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 type Sample = { id: string; label: ClassName; source_file: string; license: string };
@@ -109,7 +109,7 @@ export function Workbench() {
               className="grid place-items-center rounded-xl border-2 border-dashed border-line-strong px-6 py-10 text-center"
             >
               <p className="text-ink">Drag a JPEG or PNG here, or</p>
-              <button onClick={() => inputRef.current?.click()} className="mt-2 rounded-md border border-line-strong px-3 py-1.5 text-sm hover:bg-sunken">
+              <button onClick={() => inputRef.current?.click()} className={buttonClass("secondary", "sm", "mt-3")}>
                 Choose a file
               </button>
               <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="sr-only"
@@ -144,7 +144,7 @@ export function Workbench() {
 
       <div className="flex flex-wrap items-center gap-4">
         <button onClick={run} disabled={!canRun || submitting}
-                className="rounded-lg bg-accent px-5 py-2.5 font-medium text-accent-ink disabled:cursor-not-allowed disabled:opacity-50">
+                className={buttonClass("primary", "lg")}>
           {submitting ? "Starting…" : "Run analysis"}
         </button>
         {error && <span role="alert" className="text-sm text-critical-ink">{error}</span>}

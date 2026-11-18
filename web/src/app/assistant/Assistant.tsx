@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { api, ApiError, type ResearchAnswer } from "@/lib/api";
 import { ExplanationView } from "@/components/analysis/ResultView";
-import { ErrorState, Spinner } from "@/components/ui";
+import { buttonClass, ErrorState, Spinner } from "@/components/ui";
 
 const SUGGESTIONS = [
   "What accuracy did the original IEEE paper report for EfficientNetB3, and on how many test images?",
@@ -55,7 +55,7 @@ export function Assistant() {
             <option value="project_document">NeuroClass documents only</option>
           </select>
           <button disabled={busy || question.trim().length < 3}
-                  className="rounded-lg bg-accent px-4 py-2 font-medium text-accent-ink disabled:opacity-50">
+                  className={buttonClass("primary", "md")}>
             Ask
           </button>
         </div>

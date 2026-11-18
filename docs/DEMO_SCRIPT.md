@@ -45,20 +45,20 @@ diagnostic tool."
   from 0.79 to 1.00 on my labelled set."
 
 ## 3:30 — How it runs for $0 (45 s) — *System* page
-- Show `/ready`: vision, index version, database `persistent: false`, LLM
-  `provider: none`, `paid_allowed: false`.
+- Show the live status: PostgreSQL (Neon, persistent), pgvector index, Gemini
+  free tier with today's call budget, `paid_allowed: false`.
 - "TensorFlow was only needed for Grad-CAM, so I export one ONNX graph and
   compute Grad-CAM in closed form — 2.2× faster, a third of the memory, verified
   against TensorFlow. The backend is a free Hugging Face Space, the frontend
-  Vercel Hobby. With a free Gemini key it drafts explanations behind a quota
-  guard; without one, or when the quota runs out, it falls back to quoted,
-  cited passages. It can degrade, but it can't bill."
+  Vercel Hobby, the database Neon's free tier with pgvector. Gemini's free tier
+  drafts explanations behind a quota guard; when the quota runs out it falls
+  back to quoted, cited passages. It can degrade, but it can't bill."
 
 ## 4:15 — Close (15 s)
 "Everything I showed is measured, tested in CI — including a job that installs
 exactly what Hugging Face installs — and documented, including what I couldn't
 measure yet."
 
-**If something fails live:** the Space is asleep → show the Gradio demo at the
-Space URL after it wakes, or the recorded numbers in `docs/EVALUATION.md`;
-API slow → the reliability and benchmark pages still work from cached data.
+**If something fails live:** the Space is asleep → open the Space URL, wait for
+the landing page to show "Operational", then retry; or walk through the recorded
+numbers in `docs/EVALUATION.md`.

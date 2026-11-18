@@ -2,8 +2,10 @@ import { expect, test } from "@playwright/test";
 
 test("landing page separates the paper's claim from measured results", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("published brain MRI classifier");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Brain MRI classification");
   await expect(page.getByText("Reported by the paper")).toBeVisible();
+  await expect(page.getByText("Measured by this project")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Analyse an MRI slice" })).toBeVisible();
   await expect(page.getByText(/not diagnoses/).first()).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();

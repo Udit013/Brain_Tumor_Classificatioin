@@ -9,7 +9,7 @@ Defaults are safe for local development and cost nothing.
 |---|---|---|
 | `NEUROCLASS_ENV` | `development` | `production` requires `NEUROCLASS_JWT_SECRET` |
 | `NEUROCLASS_DATA_DIR` | `./var` | SQLite file, uploads, LangGraph SQLite checkpoints |
-| `DATABASE_URL` | empty (SQLite) | Postgres URL (`postgres://` and `postgresql://` accepted); enables the Postgres checkpointer |
+| `DATABASE_URL` | empty (SQLite) | Postgres URL (`postgres://` and `postgresql://` accepted); enables the Postgres checkpointer. Neon pooled (`-pooler`) and direct endpoints both work: behind the pooler, prepared statements are disabled automatically |
 | `NEUROCLASS_EPHEMERAL_STORAGE` | `false` | set `true` where the disk is wiped on restart; `/ready` reports `persistent: false` and the UI warns |
 | `NEUROCLASS_MODEL_DIR` | `models/serving` | the verified ONNX bundle |
 | `NEUROCLASS_INFERENCE_TIMEOUT_S` | `20` | per image |
@@ -33,7 +33,8 @@ Defaults are safe for local development and cost nothing.
 | `NEUROCLASS_JWT_SECRET` | empty | required in production; ≥ 32 random characters |
 | `NEUROCLASS_JWT_TTL_MIN` | 720 | |
 | `NEUROCLASS_ALLOW_SIGNUP` | `true` | |
-| `NEUROCLASS_REVIEWER_EMAILS` | empty | emails that receive the reviewer role at sign-up. Emails are not verified, so list an address and register it yourself before sharing the site |
+| `NEUROCLASS_REVIEWER_EMAILS` | empty | emails eligible for the reviewer role |
+| `NEUROCLASS_REVIEWER_CODE` | empty | secret (≥ 16 characters) a listed email must also present, at sign-up or via `POST /auth/reviewer`. Unset → nobody can become a reviewer |
 
 ## LLM (optional, free by default)
 
@@ -59,13 +60,14 @@ Defaults are safe for local development and cost nothing.
 | `NEUROCLASS_EMBED_CACHE` | `data/fastembed_cache` | model download cache |
 | `NEUROCLASS_RETRIEVAL_MODE` | `hybrid` | |
 | `NEUROCLASS_RERANK` / `NEUROCLASS_RERANKER_MODEL` | `false` / MiniLM cross-encoder | off: +1 s/query on CPU, no recall gain measured |
+| `NEUROCLASS_SYNC_INDEX_TO_DB` | `false` (`true` on the Space) | copy the index into PostgreSQL/pgvector on first use (idempotent) and search it there; in-memory fallback |
 
 ## Other
 
 | Variable | Notes |
 |---|---|
 | `NEUROCLASS_MCP_TOKEN` | JWT of the one account the local MCP server may read analyses for |
-| `NEUROCLASS_WEB_URL` | Space only: link from the demo to the web app |
+| `NEUROCLASS_WEB_URL` | Space only: the landing page links to the web app |
 | `NEXT_PUBLIC_API_URL` | web build: API base URL (`.../api` on the Space) |
 | `NEUROCLASS_E2E_WEB`, `NEUROCLASS_E2E_API` | Playwright targets (default localhost:3000 / :8000) |
 | `DATABASE_URL_TEST` | runs the Postgres integration tests |

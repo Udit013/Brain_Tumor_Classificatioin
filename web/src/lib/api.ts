@@ -145,11 +145,11 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, top_k: 6, filters: sourceType ? { source_type: sourceType } : null }),
     }),
-  signup: (email: string, password: string) =>
+  signup: (email: string, password: string, reviewerCode?: string) =>
     request<{ access_token: string; role: string }>("/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, ...(reviewerCode ? { reviewer_code: reviewerCode } : {}) }),
     }),
   login: (email: string, password: string) =>
     request<{ access_token: string; role: string }>("/auth/login", {

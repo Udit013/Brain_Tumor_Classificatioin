@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { api, DISPLAY, type Analysis, type Passage, type Statement } from "@/lib/api";
-import { Card, LevelBadge, Notice, Pill, pct } from "@/components/ui";
+import { buttonClass, Card, LevelBadge, Notice, pct, Pill } from "@/components/ui";
 
 const KIND_LABEL: Record<string, string> = {
   model_output: "Model output",
@@ -304,10 +304,10 @@ export function ReportLinks({ id }: { id: string }) {
   }
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <button onClick={() => download("html")} className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:opacity-90">
+      <button onClick={() => download("html")} className={buttonClass("primary", "sm")}>
         Download report (HTML)
       </button>
-      <button onClick={() => download("md")} className="rounded-md border border-line-strong px-3 py-2 text-sm hover:bg-sunken">
+      <button onClick={() => download("md")} className={buttonClass("secondary", "sm")}>
         Markdown
       </button>
       {error && <span role="alert" className="text-sm text-critical-ink">{error}</span>}

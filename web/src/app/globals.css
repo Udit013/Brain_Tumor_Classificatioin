@@ -1,51 +1,63 @@
 @import "tailwindcss";
 
 /*
- * NeuroClass design tokens. Chart colours are the validated reference palette
- * (dataviz validate_palette.js: series-1/series-2 pass every check in both modes);
- * status colours are reserved for reliability state and always ship with an
- * icon and a text label.
+ * NeuroClass design tokens.
+ * - Neutrals: cool greys; one accent (blue) for actions and links only.
+ * - Chart colours are the validated reference palette (dataviz
+ *   validate_palette.js: series-1/series-2 pass every check in both modes).
+ * - Status colours are reserved for reliability state and always ship with an
+ *   icon and a text label.
+ * Base element styles live in @layer base so Tailwind utilities can override
+ * them (an unlayered `a { color }` used to beat `text-*` on link buttons).
  */
 :root {
   color-scheme: light;
-  --surface: #fbfaf7;
+  --surface: #f7f8fa;
   --surface-raised: #ffffff;
-  --surface-sunken: #f2f0ea;
-  --ink: #141a22;
-  --ink-secondary: #4b5260;
-  --ink-muted: #6b7180;
-  --line: #e3e0d8;
-  --line-strong: #c9c5ba;
-  --accent: #1c5cab;          /* links and primary actions (blue 550, 6.4:1) */
+  --surface-sunken: #eff1f4;
+  --ink: #0e1320;
+  --ink-secondary: #454d5d;
+  --ink-muted: #687083;
+  --line: #e3e6ec;
+  --line-strong: #cbd0d9;
+  --accent: #2650c4;          /* actions and links: 6.6:1 on white */
+  --accent-hover: #1d41a6;
   --accent-ink: #ffffff;
+  --accent-soft: #e9eefc;
   --series-1: #2a78d6;        /* current model */
   --series-2: #eb6834;        /* previous model */
   --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-400: #3987e5; --seq-550: #1c5cab; --seq-700: #0d366b;
   --seq-ink-low: #141a22; --seq-ink-high: #ffffff;   /* text on the low / high end of the ramp */
   --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
   --good-ink: #0a6b0a; --warning-ink: #8a5a00; --critical-ink: #a32424;
-  --focus: #2a78d6;
+  --focus: #2650c4;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-md: 0 1px 2px rgb(16 24 40 / 0.04), 0 4px 12px rgb(16 24 40 / 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
-    --surface: #121314;
-    --surface-raised: #1a1a19;
-    --surface-sunken: #0d0e0f;
-    --ink: #f0efec;
-    --ink-secondary: #c3c2b7;
-    --ink-muted: #9a998f;
-    --line: #2e2e2b;
-    --line-strong: #45443f;
-    --accent: #6da7ec;
-    --accent-ink: #0b0b0b;
+    --surface: #0b0d11;
+    --surface-raised: #13161c;
+    --surface-sunken: #0f1216;
+    --ink: #eceef2;
+    --ink-secondary: #b6bdc9;
+    --ink-muted: #8b93a3;
+    --line: #232832;
+    --line-strong: #343b47;
+    --accent: #86a8ff;
+    --accent-hover: #a3bdff;
+    --accent-ink: #0b1124;
+    --accent-soft: #18213a;
     --series-1: #3987e5;
     --series-2: #d95926;
     --seq-100: #1a2a3d; --seq-250: #184f95; --seq-400: #256abf; --seq-550: #6da7ec; --seq-700: #cde2fb;
     --seq-ink-low: #f0efec; --seq-ink-high: #0b0b0b;
     --good-ink: #5fd35f; --warning-ink: #fab219; --critical-ink: #f08a8a;
-    --focus: #6da7ec;
+    --focus: #86a8ff;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 16px rgb(0 0 0 / 0.35);
   }
 }
 
@@ -59,7 +71,9 @@
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
   --color-series-1: var(--series-1);
   --color-series-2: var(--series-2);
   --color-good: var(--good);
@@ -68,33 +82,54 @@
   --color-good-ink: var(--good-ink);
   --color-warning-ink: var(--warning-ink);
   --color-critical-ink: var(--critical-ink);
+  --shadow-card: var(--shadow-sm);
+  --shadow-raised: var(--shadow-md);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-html {
-  background: var(--surface);
-}
+@layer base {
+  html {
+    background: var(--surface);
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;        /* sticky header */
+  }
 
-body {
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-}
+  body {
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+  }
 
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 
-a {
-  color: var(--accent);
-  text-underline-offset: 3px;
+  a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  a:hover {
+    color: var(--accent-hover);
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
 }
 
 .prose-tight p + p {
   margin-top: 0.75rem;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
