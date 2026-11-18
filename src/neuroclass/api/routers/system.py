@@ -62,6 +62,13 @@ def _load(rel: str):
     return data
 
 
+def _store_name(store) -> str:
+    name = type(store).__name__
+    if name == "FallbackStore":
+        return "pgvector" + (f" (degraded to memory: {store.last_error})" if store.last_error else "")
+    return {"MemoryStore": "memory", "PgVectorStore": "pgvector"}.get(name, name)
+
+
 @router.get("/health", summary="Liveness")
 def health() -> dict:
     return {"status": "ok", "version": __version__}
@@ -75,7 +82,8 @@ def ready(services: Services = Depends(get_services)):
             c.execute(text("SELECT 1"))
         pg = services.settings.is_postgres
         checks["database"] = {"ok": True, "backend": "postgresql" if pg else "sqlite",
-                              "persistent": pg or not services.settings.ephemeral_storage}
+                              "persistent": pg or not services.settings.ephemeral_storage,
+                              "pooled": services.settings.db_is_pooled}
     except Exception as exc:  # noqa: BLE001
         checks["database"] = {"ok": False, "error": type(exc).__name__}
     try:
@@ -86,7 +94,7 @@ def ready(services: Services = Depends(get_services)):
     r = services.retriever()
     checks["retrieval"] = ({"ok": True, "index_version": r.index.version,
                             "documents": len(r.index.docs), "chunks": len(r.index.chunks),
-                            "backend": type(r.store).__name__}
+                            "backend": _store_name(r.store)}
                            if r is not None else {"ok": False, "error": services.retriever_error})
     llm = services.llm_status()
     checks["llm"] = {"ok": True, **llm, "mode": "llm" if llm["enabled"] else "extractive"}

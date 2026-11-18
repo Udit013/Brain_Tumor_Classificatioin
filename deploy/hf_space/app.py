@@ -1,27 +1,23 @@
-"""NeuroClass on a free Hugging Face Space (CPU Basic, Gradio SDK).
+"""NeuroClass API on a free Hugging Face Space (CPU Basic).
 
-One process, one port (7860), two surfaces:
-  /      a small Gradio demo (upload -> class, calibrated confidence, Grad-CAM,
-         reliability level), for people who arrive at the Space itself
-  /api   the full NeuroClass platform API (FastAPI): agent workflow, research
-         retrieval, reports, review queue. The Next.js app on Vercel calls this.
+The Space is the platform's Python backend only:
+  /api   the NeuroClass platform API (FastAPI): ONNX inference with analytic
+         Grad-CAM, LangGraph analysis workflow with human review, literature
+         retrieval, reports, benchmarks. The Next.js app on Vercel calls it.
+  /      a minimal landing page pointing people to the web app and API docs.
 
-Both use the same TF-free vision service (ONNX Runtime + NumPy Grad-CAM) and
-the same deterministic reliability rules, so they never disagree.
+The Space keeps the Gradio SDK only because free accounts can't create Docker
+Spaces; nothing here imports or serves Gradio. Uvicorn binds port 7860 itself.
 
-Zero-cost facts this file relies on (see docs/FREE_TIER.md):
-- CPU Basic is free, sleeps after ~48 h without traffic, and its disk is not
-  persistent. Without DATABASE_URL, history lives in SQLite under /tmp and
-  resets when the Space restarts; /api/ready reports this as persistent=false.
-- DATABASE_URL (optional secret) points at a free Neon Postgres project.
-- GEMINI_API_KEY (optional secret) enables the free-tier LLM; without it every
-  explanation is extractive. No paid provider is configured here.
+Configuration (Space settings; see docs/DEPLOYMENT.md):
+  DATABASE_URL (secret)     Neon Postgres: history, reviews, checkpoints, pgvector
+  GEMINI_API_KEY (secret)   Gemini free tier; without it explanations are extractive
+  NEUROCLASS_JWT_SECRET, NEUROCLASS_REVIEWER_CODE (secrets), NEUROCLASS_* variables
 """
 
 from __future__ import annotations
 
-import base64
-import io
+import html
 import os
 import sys
 import threading
@@ -34,113 +30,118 @@ os.environ.setdefault("NEUROCLASS_DATA_DIR", "/tmp/neuroclass")
 os.environ.setdefault("NEUROCLASS_EMBED_CACHE", "/tmp/fastembed_cache")
 os.environ.setdefault("NEUROCLASS_ENV", "production")
 os.environ.setdefault("NEUROCLASS_WORKERS", "2")
+os.environ.setdefault("NEUROCLASS_SYNC_INDEX_TO_DB", "true")
 
-import gradio as gr  # noqa: E402
 from fastapi import FastAPI  # noqa: E402
-from fastapi.responses import RedirectResponse  # noqa: E402
-from PIL import Image  # noqa: E402
+from fastapi.responses import HTMLResponse, RedirectResponse  # noqa: E402
 
 from neuroclass.api.app import create_app  # noqa: E402
-from neuroclass.reliability import assess  # noqa: E402
-from neuroclass.agent.compose import DISPLAY  # noqa: E402
 from neuroclass.settings import get_settings  # noqa: E402
-from neuroclass.vision.validation import InputRejected, assess_quality, decode_image  # noqa: E402
 
 settings = get_settings()
 api = create_app(settings)
 WEB_URL = os.environ.get("NEUROCLASS_WEB_URL", "").rstrip("/")
-EXAMPLES = sorted(str(p) for p in (HERE / "space" / "examples").glob("*.jpg"))
-
-DISCLAIMER = ("**Research and education demo — not a medical device.** Do not use it for diagnosis, "
-              "triage or any decision about a person's care. Accuracy on images unlike the "
-              "training data is far lower than the benchmark score.")
-LEVEL_ICON = {"standard": "●", "caution": "▲", "unreliable": "■"}
-
-
-def _services():
-    return api.state.services
-
-
-def predict(path: str | None):
-    if not path:
-        raise gr.Error("Upload an image or pick an example first.")
-    raw = Path(path).read_bytes()
-    try:
-        img = decode_image(raw, settings.max_upload_bytes, settings.max_image_pixels)
-    except InputRejected as exc:
-        raise gr.Error(str(exc), title="Can't use this image") from None
-    try:
-        result = _services().vision.predict(img, assess_quality(img))
-    except Exception as exc:  # noqa: BLE001 — report to this user, keep the demo up
-        raise gr.Error("The model could not score this image. Try another one.") from exc
-    rel = assess(result)
-    cls = DISPLAY[result.predicted_class].capitalize()
-    summary = (f"## Model-predicted class: {cls}\n"
-               f"Calibrated confidence **{result.calibrated_confidence:.1%}** · "
-               f"reliability **{LEVEL_ICON[rel.level]} {rel.level}**"
-               + (" · *would be sent to human review on the platform*" if rel.requires_review else ""))
-    findings = "\n".join(f"- **{getattr(f.severity, 'value', f.severity)}** — {f.message}" for f in rel.findings) or \
-        "- No reliability rule fired for this image."
-    probs = {DISPLAY[p.label].capitalize(): p.calibrated for p in result.probabilities}
-    cam = (Image.open(io.BytesIO(base64.b64decode(result.gradcam_png_base64)))
-           if result.gradcam_png_base64 else None)
-    tech = (f"- Model `{result.model_version}`, ONNX Runtime on CPU, analytic Grad-CAM\n"
-            f"- Test-time augmentation: {result.tta_agreement}/{result.tta_views} views agree\n"
-            f"- Input-shift distance {result.ood_distance:.1f} (flag above {result.ood_threshold:.1f})\n"
-            f"- Latency {result.latency_ms.get('total', 0):.0f} ms\n"
-            f"- Reliability rules `{rel.rules_version}`")
-    return summary, probs, cam, findings, tech
-
-
-with gr.Blocks(title="NeuroClass — Brain Tumor MRI Classifier") as demo:
-    gr.Markdown("# NeuroClass\nClassifies a brain MRI slice as glioma, meningioma, pituitary tumor "
-                "or no tumor, with a calibrated confidence, a Grad-CAM heatmap and a reliability "
-                "level from measured rules.")
-    gr.Markdown("⚠️ " + DISCLAIMER)
-    links = ["[API docs](/api/docs)", "[Source code](https://github.com/Udit013/Brain_Tumor_Classificatioin)",
-             "[IEEE 2024 paper](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941)"]
-    if WEB_URL:
-        links.insert(0, f"**[Open the full research platform]({WEB_URL})** (agent workflow, "
-                        "cited literature, reports, history)")
-    gr.Markdown(" · ".join(links))
-    with gr.Row(equal_height=False):
-        with gr.Column(min_width=320):
-            inp = gr.Image(type="filepath", label="Brain MRI slice (JPG or PNG)",
-                           sources=["upload", "clipboard"], height=320)
-            btn = gr.Button("Classify", variant="primary")
-            if EXAMPLES:
-                gr.Examples(EXAMPLES, inputs=inp, label="Examples (test split, CC BY 4.0)")
-            gr.Markdown("Images are processed in memory for this result and not stored by the demo.")
-        with gr.Column(min_width=320):
-            out_summary = gr.Markdown("*Upload an image and press **Classify**.*")
-            out_label = gr.Label(num_top_classes=4, label="Calibrated probabilities")
-            out_cam = gr.Image(label="Grad-CAM: where the score came from (not a tumor outline)",
-                               height=320, interactive=False)
-            with gr.Accordion("Reliability findings", open=True):
-                out_findings = gr.Markdown()
-            with gr.Accordion("Technical details", open=False):
-                out_tech = gr.Markdown()
-    btn.click(predict, inputs=inp, outputs=[out_summary, out_label, out_cam, out_findings, out_tech],
-              concurrency_limit=2)
 
 
 def _warm():
     try:
-        _services().vision.ensure_loaded()
-        _services().retriever()                       # loads the index and embedding model
+        api.state.services.vision.ensure_loaded()
+        api.state.services.retriever()          # syncs the index to pgvector on first start
     except Exception:  # noqa: BLE001 — /api/ready reports what failed
         pass
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    # Mounted sub-apps don't get lifespan events; run the API's here.
+    # Mounted sub-apps don't receive lifespan events; run the API's here.
     async with api.router.lifespan_context(api):
         threading.Thread(target=_warm, daemon=True).start()
         yield
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
+
+LANDING = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuroClass API</title>
+<meta name="description" content="Backend API of the NeuroClass research platform.">
+<style>
+  :root { --bg:#fbfbfa; --fg:#16181d; --muted:#5d6370; --line:#e4e5e9; --card:#fff;
+          --accent:#2a5bd7; --accent-fg:#fff; --warn-bg:#fdf6e7; --warn-line:#e9c46a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0e1013; --fg:#eceef2; --muted:#9aa1ad; --line:#262a31; --card:#15181d;
+            --accent:#7aa2ff; --accent-fg:#0b1020; --warn-bg:#211c10; --warn-line:#7a6326; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font:15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 56px 20px; }
+  a { color: var(--accent); }
+  .mark { display:inline-grid; place-items:center; width:32px; height:32px; border-radius:8px;
+          background:var(--fg); color:var(--bg); font-weight:700; font-size:12px; letter-spacing:.02em; }
+  h1 { font-size: 22px; margin: 18px 0 6px; letter-spacing: -0.01em; }
+  p { margin: 0 0 14px; color: var(--muted); }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin: 22px 0 28px; }
+  a.btn { display:inline-flex; align-items:center; height:38px; padding:0 16px; border-radius:8px;
+          font-weight:600; text-decoration:none; border:1px solid var(--line); color:var(--fg);
+          background:var(--card); }
+  a.btn.primary { background:var(--accent); border-color:var(--accent); color:var(--accent-fg); }
+  a.btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:6px 16px; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:9px 0; font-size:14px; }
+  .row + .row { border-top:1px solid var(--line); }
+  .k { color:var(--muted); }
+  .note { margin-top:20px; padding:12px 14px; border-left:3px solid var(--warn-line);
+          background:var(--warn-bg); border-radius:6px; font-size:13.5px; color:var(--fg); }
+</style>
+</head>
+<body>
+<main>
+  <span class="mark" aria-hidden="true">NC</span>
+  <h1>NeuroClass API</h1>
+  <p>This Space hosts the backend of the NeuroClass research platform: model inference with
+     Grad-CAM, the analysis workflow, literature retrieval and reports. The product itself is
+     the web app.</p>
+  <div class="actions">
+    __PRIMARY__
+    <a class="btn" href="/api/docs">API reference</a>
+  </div>
+  <div class="card" aria-live="polite">
+    <div class="row"><span class="k">Status</span><span id="status">Checking…</span></div>
+    <div class="row"><span class="k">Model</span><span id="model">—</span></div>
+    <div class="row"><span class="k">Database</span><span id="db">—</span></div>
+    <div class="row"><span class="k">Explanations</span><span id="llm">—</span></div>
+  </div>
+  <p class="note">Research and education only. Outputs are an experimental model's predictions,
+     not diagnoses, and must not inform anyone's care.</p>
+  <p style="font-size:13px">Source: <a href="https://github.com/Udit013/Brain_Tumor_Classificatioin" target="_blank" rel="noopener">GitHub</a>
+     · Paper: <a href="https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941" target="_blank" rel="noopener">IEEE ICC-ROBINS 2024</a></p>
+</main>
+<script>
+fetch("/api/ready").then(r => r.json()).then(d => {
+  const c = d.checks || {};
+  document.getElementById("status").textContent = d.status === "ready" ? "Operational" : "Degraded";
+  document.getElementById("model").textContent = (c.vision && c.vision.model_version) || "unavailable";
+  document.getElementById("db").textContent = c.database && c.database.ok
+    ? (c.database.backend === "postgresql" ? "PostgreSQL" : "SQLite (temporary)") : "unavailable";
+  document.getElementById("llm").textContent = c.llm && c.llm.mode === "llm"
+    ? "LLM-drafted, citation-verified" : "Quoted passages, citation-verified";
+}).catch(() => { document.getElementById("status").textContent = "Starting up…"; });
+</script>
+</body>
+</html>
+"""
+
+
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
+def landing() -> str:
+    primary = (f'<a class="btn primary" href="{html.escape(WEB_URL)}" target="_blank" rel="noopener">'
+               'Open NeuroClass</a>'
+               if WEB_URL else "")
+    return LANDING.replace("__PRIMARY__", primary)
 
 
 @app.get("/healthz", include_in_schema=False)
@@ -154,9 +155,6 @@ def api_root():
 
 
 app.mount("/api", api)
-# ssr_mode=False: HF sets GRADIO_SSR_MODE=true for Gradio Spaces, which would make
-# Gradio start its Node SSR server on port 7860, the port uvicorn serves.
-app = gr.mount_gradio_app(app, demo, path="/", ssr_mode=False)
 
 if __name__ == "__main__":
     import uvicorn

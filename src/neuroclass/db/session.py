@@ -25,7 +25,15 @@ def make_engine(url: str) -> Engine:
             cur.close()
 
         return engine
-    return create_engine(url, pool_pre_ping=True, pool_size=5, max_overflow=5)
+    from urllib.parse import urlsplit
+
+    # Neon: pre-ping + recycle survive scale-to-zero (idle connections are closed);
+    # behind its PgBouncer pooler (transaction mode) server-side prepared
+    # statements are not safe across transactions, so psycopg must not prepare.
+    pooled = "-pooler" in (urlsplit(url).hostname or "")
+    connect_args = {"prepare_threshold": None} if pooled else {}
+    return create_engine(url, pool_pre_ping=True, pool_size=5, max_overflow=5, pool_recycle=240,
+                         connect_args=connect_args)
 
 
 @lru_cache

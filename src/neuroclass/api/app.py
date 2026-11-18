@@ -19,6 +19,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import DBAPIError
 
 from .. import __version__
 from ..db.migrate import upgrade
@@ -86,6 +88,14 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
                      "research context; it does not verify a prediction."),
         lifespan=lifespan)
     app.state.rate_limiter = RateLimiter()
+
+    @app.exception_handler(DBAPIError)
+    async def database_unavailable(request: Request, exc: DBAPIError):
+        # e.g. Neon suspended after its free monthly compute: say so, don't 500.
+        logging.getLogger("neuroclass").warning("database error on %s: %s", request.url.path,
+                                                type(exc.orig).__name__ if exc.orig else type(exc).__name__)
+        return JSONResponse({"detail": "the database is temporarily unavailable; benchmarks and "
+                                       "literature search still work"}, status_code=503)
 
     @app.middleware("http")
     async def request_context(request: Request, call_next):

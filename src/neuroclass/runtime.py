@@ -69,7 +69,12 @@ class Services:
             from psycopg_pool import ConnectionPool
 
             url = self.settings.resolved_database_url.replace("postgresql+psycopg://", "postgresql://")
-            pool = ConnectionPool(url, max_size=4, kwargs={"autocommit": True, "prepare_threshold": 0})
+            # prepare_threshold None behind Neon's pooler (see db.session.make_engine);
+            # check + max_idle drop connections Neon closed while scaled to zero.
+            prepare = None if self.settings.db_is_pooled else 0
+            pool = ConnectionPool(url, min_size=0, max_size=4, max_idle=240,
+                                  check=ConnectionPool.check_connection,
+                                  kwargs={"autocommit": True, "prepare_threshold": prepare})
             saver = PostgresSaver(pool)
             saver.setup()
             return saver
@@ -97,6 +102,13 @@ class Services:
                     index = Index.load(latest_index(s.index_dir, s.embedding_model))
                     reranker = (CrossEncoderReranker(s.reranker_model, s.embedding_cache_dir)
                                 if s.rerank else None)
+                    if s.is_postgres and s.sync_index_to_db:
+                        from .rag.store import load_index
+
+                        try:
+                            load_index(index)          # idempotent; no-op when already loaded
+                        except Exception as exc:  # noqa: BLE001 — keep the in-memory index
+                            log.warning("index not synced to PostgreSQL: %s", type(exc).__name__)
                     self._retriever = Retriever(index, Embedder(s.embedding_model, threads=2),
                                                 store=make_store(s, index), reranker=reranker)
                 except Exception as exc:  # noqa: BLE001 — degrade, report via /health
@@ -161,13 +173,22 @@ class Services:
     # ------------------------------------------------------------ ledger
     def llm_budget_ok(self) -> bool:
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        with session_scope() as db:
-            row = db.get(LlmUsage, day)
-            if (row.calls if row else 0) >= self.settings.llm_daily_call_cap:
-                return False
+        try:
+            with session_scope() as db:
+                row = db.get(LlmUsage, day)
+                if (row.calls if row else 0) >= self.settings.llm_daily_call_cap:
+                    return False
+        except Exception as exc:  # noqa: BLE001 — ledger unreachable: the in-process guard still applies
+            log.warning("LLM ledger unavailable: %s", type(exc).__name__)
         return self.quota_guard.available(1)
 
     def record_llm_usage(self, usage: dict) -> None:
+        try:
+            self._record_llm_usage(usage)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("LLM usage not recorded: %s", type(exc).__name__)
+
+    def _record_llm_usage(self, usage: dict) -> None:
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         with session_scope() as db:
             row = db.get(LlmUsage, day) or LlmUsage(day=day, calls=0, input_tokens=0,
@@ -181,9 +202,13 @@ class Services:
     # ------------------------------------------------------- persistence
     def record_event(self, analysis_id: str | None, step: str, status: str,
                      duration_ms: float | None, detail: dict, request_id: str | None = None) -> None:
-        with session_scope() as db:
-            db.add(TraceEventRow(analysis_id=analysis_id, request_id=request_id, step=step,
-                                 status=status, duration_ms=duration_ms, detail=detail or {}))
+        # Tracing must never take a request down (e.g. Neon suspended at its limit).
+        try:
+            with session_scope() as db:
+                db.add(TraceEventRow(analysis_id=analysis_id, request_id=request_id, step=step,
+                                     status=status, duration_ms=duration_ms, detail=detail or {}))
+        except Exception as exc:  # noqa: BLE001
+            log.warning("trace event not recorded (%s): %s", step, type(exc).__name__)
 
     def save_result(self, analysis_id: str, fields: dict) -> None:
         with session_scope() as db:

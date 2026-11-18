@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 
 import numpy as np
 from sqlalchemy import delete, select, text, update
@@ -20,6 +21,8 @@ from ..db.session import get_engine, session_scope
 from ..schemas import SearchFilters
 from ..settings import Settings, get_settings
 from .retrieval import Index, MemoryStore, latest_index
+
+log = logging.getLogger("neuroclass.rag")
 
 
 class PgVectorStore:
@@ -56,13 +59,36 @@ class PgVectorStore:
         return [(self.row_of[r[0]], float(r[1])) for r in rows if r[0] in self.row_of]
 
 
+class FallbackStore:
+    """pgvector first; the exact in-memory search when the database is unreachable
+    (e.g. Neon suspended at its free-tier limit). Results are the same either way."""
+
+    def __init__(self, primary: PgVectorStore, fallback: MemoryStore):
+        self.primary, self.fallback = primary, fallback
+        self.last_error: str | None = None
+
+    def search(self, query, k, allowed=None, filters: SearchFilters | None = None):
+        try:
+            out = self.primary.search(query, k, allowed, filters)
+            self.last_error = None
+            return out
+        except Exception as exc:  # noqa: BLE001
+            self.last_error = type(exc).__name__
+            log.warning("pgvector search failed (%s); using in-memory index", self.last_error)
+            return self.fallback.search(query, k, allowed)
+
+
 def make_store(settings: Settings, index: Index):
     if settings.is_postgres:
-        with session_scope() as db:
-            active = db.scalar(select(IndexVersion).where(IndexVersion.version == index.version,
-                                                          IndexVersion.active.is_(True)))
+        try:
+            with session_scope() as db:
+                active = db.scalar(select(IndexVersion).where(IndexVersion.version == index.version,
+                                                              IndexVersion.active.is_(True)))
+        except Exception as exc:  # noqa: BLE001 — database down: serve from memory
+            log.warning("pgvector unavailable at start-up: %s", type(exc).__name__)
+            active = None
         if active is not None:
-            return PgVectorStore(index)
+            return FallbackStore(PgVectorStore(index), MemoryStore(index.embeddings))
     return MemoryStore(index.embeddings)
 
 

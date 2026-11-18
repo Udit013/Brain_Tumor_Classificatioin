@@ -158,6 +158,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/reviewer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Claim Reviewer
+         * @description Upgrade an existing account to reviewer with the operator's reviewer code.
+         */
+        post: operations["claim_reviewer_auth_reviewer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/signup": {
         parameters: {
             query?: never;
@@ -685,6 +705,11 @@ export interface components {
             /** Reviewer */
             reviewer: string;
         };
+        /** ReviewerClaim */
+        ReviewerClaim: {
+            /** Code */
+            code: string;
+        };
         /** SearchFilters */
         SearchFilters: {
             /** Min Year */
@@ -699,6 +724,15 @@ export interface components {
          * @enum {string}
          */
         Severity: "info" | "caution" | "block";
+        /** SignupIn */
+        SignupIn: {
+            /** Email */
+            email: string;
+            /** Password */
+            password: string;
+            /** Reviewer Code */
+            reviewer_code?: string | null;
+        };
         /** TokenOut */
         TokenOut: {
             /** Access Token */
@@ -1127,6 +1161,42 @@ export interface operations {
             };
         };
     };
+    claim_reviewer_auth_reviewer_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                "x-client-id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewerClaim"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     signup_auth_signup_post: {
         parameters: {
             query?: never;
@@ -1136,7 +1206,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Credentials"];
+                "application/json": components["schemas"]["SignupIn"];
             };
         };
         responses: {

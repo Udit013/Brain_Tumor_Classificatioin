@@ -21,6 +21,8 @@ services:
       DATABASE_URL: postgresql://neuroclass:neuroclass@db:5432/neuroclass
       NEUROCLASS_JWT_SECRET: ${NEUROCLASS_JWT_SECRET:-change-me-local-only-0123456789abcdef}
       NEUROCLASS_REVIEWER_EMAILS: ${NEUROCLASS_REVIEWER_EMAILS:-reviewer@example.org}
+      # local only; a listed email must also present this code to become a reviewer
+      NEUROCLASS_REVIEWER_CODE: ${NEUROCLASS_REVIEWER_CODE:-local-reviewer-code-change-me}
       NEUROCLASS_CORS_ORIGINS: http://localhost:3000
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     # migrate, load the literature index into pgvector, then serve

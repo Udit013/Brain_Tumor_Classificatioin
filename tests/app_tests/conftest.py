@@ -33,6 +33,7 @@ REPO = Path(__file__).resolve().parents[2]
 SERVING = REPO / "models" / "serving"
 EXAMPLES = sorted((REPO / "space" / "examples").glob("*.jpg"))
 CLIENT = {"X-Client-Id": "pytest-client-0123456789abcdef"}
+REVIEWER_CODE = "test-reviewer-code-0123456789"
 
 
 class FakeVision:
@@ -131,7 +132,8 @@ def retriever():
 def make_settings(tmp_path: Path, **overrides) -> Settings:
     base = dict(data_dir=tmp_path / "var", database_url="", model_dir=tmp_path / "nomodel",
                 index_dir=tmp_path / "noindex", jwt_secret="test-secret-" + "x" * 32,
-                reviewer_emails=("reviewer@example.org",), llm_provider="none",
+                reviewer_emails=("reviewer@example.org",), reviewer_code=REVIEWER_CODE,
+                llm_provider="none",
                 rate_limit_per_minute=1000, analysis_rate_limit_per_minute=1000, worker_threads=1,
                 cors_origins=("http://localhost:3000",))
     base.update(overrides)
@@ -184,7 +186,10 @@ def wait_for(client, aid, headers=CLIENT, timeout=20.0):
     raise AssertionError(f"analysis {aid} did not finish: {a['status']}")
 
 
-def signup(client, email, password="correct-horse-battery"):
-    r = client.post("/auth/signup", json={"email": email, "password": password})
+def signup(client, email, password="correct-horse-battery", reviewer_code=None):
+    body = {"email": email, "password": password}
+    if email == "reviewer@example.org":           # the configured reviewer gets the code
+        body["reviewer_code"] = reviewer_code or REVIEWER_CODE
+    r = client.post("/auth/signup", json=body)
     assert r.status_code == 201, r.text
     return {"Authorization": f"Bearer {r.json()['access_token']}"}

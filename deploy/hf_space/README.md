@@ -1,8 +1,8 @@
 ---
-title: NeuroClass
+title: NeuroClass API
 emoji: 🧠
 colorFrom: indigo
-colorTo: purple
+colorTo: gray
 sdk: gradio
 sdk_version: 6.32.0
 python_version: "3.11"
@@ -10,35 +10,29 @@ app_file: app.py
 startup_duration_timeout: 30m
 pinned: false
 license: mit
-short_description: Research MRI classifier with Grad-CAM, cited literature, API
+short_description: Backend API of the NeuroClass research platform
 ---
 
-# NeuroClass — research platform API + demo
+# NeuroClass API
+
+**The NeuroClass app is at [neuroclass-gilt.vercel.app](https://neuroclass-gilt.vercel.app).**
+This Space is its backend: a FastAPI service at [`/api`](https://udit013-brain-tumor-mri-classifier.hf.space/api/docs)
+for model inference with Grad-CAM, the LangGraph analysis workflow with human
+review, literature retrieval with verified citations, and reports.
 
 **⚠️ Research and education only. Not a medical device and not clinically validated.**
-Outputs are an experimental model's predictions, never diagnoses.
 
-This free CPU Space serves two things from one process:
+- Inference: EfficientNetB3 exported to ONNX, Grad-CAM computed in NumPy
+  (verified against TensorFlow before export).
+- Storage: PostgreSQL with pgvector (Neon, free plan).
+- Explanations: Gemini API free tier when configured, otherwise quoted
+  passages; every statement is checked against its sources.
+- The model extends an [IEEE ICC-ROBINS 2024 paper](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941);
+  the paper's reported accuracy is its own claim, measured results are separate.
 
-- `/` — a small demo: upload a brain MRI slice, get the model-predicted class
-  (glioma, meningioma, pituitary tumor, no tumor), a temperature-calibrated
-  confidence, a Grad-CAM heatmap and a reliability level from measured rules.
-- `/api` — the NeuroClass platform API ([docs](/api/docs)): LangGraph analysis
-  workflow with human review, retrieval over open-access literature with
-  verified citations, reports, and benchmark data. The web app calls it.
+Runs on free CPU hardware; after about two days without traffic it sleeps and
+the first request takes a minute or two. The Space uses the Gradio SDK as a
+plain Python host (free accounts can't create Docker Spaces); it serves no
+Gradio interface.
 
-Inference is TensorFlow-free: ONNX Runtime plus Grad-CAM computed in NumPy,
-verified against TensorFlow before export. The model extends an
-[IEEE ICC-ROBINS 2024 paper](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941);
-the paper's reported accuracy is its own claim, measured results are separate.
-
-**Free-tier behaviour.** The Space sleeps after about two days without visitors;
-the first request then takes a minute or two. Without a `DATABASE_URL` secret,
-analysis history is kept on the Space's temporary disk and resets on restart.
-Without a `GEMINI_API_KEY` secret, explanations are extractive (quoted,
-cited passages) rather than LLM-written. Nothing here can incur a charge.
-
-Source, evaluations and documentation:
-[github.com/Udit013/Brain_Tumor_Classificatioin](https://github.com/Udit013/Brain_Tumor_Classificatioin).
-Example images: [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset),
-Masoud Nickparvar, CC BY 4.0.
+Source and documentation: [github.com/Udit013/Brain_Tumor_Classificatioin](https://github.com/Udit013/Brain_Tumor_Classificatioin).

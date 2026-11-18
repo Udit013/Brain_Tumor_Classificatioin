@@ -57,6 +57,10 @@ class Settings:
     jwt_secret: str = field(default_factory=lambda: _env("NEUROCLASS_JWT_SECRET", ""))
     jwt_ttl_minutes: int = field(default_factory=lambda: _env_int("NEUROCLASS_JWT_TTL_MIN", 720))
     allow_signup: bool = field(default_factory=lambda: _env_bool("NEUROCLASS_ALLOW_SIGNUP", True))
+    # Emails are not verified, so a listed email alone grants nothing: the reviewer
+    # role also needs this server-side code (>= 16 chars), at sign-up or later
+    # through POST /auth/reviewer. Unset -> nobody can become a reviewer.
+    reviewer_code: str = field(default_factory=lambda: _env("NEUROCLASS_REVIEWER_CODE", ""))
     reviewer_emails: tuple[str, ...] = field(default_factory=lambda: tuple(
         e.strip().lower() for e in _env("NEUROCLASS_REVIEWER_EMAILS", "").split(",") if e.strip()))
 
@@ -107,6 +111,9 @@ class Settings:
         "NEUROCLASS_RERANKER_MODEL", "Xenova/ms-marco-MiniLM-L-6-v2"))
     retrieval_mode: str = field(default_factory=lambda: _env("NEUROCLASS_RETRIEVAL_MODE", "hybrid"))
     rerank: bool = field(default_factory=lambda: _env_bool("NEUROCLASS_RERANK", False))
+    # Copy the literature index into PostgreSQL/pgvector on first use (idempotent)
+    # and search it there; the in-memory index remains the fallback.
+    sync_index_to_db: bool = field(default_factory=lambda: _env_bool("NEUROCLASS_SYNC_INDEX_TO_DB", False))
     index_dir: Path = field(default_factory=lambda: Path(_env(
         "NEUROCLASS_INDEX_DIR", str(REPO_ROOT / "data" / "rag_index"))))
     embedding_cache_dir: Path = field(default_factory=lambda: Path(_env(
@@ -137,6 +144,13 @@ class Settings:
             return url
         self.data_dir.mkdir(parents=True, exist_ok=True)
         return f"sqlite:///{self.data_dir / 'neuroclass.db'}"
+
+    @property
+    def db_is_pooled(self) -> bool:
+        """Neon's pooled endpoints (PgBouncer, transaction mode) have '-pooler' in the host."""
+        from urllib.parse import urlsplit
+
+        return self.is_postgres and "-pooler" in (urlsplit(self.resolved_database_url).hostname or "")
 
     @property
     def is_postgres(self) -> bool:

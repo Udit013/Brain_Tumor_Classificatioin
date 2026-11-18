@@ -894,6 +894,21 @@
         "title": "ReviewOut",
         "type": "object"
       },
+      "ReviewerClaim": {
+        "properties": {
+          "code": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "ReviewerClaim",
+        "type": "object"
+      },
       "SearchFilters": {
         "properties": {
           "min_year": {
@@ -948,6 +963,40 @@
         ],
         "title": "Severity",
         "type": "string"
+      },
+      "SignupIn": {
+        "properties": {
+          "email": {
+            "maxLength": 320,
+            "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 200,
+            "minLength": 10,
+            "title": "Password",
+            "type": "string"
+          },
+          "reviewer_code": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Code"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "SignupIn",
+        "type": "object"
       },
       "TokenOut": {
         "properties": {
@@ -1889,6 +1938,83 @@
         ]
       }
     },
+    "/auth/reviewer": {
+      "post": {
+        "description": "Upgrade an existing account to reviewer with the operator's reviewer code.",
+        "operationId": "claim_reviewer_auth_reviewer_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-client-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Client-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewerClaim"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Claim Reviewer",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/auth/signup": {
       "post": {
         "operationId": "signup_auth_signup_post",
@@ -1896,7 +2022,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Credentials"
+                "$ref": "#/components/schemas/SignupIn"
               }
             }
           },
