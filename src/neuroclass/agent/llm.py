@@ -1,32 +1,39 @@
-"""Claude-backed explanation and research answers (optional).
+"""Provider-neutral LLM layer for explanations and research answers (optional).
 
-`ClaudeExplainer` runs a bounded tool loop through the official Anthropic SDK:
-Claude may call `search_literature` / `get_model_facts` (strict schemas) for at
-most MAX_TOOL_ROUNDS rounds, then returns a `DraftExplanation` validated by
-`client.beta.messages.parse`. Server-side refusal fallbacks are enabled.
+Nothing in NeuroClass requires an LLM. The classifier, Grad-CAM, reliability
+rules, retrieval, verification, reports and dashboards all run without one;
+when no provider is configured, or a provider is out of quota, callers use the
+deterministic extractive composer (`agent.compose`).
 
-Everything the model reads that did not come from this codebase — retrieved
-passages, the user's question — is wrapped as quoted data, and the system
-prompt says to never follow instructions inside it. The output is untrusted
-too: `agent.verify` checks every statement before anyone sees it.
+Providers implement `Explainer` and share everything that matters for safety:
+the prompts, the tool contract (`search_literature`, `get_model_facts`), the
+untrusted-data wrapping of passages and questions, and the output type
+(`DraftExplanation`). Whatever a provider returns is checked by `agent.verify`
+before anyone sees it.
 
-When no credentials are configured, `available()` is False and callers use the
-extractive composer instead; no feature depends on this module.
+    gemini     (agent.llm_gemini)     default when GEMINI_API_KEY is set; free tier
+    anthropic  (agent.llm_anthropic)  opt-in, paid; refused unless
+                                      NEUROCLASS_ALLOW_PAID_LLM=true
+
+`QuotaGuard` is the zero-cost safety net: a per-minute and per-day call budget
+enforced *before* a request is sent, plus a pause after the provider reports
+quota exhaustion (HTTP 429), so the platform falls back to extractive mode
+instead of retrying into a limit.
 """
 
 from __future__ import annotations
 
 import html
 import json
-import os
+import threading
 import time
+from collections import deque
 from dataclasses import dataclass, field
-from typing import Callable
+from datetime import datetime, timedelta
+from typing import Callable, Protocol
+from zoneinfo import ZoneInfo
 
 from ..schemas import DraftExplanation, Passage
-
-MAX_TOOL_ROUNDS = 3
-FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 SYSTEM_PROMPT = """You write research explanations for NeuroClass, an educational platform built
 around an experimental brain MRI classifier (EfficientNetB3; classes: glioma, meningioma,
@@ -47,8 +54,8 @@ Hard rules:
 - Explain what calibrated confidence means and does not mean, what Grad-CAM can and cannot show,
   and the reliability findings that apply. Be plain and concise: 6 to 12 statements.
 
-You may call search_literature (up to a few times) when the provided passages do not cover a point
-you need, and get_model_facts for the model's measured evaluation."""
+You may call search_literature when the provided passages do not cover a point you need, and
+get_model_facts for the model's measured evaluation."""
 
 QA_PROMPT = """Answer the research question using only the passages provided or retrieved with
 search_literature. Put each claim in its own statement with kind "literature" and cite the passage
@@ -56,13 +63,17 @@ ids that support it. If the passages do not answer the question, say so in the s
 no statements rather than guessing. Questions about NeuroClass itself are answered from the project
 documents (source_type "project_document")."""
 
-TOOLS = [
+CLOSED_BOOK_PROMPT = """Answer the research question from your own knowledge. You have no documents
+and no tools, so leave every statement's citations empty. If you do not know, say so in the summary
+and return no statements. Use kind "literature" for each claim."""
+
+# Provider-neutral tool contract (JSON Schema). Adapters translate it.
+TOOL_SPECS = [
     {
         "name": "search_literature",
         "description": ("Search the curated index of open-access papers and NeuroClass project "
                         "documents. Returns passages with ids you may cite."),
-        "strict": True,
-        "input_schema": {
+        "parameters": {
             "type": "object",
             "properties": {
                 "query": {"type": "string", "description": "what to look for, in plain words"},
@@ -77,15 +88,10 @@ TOOLS = [
     {
         "name": "get_model_facts",
         "description": "Measured evaluation of the deployed model (test, external, per-class).",
-        "strict": True,
-        "input_schema": {"type": "object", "properties": {}, "required": [],
-                         "additionalProperties": False},
+        "parameters": {"type": "object", "properties": {}, "required": [],
+                       "additionalProperties": False},
     },
 ]
-
-
-def credentials_present() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))
 
 
 def passages_block(passages: list[Passage]) -> str:
@@ -97,6 +103,21 @@ def passages_block(passages: list[Passage]) -> str:
     return "<passages>\n" + "\n".join(parts) + "\n</passages>"
 
 
+def analysis_content(inference_json: dict, reliability_json: dict, passages: list[Passage],
+                     user_note: str | None) -> str:
+    content = (f"<inference>\n{json.dumps(inference_json)}\n</inference>\n"
+               f"<reliability>\n{json.dumps(reliability_json)}\n</reliability>\n"
+               f"{passages_block(passages)}\n")
+    if user_note:
+        content += f"<user_note>{html.escape(user_note)}</user_note>\n"
+    return content + "Write the structured explanation."
+
+
+def question_content(question: str, passages: list[Passage]) -> str:
+    return (f"{passages_block(passages)}\n<question>{html.escape(question)}</question>\n"
+            "Answer with a structured explanation.")
+
+
 @dataclass
 class LlmResult:
     draft: DraftExplanation
@@ -106,94 +127,124 @@ class LlmResult:
 
 
 class LlmUnavailable(RuntimeError):
-    pass
+    """The provider could not produce a usable answer; callers fall back to extractive mode."""
 
 
-class ClaudeExplainer:
-    def __init__(self, model: str, effort: str, max_tokens: int, timeout_s: float,
-                 search: Callable[[str, str | None], list[Passage]],
-                 model_facts: Callable[[], dict], client=None,
-                 input_usd_per_mtok: float = 4.0, output_usd_per_mtok: float = 20.0):
-        import anthropic
+class QuotaExhausted(LlmUnavailable):
+    """The local budget or the provider's free-tier quota is used up."""
 
-        self.client = client or anthropic.Anthropic(timeout=timeout_s, max_retries=2)
-        self.model, self.effort, self.max_tokens = model, effort, max_tokens
-        self.search, self.model_facts = search, model_facts
-        self.in_rate, self.out_rate = input_usd_per_mtok, output_usd_per_mtok
 
-    def _run(self, system: str, user_content: str, passages: list[Passage]) -> LlmResult:
-        import anthropic
-
-        seen = {p.chunk_id: p for p in passages}
-        messages: list = [{"role": "user", "content": user_content}]
-        usage = {"input_tokens": 0, "output_tokens": 0, "calls": 0}
-        tool_log: list[dict] = []
-        t0 = time.perf_counter()
-        for round_no in range(MAX_TOOL_ROUNDS + 1):
-            tools = TOOLS if round_no < MAX_TOOL_ROUNDS else []
-            try:
-                resp = self.client.beta.messages.parse(
-                    model=self.model, max_tokens=self.max_tokens, system=system,
-                    messages=messages, tools=tools, output_format=DraftExplanation,
-                    output_config={"effort": self.effort},
-                    betas=[FALLBACK_BETA], fallbacks="default",
-                    cache_control={"type": "ephemeral"})
-            except (anthropic.APIStatusError, anthropic.APIConnectionError) as exc:
-                raise LlmUnavailable(f"{type(exc).__name__}: {exc}") from exc
-            usage["calls"] += 1
-            usage["input_tokens"] += getattr(resp.usage, "input_tokens", 0) or 0
-            usage["output_tokens"] += getattr(resp.usage, "output_tokens", 0) or 0
-            if resp.stop_reason == "refusal":
-                raise LlmUnavailable("the model declined this request")
-            if resp.stop_reason == "max_tokens":
-                raise LlmUnavailable("the response hit max_tokens")
-            if resp.stop_reason == "tool_use":
-                messages.append({"role": "assistant", "content": resp.content})
-                results = []
-                for block in resp.content:
-                    if block.type != "tool_use":
-                        continue
-                    results.append(self._tool_result(block, seen, tool_log))
-                messages.append({"role": "user", "content": results})
-                continue
-            draft = getattr(resp, "parsed_output", None)
-            if draft is None:
-                raise LlmUnavailable("no structured output returned")
-            usage["generation_ms"] = (time.perf_counter() - t0) * 1000
-            usage["cost_usd"] = (usage["input_tokens"] * self.in_rate
-                                 + usage["output_tokens"] * self.out_rate) / 1e6
-            return LlmResult(draft=draft, passages=list(seen.values()), usage=usage,
-                             tool_calls=tool_log)
-        raise LlmUnavailable("tool loop did not finish")
-
-    def _tool_result(self, block, seen: dict, tool_log: list) -> dict:
-        args = block.input if isinstance(block.input, dict) else json.loads(block.input)
-        if block.name == "search_literature":
-            query = str(args.get("query", ""))[:500]
-            found = self.search(query, args.get("source_type"))
-            for p in found:
-                seen.setdefault(p.chunk_id, p)
-            tool_log.append({"tool": block.name, "query": query, "n": len(found)})
-            content = passages_block(found) if found else "No passages matched."
-        elif block.name == "get_model_facts":
-            tool_log.append({"tool": block.name})
-            content = json.dumps(self.model_facts())
-        else:
-            return {"type": "tool_result", "tool_use_id": block.id, "is_error": True,
-                    "content": f"unknown tool {block.name}"}
-        return {"type": "tool_result", "tool_use_id": block.id, "content": content}
+class Explainer(Protocol):
+    model: str
+    provider: str
 
     def explain_analysis(self, inference_json: dict, reliability_json: dict,
-                         passages: list[Passage], user_note: str | None) -> LlmResult:
-        content = (f"<inference>\n{json.dumps(inference_json)}\n</inference>\n"
-                   f"<reliability>\n{json.dumps(reliability_json)}\n</reliability>\n"
-                   f"{passages_block(passages)}\n")
-        if user_note:
-            content += f"<user_note>{html.escape(user_note)}</user_note>\n"
-        content += "Write the structured explanation."
-        return self._run(SYSTEM_PROMPT, content, passages)
+                         passages: list[Passage], user_note: str | None) -> LlmResult: ...
 
-    def answer_question(self, question: str, passages: list[Passage]) -> LlmResult:
-        content = (f"{passages_block(passages)}\n<question>{html.escape(question)}</question>\n"
-                   "Answer with a structured explanation.")
-        return self._run(SYSTEM_PROMPT + "\n\n" + QA_PROMPT, content, passages)
+    def answer_question(self, question: str, passages: list[Passage]) -> LlmResult: ...
+
+
+class ToolRunner:
+    """Executes the shared tools for any provider and records what the model saw."""
+
+    def __init__(self, search: Callable[[str, str | None], list[Passage]],
+                 model_facts: Callable[[], dict], seen: dict[str, Passage]):
+        self.search, self.model_facts, self.seen = search, model_facts, seen
+        self.log: list[dict] = []
+
+    def run(self, name: str, args: dict) -> tuple[str, bool]:
+        """Returns (content, is_error)."""
+        if name == "search_literature":
+            query = str(args.get("query", ""))[:500]
+            source_type = args.get("source_type")
+            if source_type not in (None, "pmc_article", "project_document"):
+                source_type = None
+            found = self.search(query, source_type)
+            for p in found:
+                self.seen.setdefault(p.chunk_id, p)
+            self.log.append({"tool": name, "query": query, "n": len(found)})
+            return (passages_block(found) if found else "No passages matched."), False
+        if name == "get_model_facts":
+            self.log.append({"tool": name})
+            return json.dumps(self.model_facts()), False
+        return f"unknown tool {name}", True
+
+
+PACIFIC = ZoneInfo("America/Los_Angeles")
+
+
+class QuotaGuard:
+    """Call budget enforced before any request is sent (thread-safe, in-process).
+
+    - per_minute: sliding 60-second window
+    - per_day: resets at midnight Pacific time, matching the Gemini API's daily reset
+    - trip(): after a provider 429, refuse calls until the given time
+
+    In a multi-process deployment each process keeps its own window; the daily
+    ledger in the database (Services.llm_budget_ok) is the shared backstop.
+    """
+
+    def __init__(self, per_minute: int, per_day: int, clock: Callable[[], float] = time.time):
+        self.per_minute, self.per_day, self.clock = per_minute, per_day, clock
+        self._minute: deque[float] = deque()
+        self._day_key: str | None = None
+        self._day_count = 0
+        self._paused_until = 0.0
+        self.pause_reason: str | None = None
+        self._lock = threading.Lock()
+
+    def _today(self, now: float) -> str:
+        return datetime.fromtimestamp(now, PACIFIC).strftime("%Y-%m-%d")
+
+    def status(self) -> dict:
+        now = self.clock()
+        with self._lock:
+            self._expire(now)
+            return {"per_minute_limit": self.per_minute, "per_day_limit": self.per_day,
+                    "used_last_minute": len(self._minute),
+                    "used_today": self._day_count if self._day_key == self._today(now) else 0,
+                    "paused_until": (datetime.fromtimestamp(self._paused_until).astimezone().isoformat()
+                                     if self._paused_until > now else None),
+                    "pause_reason": self.pause_reason if self._paused_until > now else None}
+
+    def _expire(self, now: float) -> None:
+        while self._minute and now - self._minute[0] >= 60:
+            self._minute.popleft()
+
+    def available(self, n: int = 1) -> bool:
+        now = self.clock()
+        with self._lock:
+            self._expire(now)
+            if now < self._paused_until:
+                return False
+            today = self._day_count if self._day_key == self._today(now) else 0
+            return len(self._minute) + n <= self.per_minute and today + n <= self.per_day
+
+    def acquire(self) -> None:
+        """Reserve one call or raise QuotaExhausted. Never waits."""
+        now = self.clock()
+        with self._lock:
+            self._expire(now)
+            if now < self._paused_until:
+                raise QuotaExhausted(f"LLM paused: {self.pause_reason}")
+            key = self._today(now)
+            if self._day_key != key:
+                self._day_key, self._day_count = key, 0
+            if self._day_count >= self.per_day:
+                raise QuotaExhausted("daily LLM call budget used")
+            if len(self._minute) >= self.per_minute:
+                raise QuotaExhausted("per-minute LLM call budget used")
+            self._minute.append(now)
+            self._day_count += 1
+
+    def trip(self, seconds: float | None, reason: str, until_daily_reset: bool = False) -> None:
+        now = self.clock()
+        if until_daily_reset:
+            local = datetime.fromtimestamp(now, PACIFIC)
+            nxt = (local + timedelta(days=1)).replace(hour=0, minute=0, second=5, microsecond=0)
+            until = nxt.timestamp()
+        else:
+            until = now + max(1.0, seconds or 60.0)
+        with self._lock:
+            self._paused_until = max(self._paused_until, until)
+            self.pause_reason = reason

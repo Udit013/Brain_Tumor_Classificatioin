@@ -17,6 +17,18 @@ from neuroclass.schemas import (CLASS_NAMES, ClassProbability, InferenceResult, 
                                 ModelInfo)
 from neuroclass.settings import Settings
 
+
+LLM_ENV = ("GEMINI_API_KEY", "GOOGLE_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
+           "NEUROCLASS_LLM_PROVIDER", "NEUROCLASS_ALLOW_PAID_LLM", "NEUROCLASS_LLM_MODEL")
+
+
+@pytest.fixture(autouse=True)
+def _no_real_llm(monkeypatch):
+    """Tests never reach a hosted LLM, whatever keys the developer has exported."""
+    for name in LLM_ENV:
+        monkeypatch.delenv(name, raising=False)
+
+
 REPO = Path(__file__).resolve().parents[2]
 SERVING = REPO / "models" / "serving"
 EXAMPLES = sorted((REPO / "space" / "examples").glob("*.jpg"))

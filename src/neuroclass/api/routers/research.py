@@ -42,20 +42,25 @@ def ask(body: ResearchQuestion, services: Services = Depends(get_services)) -> R
     retrieval_ms = (time.perf_counter() - t0) * 1000
     t1 = time.perf_counter()
     mode, llm_model, usage, seen = "extractive", None, {}, passages
-    draft = None
-    explainer = services.explainer() if services.llm_budget_ok() else None
+    draft, reason = None, None
+    if services.llm_budget_ok():
+        explainer = services.explainer()
+        reason = None if explainer else "no LLM provider configured"
+    else:
+        explainer, reason = None, "LLM call budget reached (free-tier safeguard)"
     if explainer is not None:
         try:
             res = explainer.answer_question(body.question, passages)
             services.record_llm_usage(res.usage)
             draft, seen, usage, mode, llm_model = res.draft, res.passages, res.usage, "llm", explainer.model
-        except LlmUnavailable:
-            draft = None
+        except LlmUnavailable as exc:
+            draft, reason = None, str(exc)[:200]
     if draft is None:
         draft = compose.compose_answer(passages, body.question)
     summary, kept, removed = verify(draft, seen, None, None)
     cited = {c for s in kept for c in s.citations}
-    answer = Explanation(mode=mode, llm_model=llm_model, summary=summary, statements=kept,
+    answer = Explanation(mode=mode, llm_model=llm_model, fallback_reason=reason if mode == "extractive" else None,
+                         summary=summary, statements=kept,
                          removed_statements=removed,
                          passages=[p for p in seen if p.chunk_id in cited] or passages,
                          usage=usage)

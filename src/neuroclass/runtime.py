@@ -20,7 +20,7 @@ from pathlib import Path
 from sqlalchemy import select
 
 from .agent.graph import GraphDeps, build_graph, model_facts
-from .agent.llm import ClaudeExplainer, credentials_present
+from .agent.llm import QuotaGuard
 from .db.models import Analysis, LlmUsage, TraceEventRow, utcnow
 from .db.session import session_scope
 from .settings import REPO_ROOT, Settings
@@ -50,6 +50,7 @@ class Services:
         self._retriever_error: str | None = None
         self._retriever_lock = threading.Lock()
         self._explainer_factory = explainer_factory
+        self.quota_guard = QuotaGuard(settings.llm_calls_per_minute, settings.llm_daily_call_cap)
         self.samples = sample_catalog()
         self._checkpointer = self._make_checkpointer()
         self.graph = build_graph(GraphDeps(
@@ -110,7 +111,22 @@ class Services:
     def llm_enabled(self) -> bool:
         if self._explainer_factory is not None:
             return True
-        return self.settings.llm_provider == "anthropic" and credentials_present()
+        p = self.settings.resolved_llm_provider
+        if p == "gemini":
+            from .agent.llm_gemini import api_key
+
+            return api_key() is not None
+        if p == "anthropic":
+            from .agent.llm_anthropic import credentials_present
+
+            return credentials_present()
+        return False
+
+    def llm_status(self) -> dict:
+        s = self.settings
+        return {"enabled": self.llm_enabled(), "provider": s.resolved_llm_provider,
+                "model": s.llm_model if self.llm_enabled() else None,
+                "paid_allowed": s.allow_paid_llm, "budget": self.quota_guard.status()}
 
     def explainer(self):
         if self._explainer_factory is not None:
@@ -129,17 +145,27 @@ class Services:
                                    filters=SearchFilters(source_type=source_type) if source_type else None)
             return passages
 
+        if s.resolved_llm_provider == "gemini":
+            from .agent.llm_gemini import GeminiExplainer
+
+            return GeminiExplainer(s.llm_model, s.llm_max_tokens, s.llm_timeout_s, search=search,
+                                   model_facts=model_facts, guard=self.quota_guard,
+                                   tool_rounds=s.llm_tool_rounds)
+        from .agent.llm_anthropic import ClaudeExplainer
+
         return ClaudeExplainer(s.llm_model, s.llm_effort, s.llm_max_tokens, s.llm_timeout_s,
                                search=search, model_facts=model_facts,
                                input_usd_per_mtok=s.llm_input_usd_per_mtok,
-                               output_usd_per_mtok=s.llm_output_usd_per_mtok)
+                               output_usd_per_mtok=s.llm_output_usd_per_mtok, guard=self.quota_guard)
 
     # ------------------------------------------------------------ ledger
     def llm_budget_ok(self) -> bool:
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         with session_scope() as db:
             row = db.get(LlmUsage, day)
-            return (row.calls if row else 0) < self.settings.llm_daily_call_cap
+            if (row.calls if row else 0) >= self.settings.llm_daily_call_cap:
+                return False
+        return self.quota_guard.available(1)
 
     def record_llm_usage(self, usage: dict) -> None:
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")

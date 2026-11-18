@@ -140,8 +140,9 @@ def build_graph(deps: GraphDeps, checkpointer=None):
                     "_trace": {"available": False}}
         inf = state["inference"]
         cls = DISPLAY[inf["predicted_class"]]
-        queries = [f"{cls} brain MRI deep learning classification accuracy",
-                   "Grad-CAM saliency explanation limitations medical imaging"]
+        queries = [f"why {cls} is difficult to distinguish from other brain tumours on MRI "
+                   "with deep learning classifiers",
+                   "limitations of Grad-CAM saliency maps for explaining medical image classifiers"]
         rel = state["reliability"]
         codes = {f["code"] for f in rel["findings"]}
         if codes & {"low_confidence", "very_low_confidence", "unstable_prediction"}:
@@ -171,8 +172,11 @@ def build_graph(deps: GraphDeps, checkpointer=None):
         rel = ReliabilityAssessment(**state["reliability"])
         passages = [Passage(**p) for p in state.get("passages", [])]
         query = f"{DISPLAY[inf.predicted_class]} MRI classification"
-        explainer = deps.explainer_factory() if deps.llm_budget_ok() else None
-        fallback_reason = None if explainer else "no LLM configured or daily cap reached"
+        if deps.llm_budget_ok():
+            explainer = deps.explainer_factory()
+            fallback_reason = None if explainer else "no LLM provider configured"
+        else:
+            explainer, fallback_reason = None, "LLM call budget reached (free-tier safeguard)"
         if explainer is not None:
             from .llm import LlmUnavailable
 
@@ -202,7 +206,8 @@ def build_graph(deps: GraphDeps, checkpointer=None):
         summary, kept, removed = verify(draft, passages, InferenceResult(**state["inference"]),
                                         ReliabilityAssessment(**state["reliability"]))
         cited = {c for s in kept for c in s.citations}
-        expl = Explanation(mode=d["mode"], llm_model=d.get("llm_model"), summary=summary,
+        expl = Explanation(mode=d["mode"], llm_model=d.get("llm_model"),
+                           fallback_reason=d.get("fallback_reason"), summary=summary,
                            statements=kept, removed_statements=removed,
                            passages=[p for p in passages if p.chunk_id in cited] or passages[:6],
                            usage=d.get("usage") or {})

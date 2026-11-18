@@ -60,17 +60,45 @@ class Settings:
     reviewer_emails: tuple[str, ...] = field(default_factory=lambda: tuple(
         e.strip().lower() for e in _env("NEUROCLASS_REVIEWER_EMAILS", "").split(",") if e.strip()))
 
-    # LLM (optional). Without credentials the platform runs extractive mode.
-    llm_provider: str = field(default_factory=lambda: _env("NEUROCLASS_LLM_PROVIDER", "anthropic"))
-    llm_model: str = field(default_factory=lambda: _env("NEUROCLASS_LLM_MODEL", "claude-opus-5-5"))
+    # LLM (optional). Without a provider the platform runs extractive mode.
+    #   auto       gemini if GEMINI_API_KEY is set, otherwise none   (default)
+    #   gemini     Gemini API free tier (key from an AI Studio project with no billing)
+    #   anthropic  paid; refused unless NEUROCLASS_ALLOW_PAID_LLM=true
+    #   none       never call an LLM
+    llm_provider: str = field(default_factory=lambda: _env("NEUROCLASS_LLM_PROVIDER", "auto").lower())
+    llm_model_override: str = field(default_factory=lambda: _env("NEUROCLASS_LLM_MODEL", ""))
+    allow_paid_llm: bool = field(default_factory=lambda: _env_bool("NEUROCLASS_ALLOW_PAID_LLM", False))
     llm_effort: str = field(default_factory=lambda: _env("NEUROCLASS_LLM_EFFORT", "medium"))
     llm_max_tokens: int = field(default_factory=lambda: _env_int("NEUROCLASS_LLM_MAX_TOKENS", 4000))
-    llm_timeout_s: float = field(default_factory=lambda: _env_float("NEUROCLASS_LLM_TIMEOUT_S", 60.0))
-    llm_daily_call_cap: int = field(default_factory=lambda: _env_int("NEUROCLASS_LLM_DAILY_CAP", 200))
+    llm_timeout_s: float = field(default_factory=lambda: _env_float("NEUROCLASS_LLM_TIMEOUT_S", 45.0))
+    llm_tool_rounds: int = field(default_factory=lambda: _env_int("NEUROCLASS_LLM_TOOL_ROUNDS", 1))
+    # Call budgets, enforced before a request is sent. Set below the free-tier
+    # limits shown for your project in AI Studio; a 429 also pauses the LLM.
+    llm_calls_per_minute: int = field(default_factory=lambda: _env_int("NEUROCLASS_LLM_RPM", 4))
+    llm_daily_call_cap: int = field(default_factory=lambda: _env_int("NEUROCLASS_LLM_DAILY_CAP", 100))
     llm_input_usd_per_mtok: float = field(default_factory=lambda: _env_float(
-        "NEUROCLASS_LLM_INPUT_USD_PER_MTOK", 4.0))
+        "NEUROCLASS_LLM_INPUT_USD_PER_MTOK", 4.0))          # anthropic only; gemini free tier = 0
     llm_output_usd_per_mtok: float = field(default_factory=lambda: _env_float(
         "NEUROCLASS_LLM_OUTPUT_USD_PER_MTOK", 20.0))
+
+    @property
+    def resolved_llm_provider(self) -> str:
+        """The provider that will actually be used: gemini | anthropic | none."""
+        import os
+
+        p = self.llm_provider
+        if p == "auto":
+            return "gemini" if (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")) else "none"
+        if p == "anthropic" and not self.allow_paid_llm:
+            return "none"
+        return p if p in ("gemini", "anthropic") else "none"
+
+    @property
+    def llm_model(self) -> str:
+        if self.llm_model_override:
+            return self.llm_model_override
+        return {"gemini": "gemini-3.5-flash-lite", "anthropic": "claude-opus-5-5"}.get(
+            self.resolved_llm_provider, "")
 
     # Retrieval
     embedding_model: str = field(default_factory=lambda: _env(
@@ -89,6 +117,9 @@ class Settings:
         "NEUROCLASS_RATE_LIMIT_PER_MIN", 60))
     analysis_rate_limit_per_minute: int = field(default_factory=lambda: _env_int(
         "NEUROCLASS_ANALYSIS_RATE_LIMIT_PER_MIN", 10))
+    # True on hosts whose disk is wiped on restart (free HF Space). Only matters
+    # for SQLite; reported by /ready so the UI can say history is temporary.
+    ephemeral_storage: bool = field(default_factory=lambda: _env_bool("NEUROCLASS_EPHEMERAL_STORAGE", False))
     worker_threads: int = field(default_factory=lambda: _env_int("NEUROCLASS_WORKERS", 2))
     cors_origins: tuple[str, ...] = field(default_factory=lambda: tuple(
         o.strip() for o in _env("NEUROCLASS_CORS_ORIGINS", "http://localhost:3000").split(",")

@@ -28,10 +28,10 @@ jobs:
           pip install -e . --no-deps
 
       - name: Lint
-        run: ruff check src tests space scripts
+        run: ruff check src tests space scripts deploy
 
       - name: Syntax check (all modules)
-        run: python -m compileall -q src space scripts
+        run: python -m compileall -q src space scripts deploy
 
       - name: Run tests
         run: PYTHONPATH=src pytest tests/ -q --ignore=tests/app_tests
@@ -73,7 +73,66 @@ jobs:
           pip install pip-audit
           pip-audit -r requirements-app.txt --progress-spinner off
 
+      - name: API schema matches the frontend's generated types
+        run: PYTHONPATH=src python scripts/export_openapi.py --check
+
       - name: Run platform tests (SQLite + PostgreSQL/pgvector)
         env:
           DATABASE_URL_TEST: postgresql://neuroclass:neuroclass@localhost:5432/neuroclass
         run: PYTHONPATH=src pytest tests/app_tests -q
+
+
+  space:
+    # The Hugging Face Space installs its requirements together with
+    # gradio[oauth,mcp]==<sdk_version>, whose extras pin pydantic and mcp. Rebuild the
+    # Space folder, install exactly what HF installs, and run the platform tests on
+    # that dependency set (MCP is not shipped to the Space; Claude tests skip).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install the Space's dependency set
+        run: |
+          python -m pip install --upgrade pip
+          python deploy/hf_space/build.py --requirements-only
+          SDK=$(sed -n 's/^sdk_version: //p' deploy/hf_space/README.md)
+          pip install -r build/hf_space/requirements.txt "gradio[oauth,mcp]==$SDK" \
+            "uvicorn>=0.14.0" "websockets>=10.4" spaces pytest==9.2.0 pytest-asyncio==1.5.0
+          pip check
+
+      - name: Platform tests on the Space dependency set
+        run: PYTHONPATH=src pytest tests/app_tests -q --ignore=tests/app_tests/test_mcp.py
+
+  web:
+    # Next.js frontend: lint, types, unit/component tests and a production build.
+    # Browser journeys (web/e2e) need the real API and model bundle, so they run
+    # locally against the dev stack (`npm run test:e2e`), not here.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - name: Production build (no API reachable at build time)
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:9
+        run: npm run build
+      - name: Dependency audit (production dependencies)
+        run: npm audit --omit=dev --audit-level=high

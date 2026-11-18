@@ -1,12 +1,19 @@
 """Agent workflow: human-in-the-loop, bounded revisions, recovery, retries, LLM path."""
 
+import importlib.util
 from types import SimpleNamespace
 
-from neuroclass.agent.llm import ClaudeExplainer
+import pytest
+
+from neuroclass.agent.llm_anthropic import ClaudeExplainer
 from neuroclass.schemas import DraftExplanation, Statement
 from neuroclass.vision.service import InferenceTimeout
 
 from .conftest import CLIENT, FakeVision, signup, wait_for
+
+# The paid Claude adapter's SDK is not installed on the Space (zero-cost build).
+needs_anthropic = pytest.mark.skipif(importlib.util.find_spec("anthropic") is None,
+                                     reason="anthropic SDK not installed (optional, paid provider)")
 
 LOW = dict(predicted="glioma", confidence=0.45, tta_agree=3)       # trips caution rules
 
@@ -120,6 +127,7 @@ def explainer(client, retriever):
                            model_facts=lambda: {"test_accuracy": 0.93}, client=client)
 
 
+@needs_anthropic
 def test_llm_tool_loop_and_verification(make_client, retriever):
     good = DraftExplanation(summary="The model-predicted class is meningioma.", statements=[
         Statement(kind="model_output", text="Calibrated confidence is 95.0%."),
@@ -157,6 +165,7 @@ def test_llm_tool_loop_and_verification(make_client, retriever):
         assert db.query(LlmUsage).one().calls == 2
 
 
+@needs_anthropic
 def test_refusal_falls_back_to_extractive(make_client, retriever):
     fake = FakeAnthropic([resp("refusal")])
     c, _ = make_client(retriever=retriever, explainer_factory=lambda: explainer(fake, retriever))
@@ -166,6 +175,7 @@ def test_refusal_falls_back_to_extractive(make_client, retriever):
     assert "declined" in detail["fallback_reason"]
 
 
+@needs_anthropic
 def test_provider_outage_falls_back_to_extractive(make_client, retriever):
     import anthropic
     import httpx2
@@ -190,6 +200,7 @@ def test_daily_cap_switches_to_extractive(make_client, retriever):
     assert a["explanation"]["mode"] == "extractive" and calls == []
 
 
+@needs_anthropic
 def test_tool_loop_is_bounded(retriever):
     loop = [resp("tool_use", [tool_use("get_model_facts", {}, id_=f"t{i}")]) for i in range(10)]
     fake = FakeAnthropic(loop)

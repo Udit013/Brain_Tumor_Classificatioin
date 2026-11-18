@@ -139,6 +139,7 @@ class VerifiedStatement(Statement):
 class Explanation(BaseModel):
     mode: Literal["llm", "extractive"]
     llm_model: str | None = None
+    fallback_reason: str | None = None      # why extractive mode was used (no LLM, quota, error)
     summary: str
     statements: list[VerifiedStatement]
     removed_statements: list[VerifiedStatement] = []

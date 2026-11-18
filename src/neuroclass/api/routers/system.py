@@ -73,7 +73,9 @@ def ready(services: Services = Depends(get_services)):
     try:
         with get_engine().connect() as c:
             c.execute(text("SELECT 1"))
-        checks["database"] = {"ok": True, "backend": "postgresql" if services.settings.is_postgres else "sqlite"}
+        pg = services.settings.is_postgres
+        checks["database"] = {"ok": True, "backend": "postgresql" if pg else "sqlite",
+                              "persistent": pg or not services.settings.ephemeral_storage}
     except Exception as exc:  # noqa: BLE001
         checks["database"] = {"ok": False, "error": type(exc).__name__}
     try:
@@ -86,9 +88,8 @@ def ready(services: Services = Depends(get_services)):
                             "documents": len(r.index.docs), "chunks": len(r.index.chunks),
                             "backend": type(r.store).__name__}
                            if r is not None else {"ok": False, "error": services.retriever_error})
-    checks["llm"] = {"ok": True, "enabled": services.llm_enabled(),
-                     "model": services.settings.llm_model if services.llm_enabled() else None,
-                     "mode": "llm" if services.llm_enabled() else "extractive"}
+    llm = services.llm_status()
+    checks["llm"] = {"ok": True, **llm, "mode": "llm" if llm["enabled"] else "extractive"}
     ok = checks["database"]["ok"] and checks["vision"]["ok"]
     return JSONResponse({"status": "ready" if ok else "degraded", "checks": checks},
                         status_code=200 if ok else 503)

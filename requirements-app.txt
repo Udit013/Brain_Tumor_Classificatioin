@@ -3,7 +3,8 @@
 # Pillow 13.0.0: decodes some dataset JPEGs differently from Pillow 10.3/12.3 but changes
 # no prediction on 2,441 images (results/metrics/decoder_parity.json); golden hashes guard it.
 alembic==1.20.1
-anthropic==2.10.0
+google-genai==3.4.0          # Gemini API free tier (default hosted LLM)
+anthropic==2.10.0            # optional paid provider; disabled unless NEUROCLASS_ALLOW_PAID_LLM=true
 fastapi==0.163.2
 fastembed==0.9.1
 langgraph==1.2.22
