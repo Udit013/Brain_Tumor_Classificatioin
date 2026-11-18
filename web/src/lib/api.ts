@@ -125,6 +125,7 @@ export const api = {
     });
   },
   analysis: (id: string) => request<Analysis>(`/analyses/${id}`),
+  deleteAnalysis: (id: string) => request<string>(`/analyses/${id}`, { method: "DELETE" }),
   history: () => request<AnalysisSummary[]>("/analyses?limit=100"),
   reviewQueue: () => request<AnalysisSummary[]>("/analyses/review-queue"),
   review: (id: string, decision: string, note: string) =>

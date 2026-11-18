@@ -21,7 +21,7 @@ from sqlalchemy import select
 
 from .agent.graph import GraphDeps, build_graph, model_facts
 from .agent.llm import QuotaGuard
-from .db.models import Analysis, LlmUsage, TraceEventRow, utcnow
+from .db.models import Analysis, LlmUsage, Review, TraceEventRow, utcnow
 from .db.session import session_scope
 from .settings import REPO_ROOT, Settings
 from .vision.service import VisionService
@@ -281,8 +281,11 @@ class Services:
         return len(ids)
 
     def purge_expired_uploads(self) -> int:
-        """Delete uploaded images older than the retention window (samples are kept)."""
+        """Delete uploaded images older than the upload window, and clear the Grad-CAM
+        overlays of uploads (a blended copy of the image) after the overlay window.
+        Example images are public test-split files and are kept."""
         cutoff = utcnow() - timedelta(hours=self.settings.upload_retention_hours)
+        overlay_cutoff = utcnow() - timedelta(days=self.settings.overlay_retention_days)
         n = 0
         with session_scope() as db:
             for a in db.scalars(select(Analysis).where(Analysis.upload_path.is_not(None),
@@ -290,4 +293,31 @@ class Services:
                 Path(a.upload_path).unlink(missing_ok=True)
                 a.upload_path = None
                 n += 1
+            for a in db.scalars(select(Analysis).where(Analysis.sample_id.is_(None),
+                                                       Analysis.created_at < overlay_cutoff)):
+                inf = dict(a.inference or {})
+                if inf.get("gradcam_png_base64"):
+                    inf["gradcam_png_base64"] = None
+                    a.inference = inf
+                    n += 1
         return n
+
+    def delete_analysis(self, analysis_id: str) -> None:
+        """Remove an analysis and everything derived from it: reviews, trace events,
+        workflow checkpoints and any stored upload."""
+        from sqlalchemy import delete
+
+        with session_scope() as db:
+            a = db.get(Analysis, analysis_id)
+            if a is None:
+                return
+            if a.upload_path:
+                Path(a.upload_path).unlink(missing_ok=True)
+            thread_id = a.thread_id
+            db.execute(delete(Review).where(Review.analysis_id == analysis_id))
+            db.execute(delete(TraceEventRow).where(TraceEventRow.analysis_id == analysis_id))
+            db.delete(a)
+        try:
+            self._checkpointer.delete_thread(thread_id)
+        except Exception as exc:  # noqa: BLE001 — rows are gone; stale checkpoints are inert
+            log.warning("checkpoint cleanup failed: %s", type(exc).__name__)

@@ -23,6 +23,18 @@ def hash_password(password: str) -> str:
         base64.b64encode(salt).decode(), base64.b64encode(digest).decode())
 
 
+_DUMMY_HASH: str | None = None
+
+
+def burn_password_check(password: str) -> None:
+    """Spend the same scrypt work as a real check, so a login for an unknown email
+    takes as long as one with a wrong password (no account-enumeration timing)."""
+    global _DUMMY_HASH
+    if _DUMMY_HASH is None:
+        _DUMMY_HASH = hash_password("timing-equaliser-not-a-password")
+    verify_password(password, _DUMMY_HASH)
+
+
 def verify_password(password: str, stored: str) -> bool:
     try:
         scheme, n, r, p, salt, digest = stored.split("$")

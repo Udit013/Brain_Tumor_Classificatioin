@@ -26,9 +26,9 @@ export function ResultView({ analysis, localImage }: { analysis: Analysis; local
   const original = analysis.sample_id ? api.sampleImageUrl(analysis.sample_id) : localImage ?? null;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       {inf && (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
           <Card title="Image and Grad-CAM">
             <div className="grid grid-cols-2 gap-3">
               <figure>
@@ -260,7 +260,8 @@ export function TraceView({ trace }: { trace: Analysis["trace"] }) {
       <p className="mb-3 text-sm text-ink-2">
         Each step of the LangGraph workflow, as recorded by the server. No image data or text content is logged.
       </p>
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[28rem] text-sm">
         <thead>
           <tr className="text-left text-muted">
             <th className="pb-1 font-normal">Step</th>
@@ -282,6 +283,7 @@ export function TraceView({ trace }: { trace: Analysis["trace"] }) {
           ))}
         </tbody>
       </table>
+      </div>
     </Card>
   );
 }

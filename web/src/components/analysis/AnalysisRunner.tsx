@@ -63,7 +63,7 @@ export function AnalysisRunner({ id, localImage }: { id: string; localImage?: st
 
   const running = !TERMINAL.has(analysis.status);
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <ol aria-label="Workflow progress" aria-live="polite" className="flex flex-wrap gap-2">
         {STEPS.map((s) => {
           const st = steps[s.id];

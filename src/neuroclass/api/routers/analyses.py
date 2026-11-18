@@ -24,8 +24,8 @@ from ...schemas import AnalysisOut, AnalysisSummary, ReviewIn
 from ...vision.service import ModelUnavailable
 from ...vision.validation import InputRejected, decode_image
 from ..convert import analysis_out, analysis_summary
-from ..deps import (Identity, get_services, identity, limit, load_analysis, require_identity,
-                    require_reviewer)
+from ..deps import (Identity, get_services, identity, limit, load_analysis, owns,
+                    require_identity, require_reviewer)
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])
 TERMINAL = {"completed", "failed", "awaiting_review"}
@@ -184,6 +184,20 @@ def report(analysis_id: str, format: str = Query(default="md", pattern="^(md|htm
                             headers={"Content-Disposition": f'attachment; filename="{name}.html"'})
     return PlainTextResponse(md, media_type="text/markdown",
                              headers={"Content-Disposition": f'attachment; filename="{name}.md"'})
+
+
+@router.delete("/{analysis_id}", status_code=status.HTTP_204_NO_CONTENT,
+               summary="Delete one of your analyses and everything derived from it")
+def delete_analysis(analysis_id: str, ident: Identity = Depends(require_identity),
+                    db: Session = Depends(get_db), services: Services = Depends(get_services)):
+    a = db.get(Analysis, analysis_id)
+    if not owns(a, ident):                      # owners only; reviewers can't delete
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "analysis not found")
+    if a.status in ("queued", "running"):
+        raise HTTPException(status.HTTP_409_CONFLICT, "the analysis is still running; try again shortly")
+    db.close()
+    services.delete_analysis(analysis_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/{analysis_id}/reviews", response_model=AnalysisOut,

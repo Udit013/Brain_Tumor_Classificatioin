@@ -117,7 +117,7 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
         return response
 
     app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins),
-                       allow_credentials=False, allow_methods=["GET", "POST"],
+                       allow_credentials=False, allow_methods=["GET", "POST", "DELETE"],
                        allow_headers=["Authorization", "Content-Type", "Idempotency-Key",
                                       "X-Client-Id", "X-Request-ID"],
                        expose_headers=["X-Request-ID", "Retry-After"])

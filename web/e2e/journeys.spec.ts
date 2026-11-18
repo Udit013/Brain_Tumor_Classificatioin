@@ -24,6 +24,14 @@ test("workbench: analyse an example end to end and download the report", async (
   const download = page.waitForEvent("download");
   await result.getByRole("button", { name: "Download report (HTML)" }).click();
   expect((await download).suggestedFilename()).toMatch(/^neuroclass-report-.*\.html$/);
+
+  // The owner can delete it; it then disappears from history (and the test leaves no data behind).
+  await page.goto("/history");
+  await page.getByRole("table").getByRole("link").first().click();
+  await expect(page.getByRole("button", { name: "Delete analysis" })).toBeVisible();
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Delete analysis" }).click();
+  await expect(page).toHaveURL(/\/history$/);
 });
 
 test("workbench rejects an unsupported upload before contacting the model", async ({ page }) => {

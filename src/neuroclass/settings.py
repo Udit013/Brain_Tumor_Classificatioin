@@ -122,6 +122,18 @@ class Settings:
     # Limits
     rate_limit_per_minute: int = field(default_factory=lambda: _env_int(
         "NEUROCLASS_RATE_LIMIT_PER_MIN", 60))
+    # Global caps (all clients together). Per-client limits key on the forwarded
+    # client address, which a client can vary; these bound total load regardless.
+    global_analysis_per_minute: int = field(default_factory=lambda: _env_int(
+        "NEUROCLASS_GLOBAL_ANALYSIS_PER_MIN", 30))
+    global_research_per_minute: int = field(default_factory=lambda: _env_int(
+        "NEUROCLASS_GLOBAL_RESEARCH_PER_MIN", 120))
+    global_auth_per_minute: int = field(default_factory=lambda: _env_int(
+        "NEUROCLASS_GLOBAL_AUTH_PER_MIN", 30))
+    # Grad-CAM overlays of *uploaded* images are blended copies of the upload;
+    # they are cleared after this many days (example images are public and kept).
+    overlay_retention_days: int = field(default_factory=lambda: _env_int(
+        "NEUROCLASS_OVERLAY_RETENTION_DAYS", 30))
     analysis_rate_limit_per_minute: int = field(default_factory=lambda: _env_int(
         "NEUROCLASS_ANALYSIS_RATE_LIMIT_PER_MIN", 10))
     # True on hosts whose disk is wiped on restart (free HF Space). Only matters

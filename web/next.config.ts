@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",         // self-contained server for the Docker image
+  devIndicators: false,         // the dev badge overlaps bottom-left controls on phones
   cacheComponents: true,
   partialPrefetching: true,
   // Baseline hardening for every page. No CSP yet: Next's inline bootstrap

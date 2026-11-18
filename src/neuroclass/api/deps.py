@@ -10,10 +10,11 @@ from dataclasses import dataclass
 
 import jwt
 from fastapi import Depends, Header, HTTPException, Request, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..auth.security import decode_token
-from ..db.models import Analysis, User
+from ..db.models import Analysis, Review, User
 from ..db.session import get_db
 from ..runtime import Services
 
@@ -74,11 +75,21 @@ def require_reviewer(ident: Identity = Depends(identity)) -> Identity:
     return ident
 
 
+def owns(a: Analysis | None, ident: Identity) -> bool:
+    return ident.owner_key is not None and a is not None and a.owner_key == ident.owner_key
+
+
+def in_review_scope(a: Analysis, db: Session) -> bool:
+    """Reviewers see analyses that entered the review workflow, not everyone's history."""
+    if a.status == "awaiting_review":
+        return True
+    return db.scalar(select(Review.id).where(Review.analysis_id == a.id).limit(1)) is not None
+
+
 def load_analysis(analysis_id: str, db: Session, ident: Identity) -> Analysis:
     a = db.get(Analysis, analysis_id)
     # Same 404 for "missing" and "not yours": no existence oracle.
-    owns = ident.owner_key is not None and a is not None and a.owner_key == ident.owner_key
-    if a is None or not (owns or ident.is_reviewer):
+    if a is None or not (owns(a, ident) or (ident.is_reviewer and in_review_scope(a, db))):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "analysis not found")
     return a
 
@@ -108,9 +119,15 @@ def client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+GLOBAL_CAPS = {"analysis": "global_analysis_per_minute", "research": "global_research_per_minute",
+               "auth": "global_auth_per_minute"}
+
+
 def limit(bucket: str, per_minute_attr: str):
     def dep(request: Request) -> None:
         services: Services = request.app.state.services
-        request.app.state.rate_limiter.check(client_ip(request), bucket,
-                                             getattr(services.settings, per_minute_attr))
+        limiter: RateLimiter = request.app.state.rate_limiter
+        limiter.check(client_ip(request), bucket, getattr(services.settings, per_minute_attr))
+        if bucket in GLOBAL_CAPS:
+            limiter.check("*", bucket, getattr(services.settings, GLOBAL_CAPS[bucket]))
     return dep

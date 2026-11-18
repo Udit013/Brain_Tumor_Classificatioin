@@ -135,6 +135,7 @@ def make_settings(tmp_path: Path, **overrides) -> Settings:
                 reviewer_emails=("reviewer@example.org",), reviewer_code=REVIEWER_CODE,
                 llm_provider="none",
                 rate_limit_per_minute=1000, analysis_rate_limit_per_minute=1000, worker_threads=1,
+                global_analysis_per_minute=1000, global_research_per_minute=1000, global_auth_per_minute=1000,
                 cors_origins=("http://localhost:3000",))
     base.update(overrides)
     return Settings(**base)
