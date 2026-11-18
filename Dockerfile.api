@@ -1,0 +1,43 @@
+# NeuroClass platform API — no TensorFlow (ONNX Runtime + analytic Grad-CAM).
+#   docker build -f Dockerfile.api -t neuroclass-platform-api .
+# Bakes in: the verified serving bundle, measured metrics, example images, the
+# literature index and its embedding model, so the container needs no network.
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+    NEUROCLASS_ENV=production \
+    NEUROCLASS_DATA_DIR=/var/lib/neuroclass \
+    NEUROCLASS_INDEX_DIR=/app/data/rag_index \
+    NEUROCLASS_EMBED_CACHE=/app/data/fastembed_cache \
+    HF_HUB_OFFLINE=0
+
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+
+COPY requirements-app.txt .
+RUN pip install --no-cache-dir -r requirements-app.txt
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+RUN pip install --no-cache-dir -e . --no-deps
+
+COPY models/serving ./models/serving
+COPY models/registry.json ./models/registry.json
+COPY results/metrics ./results/metrics
+COPY results/rag ./results/rag
+COPY space/examples ./space/examples
+COPY data/rag_index ./data/rag_index
+
+# Fetch the query embedding model at build time; runtime stays offline.
+RUN python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5', cache_dir='/app/data/fastembed_cache')"
+ENV HF_HUB_OFFLINE=1
+
+RUN useradd --create-home --uid 1000 app && mkdir -p /var/lib/neuroclass \
+    && chown app:app /var/lib/neuroclass
+USER app
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)" || exit 1
+CMD ["uvicorn", "neuroclass.api.app:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]

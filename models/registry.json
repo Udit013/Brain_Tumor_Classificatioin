@@ -1,0 +1,47 @@
+{
+  "note": "Every model version that has been deployed. Weights live on the Hugging Face Hub; local copies with SHA256SUMS in models/archive/<version>/.",
+  "hub_repo": "Udit013/brain-tumor-efficientnetb3",
+  "versions": [
+    {
+      "version": "parity-2024",
+      "status": "archived",
+      "hub_revision": "parity-2024 (31a6602)",
+      "description": "Exact reproduction of the IEEE 2024 recipe; deployed until 2026-10-27",
+      "metrics": {
+        "test_accuracy": 0.9025,
+        "novel_subset_accuracy": 0.8566591422121896,
+        "glioma_recall": 0.6425,
+        "glioma_to_notumor": 33,
+        "macro_f1": 0.8978603345349722,
+        "ece_raw": 0.18800297429785137,
+        "mean_corrupted_accuracy": 0.6731666666666668,
+        "external_accuracy": 0.6956521739130435,
+        "external_tumor_recall": 0.5032258064516129
+      },
+      "archive": "models/archive/parity-2024",
+      "results": "results/archive/parity-2024"
+    },
+    {
+      "version": "2026.10-finetune",
+      "status": "deployed",
+      "hub_revision": "main (d655e25)",
+      "description": "Two-stage fine-tune selected on a leakage-safe validation split",
+      "weights_sha256": "d2ba7de13b7d1f1ae9aa609403a52a4e41ed8f045d7995c60942d6bf59fbc2dd",
+      "serving_onnx_sha256": "3c8964207a8d6bd9cc2eb4456bad9c4bf4095b573db846751bff7c7e568c78af",
+      "metrics": {
+        "test_accuracy": 0.934375,
+        "novel_subset_accuracy": 0.8939051918735892,
+        "glioma_recall": 0.795,
+        "glioma_to_notumor": 25,
+        "macro_f1": 0.9329134716595028,
+        "ece_raw": 0.022207899242639544,
+        "mean_corrupted_accuracy": 0.9067500000000001,
+        "external_accuracy": 0.7272727272727273,
+        "external_tumor_recall": 0.5612903225806452
+      },
+      "promoted": "2026-10-27",
+      "promotion_gate": "results/metrics/promotion_gate.json",
+      "archive": "models/archive/retrain-2026-10"
+    }
+  ]
+}

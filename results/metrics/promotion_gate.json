@@ -1,0 +1,94 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "metric": "test_accuracy",
+      "deployed": 0.9025,
+      "candidate": 0.934375,
+      "delta": 0.03187499999999999,
+      "allowed_regression": 0.005,
+      "passed": true,
+      "rule": "overall accuracy may not drop by more than 0.5 pt"
+    },
+    {
+      "metric": "novel_subset_accuracy",
+      "deployed": 0.8566591422121896,
+      "candidate": 0.8939051918735892,
+      "delta": 0.03724604966139955,
+      "allowed_regression": 0.005,
+      "passed": true,
+      "rule": "accuracy on images without a near-duplicate in training"
+    },
+    {
+      "metric": "glioma_recall",
+      "deployed": 0.6425,
+      "candidate": 0.795,
+      "delta": 0.15250000000000008,
+      "allowed_regression": 0.01,
+      "passed": true,
+      "rule": "the weakest class may not get weaker by more than 1 pt"
+    },
+    {
+      "metric": "glioma_to_notumor",
+      "deployed": 33,
+      "candidate": 25,
+      "delta": -8,
+      "allowed_regression": 0,
+      "passed": true,
+      "rule": "missed tumours (glioma called no tumour) may not increase"
+    },
+    {
+      "metric": "macro_f1",
+      "deployed": 0.8978603345349722,
+      "candidate": 0.9329134716595028,
+      "delta": 0.03505313712453062,
+      "allowed_regression": 0.005,
+      "passed": true,
+      "rule": "class-balanced quality"
+    },
+    {
+      "metric": "ece_raw",
+      "deployed": 0.18800297429785137,
+      "candidate": 0.022207899242639544,
+      "delta": -0.16579507505521182,
+      "allowed_regression": 0.01,
+      "passed": true,
+      "rule": "calibration error may not rise by more than 0.01"
+    },
+    {
+      "metric": "mean_corrupted_accuracy",
+      "deployed": 0.6731666666666668,
+      "candidate": 0.9067500000000001,
+      "delta": 0.23358333333333325,
+      "allowed_regression": 0.01,
+      "passed": true,
+      "rule": "robustness to the corruption benchmark"
+    },
+    {
+      "metric": "external_accuracy",
+      "deployed": 0.6956521739130435,
+      "candidate": 0.7272727272727273,
+      "delta": 0.031620553359683834,
+      "allowed_regression": 0.01,
+      "passed": true,
+      "rule": "accuracy on the external MRI dataset"
+    },
+    {
+      "metric": "external_tumor_recall",
+      "deployed": 0.5032258064516129,
+      "candidate": 0.5612903225806452,
+      "delta": 0.058064516129032295,
+      "allowed_regression": 0.01,
+      "passed": true,
+      "rule": "tumours found in the external dataset"
+    },
+    {
+      "metric": "paired_test_full",
+      "deployed_only_correct": 30,
+      "candidate_only_correct": 81,
+      "p_value": 1.3738677823789658e-06,
+      "passed": true,
+      "rule": "candidate may not be significantly worse (exact McNemar, alpha 0.05)"
+    }
+  ]
+}

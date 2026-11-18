@@ -65,4 +65,5 @@ runs/
 
 # Platform environment and runtime data
 .venv-app/
+.venv-space/
 var/

@@ -1,0 +1,13 @@
+# Build context for Dockerfile.api (BuildKit picks this file over .dockerignore).
+*
+!requirements-app.txt
+!pyproject.toml
+!README.md
+!src/
+!models/serving/
+!models/registry.json
+!results/metrics/
+!results/rag/
+!space/examples/
+!data/rag_index/20261117-bge-small-en-v1.5-bddad395/
+**/__pycache__
