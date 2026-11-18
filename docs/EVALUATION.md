@@ -85,7 +85,7 @@ documents), e.g. P01 needs "99.844" and "640".
 | **extractive, full** (routed top-6 + verifier) | **0.661** | **98%** | 0.528 | 0 | 0 | 18 ms |
 | Gemini closed-book (LLM only) | not run | | | | | |
 | Gemini + naive RAG | not run | | | | | |
-| Gemini + full pipeline | not run | | | | | |
+| Gemini + full pipeline | see §3a (34-question subset, live) | | | | | |
 
 Reading this honestly:
 - Better retrieval raises **fact recall** (0.54 → 0.66) and the share of
@@ -96,13 +96,55 @@ Reading this honestly:
 - Extractive answers quote retrieved sentences verbatim, so "unsupported
   shown" and "invalid citations" are 0 by construction. They are the metrics
   that matter for LLM answers, which the verifier is designed to catch.
-- **The LLM variants were not run**: no Gemini key was available, and no paid
-  provider is used. The harness is ready, quota-guarded and resumable; with a
-  free key it produces the missing rows (see `docs/DEPLOYMENT.md` §3). The
-  verifier and the fallback paths are covered by tests with scripted provider
-  responses (`tests/app_tests/test_llm_providers.py`, `test_agent.py`).
+- **Closed-book and naive-RAG Gemini variants were not run**: they need direct
+  model access, and the only key lives as a Space secret that was deliberately
+  not copied. The production pipeline was measured through the live API (§3a).
 - The verifier is lexical (token overlap ≥ 0.5 plus exact numbers), so it is a
   guard against invented citations and numbers, not a semantic judge.
+
+### 3a. Gemini (free tier) through the live production pipeline
+
+`scripts/eval_generation.py --live-api ...` sent 34 of the 50 questions (all 14
+project questions + the first 20 known-item questions) to the deployed
+`/api/research/ask` on 2026-11-18 (UTC): routed retrieval → `gemini-3.5-flash-lite`
+(free tier, server-side key, never copied) → verifier. The subset kept ~30 of the
+day's 100-call budget for visitors. Scored on exactly what the API returned;
+compared with the extractive pipeline on the same 34 questions.
+
+| Same 34 questions | Gemini + full pipeline | Extractive + full pipeline |
+|---|---|---|
+| Fact recall (14 project questions) | **0.750** | 0.661 |
+| Citation precision | **0.928** | 0.588 |
+| Answer cites a relevant document | 0.765 | **0.971** |
+| … project questions only | 0.571 | **1.000** |
+| … known-item questions only | 0.900 | **0.950** |
+| Statements removed by the verifier | 11 | 0 (quotes) |
+| Latency p50 / p95 | 2,726 / 3,939 ms | 18 / 30 ms |
+| Calls / tokens / cost | 68 calls, 192,423 in / 9,458 out, **$0** | none |
+
+What this shows:
+- Gemini answers contain more of the right facts (0.75 vs 0.66) and cite more
+  precisely (0.93 vs 0.59), at ~150× the latency.
+- **But they cite a relevant source less often** (0.77 vs 0.97), mostly on
+  project questions. Reading the verifier's removals explains most of it:
+  10 of the 11 removals hit one rule — statements the model labelled
+  `model_output`/`limitation` had their numbers checked against the (empty)
+  inference result, because research Q&A has none. At least 9 of those 10 were
+  facts the indexed project documents support (89.4%, 72.7%/56.1%, 79.5%,
+  25 of 400, T = 0.937, the corruption-robustness figures); the 10th was a true
+  project fact inserted into an unrelated literature question. The 11th was a
+  genuine low-support removal. Removing them left the facts only in summaries.
+- **Fixed after the run:** in research Q&A every statement is now verified
+  against its cited passages (regression test
+  `test_research_answers_verify_every_statement_against_its_sources`). The
+  numbers above were measured *before* the fix and are reported unchanged.
+- A post-fix spot check showed the next weakness: Flash-Lite sometimes returns a
+  claim without any citation, which the verifier (correctly) removes. Re-measuring
+  after the fix — and tightening the prompt or schema — needs another day's free
+  budget; the run is resumable (`results/rag/generation_runs/gemini_full_live.jsonl`).
+- One transient Gemini `503 UNAVAILABLE` occurred; production fell back to
+  extractive for that request and the harness retried instead of scoring it.
+- n is small (14 questions carry gold facts); treat differences as indicative.
 
 ## 4. Serving — TensorFlow vs the TF-free path
 
@@ -129,15 +171,17 @@ while ONNX Runtime warms up.
 
 ## 5. Tests that were run
 
-| Suite | Result (2026-11-17) |
+| Suite | Result (2026-11-18, latest) |
 |---|---|
-| Platform, SQLite (`tests/app_tests`) | 81 passed, 3 skipped (Postgres-only tests) |
-| Platform, PostgreSQL 17 + pgvector 0.8.1 | 84 passed — incl. history and a paused review surviving an app restart, pgvector store selection |
-| Platform on the HF Space dependency set (pydantic 2.12.5, no MCP/Claude SDK) | 72 passed, 7 skipped (SQLite); 75 passed, 4 skipped (PostgreSQL) — skips are the Claude-SDK and Postgres-only tests |
+| Platform, SQLite (`tests/app_tests`) | 88 passed, 3 skipped (Postgres-only tests) |
+| Platform, PostgreSQL 17 + pgvector 0.8.1 | 91 passed — incl. restart persistence of history and paused reviews, pgvector selection, reviewer scope, deletion, outage behaviour |
+| Platform on the HF Space dependency set (pydantic 2.12.5, no MCP/Claude SDK) | 79 passed, 7 skipped (Claude-SDK and Postgres-only tests) |
 | Research (`tests/`, no TensorFlow) | 65 passed |
 | Web unit/component (Vitest) | 8 passed |
-| Browser journeys (Playwright, desktop + Pixel 7) | 12 / 12 against the dev stack, the Docker Compose stack and the live deployment |
-| Dependency audit | pip-audit: no known vulnerabilities in `requirements-app.txt`; npm audit (prod): 0 |
+| Browser journeys (Playwright, desktop + Pixel 7; workbench journey now also deletes its analysis) | 12 / 12 against the dev stack and the live deployment |
+| Dependency audit | pip-audit: no known vulnerabilities; npm audit (production deps): 0. Dev-only `picomatch` ReDoS advisory, no patched release (see SECURITY.md) |
+| Accessibility spot check (landing, workbench) | one `h1`, no skipped heading levels, every control named, every image with alt text; no horizontal overflow at 375 px on any page |
+| GitHub Actions | research, platform (Postgres), space (HF dependency set), web — all green |
 
 ## 6. Live verification on production (Neon + Gemini)
 

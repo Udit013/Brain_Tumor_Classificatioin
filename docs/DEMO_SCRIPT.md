@@ -3,7 +3,7 @@
 **Before you start (2 minutes earlier):** open
 https://udit013-brain-tumor-mri-classifier.hf.space/api/ready to wake the Space
 (it sleeps after ~48 h idle; waking takes about a minute), then open
-https://neuroclass-gilt.vercel.app in another tab.
+https://neuroclass-lab.vercel.app in another tab.
 
 ## 0:00 — Frame it (20 s)
 "NeuroClass started as my IEEE 2024 paper on brain-tumour MRI classification.

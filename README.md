@@ -22,7 +22,7 @@ clearly separated layers:
    retrieval over openly licensed literature with verified citations, a FastAPI
    backend, a Next.js app, and a deployment that costs **$0**.
 
-**🌐 Web app:** [neuroclass-gilt.vercel.app](https://neuroclass-gilt.vercel.app)
+**🌐 Web app:** [neuroclass-lab.vercel.app](https://neuroclass-lab.vercel.app)
 · **⚙️ API:** [udit013-brain-tumor-mri-classifier.hf.space/api/docs](https://udit013-brain-tumor-mri-classifier.hf.space/api/docs)
 · **🧪 Backend:** [HF Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
 · **🤗 Model:** [Udit013/brain-tumor-efficientnetb3](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
@@ -55,12 +55,16 @@ flowchart LR
 | Reliability rules on test: "standard" vs "caution" accuracy | **96.0%** (95% of images) vs **47.4%** (5%) |
 | Retrieval, routed hybrid (bge-small): recall@10 / MRR@10, 50 labelled questions | **1.00 / 0.953**, 27 ms p50 |
 | Grounded answers: fact recall, naive → full pipeline (extractive) | 0.54 → **0.66** |
+| Gemini free tier through the live pipeline (34 questions) vs extractive | fact recall **0.75** vs 0.66; citation precision **0.93** vs 0.59; cites a relevant source 0.77 vs **0.97** |
 | Serving per image incl. Grad-CAM: TensorFlow → ONNX | 89 → **41 ms**, 803 → **262 MB** RSS |
-| Tests | 72 platform (SQLite + Postgres), 65 research, 8 web, 12 browser journeys × 3 targets |
+| Tests | 91 platform (PostgreSQL) / 88 (SQLite), 65 research, 8 web, 12 browser journeys against dev, Docker and production |
 | Monthly cost | **$0** — and no configuration that can incur a charge |
 
-Details: [docs/EVALUATION.md](docs/EVALUATION.md). The LLM-vs-RAG comparison
-needs a free Gemini key and is reported as *not run*, not estimated.
+Details: [docs/EVALUATION.md](docs/EVALUATION.md), including the negative
+findings: Gemini answers cite a relevant source less often than extractive ones,
+mostly because of a verifier rule bug the evaluation exposed (fixed afterwards;
+the numbers above are as measured), and the closed-book / naive-RAG Gemini
+variants were not run.
 
 
 ## Section 1 — Published Work (IEEE 2024)

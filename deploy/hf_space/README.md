@@ -15,7 +15,7 @@ short_description: Backend API of the NeuroClass research platform
 
 # NeuroClass API
 
-**The NeuroClass app is at [neuroclass-gilt.vercel.app](https://neuroclass-gilt.vercel.app).**
+**The NeuroClass app is at [neuroclass-lab.vercel.app](https://neuroclass-lab.vercel.app).**
 This Space is its backend: a FastAPI service at [`/api`](https://udit013-brain-tumor-mri-classifier.hf.space/api/docs)
 for model inference with Grad-CAM, the LangGraph analysis workflow with human
 review, literature retrieval with verified citations, and reports.

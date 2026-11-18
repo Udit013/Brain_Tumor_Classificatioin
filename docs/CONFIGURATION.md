@@ -25,6 +25,8 @@ Defaults are safe for local development and cost nothing.
 | `NEUROCLASS_UPLOAD_RETENTION_HOURS` | 24 |
 | `NEUROCLASS_ANALYSIS_RATE_LIMIT_PER_MIN` | 10 per client (also used for sign-up/login) |
 | `NEUROCLASS_RATE_LIMIT_PER_MIN` | 60 per client (research) |
+| `NEUROCLASS_GLOBAL_ANALYSIS_PER_MIN` / `_RESEARCH_PER_MIN` / `_AUTH_PER_MIN` | 30 / 120 / 30 across all clients |
+| `NEUROCLASS_OVERLAY_RETENTION_DAYS` | 30 — Grad-CAM overlays of uploads are cleared after this |
 
 ## Auth
 

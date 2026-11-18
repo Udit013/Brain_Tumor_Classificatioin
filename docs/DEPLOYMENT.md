@@ -4,7 +4,7 @@ Live deployment (verified 2026-11-17, Neon and Gemini connected):
 
 | Surface | URL | Host / plan |
 |---|---|---|
-| Web app | https://neuroclass-gilt.vercel.app | Vercel Hobby |
+| Web app | https://neuroclass-lab.vercel.app | Vercel Hobby |
 | API (docs at `/api/docs`) | https://udit013-brain-tumor-mri-classifier.hf.space/api | Hugging Face Space, CPU Basic |
 | Database | Neon project `neuroclass`, branch `production` (Postgres + pgvector) | Neon Free |
 | Space page | https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier | API landing page (no classifier UI) |
@@ -59,7 +59,7 @@ Space settings → **Variables and secrets**:
 | `NEUROCLASS_JWT_SECRET` | secret | random, ≥ 32 characters (required in production) |
 | `DATABASE_URL` | secret | Neon connection string — see section 4 |
 | `GEMINI_API_KEY` | secret | free-tier key — see section 3 |
-| `NEUROCLASS_CORS_ORIGINS` | variable | your Vercel URL, e.g. `https://neuroclass-gilt.vercel.app` |
+| `NEUROCLASS_CORS_ORIGINS` | variable | your Vercel URL, e.g. `https://neuroclass-lab.vercel.app` |
 | `NEUROCLASS_WEB_URL` | variable | same URL (linked from the landing page) |
 | `NEUROCLASS_LLM_PROVIDER` | variable | `auto` |
 | `NEUROCLASS_EPHEMERAL_STORAGE` | variable | `false` (only matters without `DATABASE_URL`) |

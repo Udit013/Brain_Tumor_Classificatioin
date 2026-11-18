@@ -84,6 +84,12 @@ Everything else in this document is about *how* those two flows actually work un
 
 ## 2. High-Level Architecture
 
+> **Historical (Part I).** This section describes the research system as it was
+> deployed until November 2026, when the public product became the NeuroClass
+> platform (Part II): a Next.js app on Vercel calling the FastAPI platform API on
+> the Hugging Face Space, which no longer serves any Gradio interface. The Gradio
+> app described here is preserved in `space/` and at Space tag `tf-gradio5-2026-10`.
+
 There is no client-server web app with a database in the traditional sense. Instead, picture **two independent consumers reading from a shared, versioned "model artifact"** produced by a training/evaluation pipeline:
 
 ```text
@@ -971,6 +977,12 @@ Not a hand-written REST route — Gradio auto-generates its own internal API fro
 
 ## 17. Execution Traces: Tracing Every Major Action Through the System
 
+> **Historical (Part I).** This section describes the research system as it was
+> deployed until November 2026, when the public product became the NeuroClass
+> platform (Part II): a Next.js app on Vercel calling the FastAPI platform API on
+> the Hugging Face Space, which no longer serves any Gradio interface. The Gradio
+> app described here is preserved in `space/` and at Space tag `tf-gradio5-2026-10`.
+
 ### Trace A — A visitor uses the live demo
 
 ```text
@@ -1218,7 +1230,7 @@ optional human review, and a downloadable report — and it runs for **$0**.
 
 | Surface | URL |
 |---|---|
-| Web app (Next.js, Vercel Hobby) | https://neuroclass-gilt.vercel.app |
+| Web app (Next.js, Vercel Hobby) | https://neuroclass-lab.vercel.app |
 | API (FastAPI on the HF Space) | https://udit013-brain-tumor-mri-classifier.hf.space/api/docs |
 | Space page (API landing, no classifier UI) | https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier |
 | Database | Neon Free, project `neuroclass`, branch `production` (Postgres + pgvector) |
@@ -1252,7 +1264,7 @@ Checked on the providers' own pages on 2026-11-17 (full table and links:
 
 | Need | Choice | Free plan facts | Payment method | Overage possible? | At the limit | Sleep / persistence | Fallback |
 |---|---|---|---|---|---|---|---|
-| Hosting (API + demo) | Hugging Face Space, existing Gradio Space | CPU Basic free: 2 vCPU, 16 GB RAM, 50 GB disk | no | no | no metered limit; requests queue | sleeps after ~48 h idle; disk not persistent | — |
+| Hosting (API) | Hugging Face Space, existing Gradio-SDK Space used as a plain Python host (no Gradio UI) | CPU Basic free: 2 vCPU, 16 GB RAM, 50 GB disk | no | no | no metered limit; requests queue | sleeps after ~48 h idle; disk not persistent | — |
 | Frontend | Vercel Hobby | 100 GB transfer, 1M invocations, 4 CPU-h/month; non-commercial | no | no ("no billing cycles") | feature paused (~30 days) | — | Space demo + API docs |
 | Database + vectors | Neon Free (configured): Postgres + pgvector | 100 CU-h/project/month, 1 GB/project, scale-to-zero after 5 min; verified Free plan, $0, no card | no (none added) | no | Neon suspends compute until next month; writes fail above 1 GB; data kept; API answers 503 for data features, retrieval falls back to memory | Neon wakes in under a second | in-memory retrieval; SQLite if `DATABASE_URL` removed |
 | LLM | Gemini API free tier | free models incl. `gemini-3.5-flash-lite` (default), `gemini-3.8-flash`; RPM/RPD per project in AI Studio; daily reset midnight Pacific | no | no on an unbilled project (429 instead); tier upgrades only after billing is linked | NeuroClass stops calling and goes extractive | free-tier content may be used to improve Google products; images never sent | extractive answers |
@@ -1344,14 +1356,14 @@ Measured 2026-11-17 (details: `docs/EVALUATION.md`).
 | Input-shift heuristic | AUROC 0.95 vs synthetic non-MRI; 0.52 vs external MRI (not an OOD detector) |
 | Retrieval (50 labelled questions) | routed hybrid bge-small: R@10 1.00, MRR@10 0.953, nDCG@10 0.966, 27 ms p50; BM25 0.96 R@10; bge-base routed MRR 0.967 at 75 ms; reranking +1 s with no recall gain |
 | Generation (extractive) | fact recall on project questions 0.536 (naive) → 0.661 (full); cites a relevant document 94% → 98%; citation precision 0.776 → 0.528 |
-| Generation (LLM variants) | not run — no free-tier key available; harness ready and resumable |
+| Generation, Gemini free tier via the live API (34 questions) | fact recall 0.75 vs 0.66 extractive; citation precision 0.93 vs 0.59; cites a relevant source 0.77 vs 0.97; 10 of 11 verifier removals traced to a Q&A rule bug (fixed after the run, numbers reported as measured); closed-book and naive-RAG Gemini variants not run |
 | Serving per image incl. Grad-CAM (M3 Pro CPU) | TensorFlow 89 ms / 803 MB; ONNX 41 ms / 262 MB; ONNX with 6 TTA views 175 ms |
 | Images | platform API 1.49 GB (TensorFlow API 3.29 GB); web 406 MB |
-| Tests | platform 71 + 1 skipped (SQLite), 72 (Postgres), 62 + 5 skipped (Space dependency set); research 65; web 8; Playwright 12/12 against dev, Docker Compose and live |
+| Tests | platform 88 + 3 skipped (SQLite), 91 (Postgres), 79 + 7 skipped (Space dependency set); research 65; web 8; Playwright 12/12 against dev and live |
 
 ## 28. Platform Limitations and Open Work
 
-- The LLM-vs-RAG comparison needs a free Gemini key (harness ready).
+- Gemini evaluation covers 34 of 50 questions through the live API, measured before the Q&A verifier fix; closed-book and naive-RAG Gemini variants were not run (the key stays a server-side secret). Flash-Lite sometimes omits citations, which the verifier removes.
 - Verification is lexical; extractive answers quote rather than synthesise.
 - Corpus: 241 openly licensed articles; the evaluation's relevance labels are
   incomplete, so recall and precision are lower bounds. The indexed project

@@ -39,7 +39,7 @@ Source: [huggingface.co/pricing](https://huggingface.co/pricing),
 | | |
 |---|---|
 | Plan | CPU Basic — listed as **FREE**: 2 vCPU, 16 GB RAM, 50 GB disk |
-| Payment method | not needed for CPU Basic |
+| Payment method | not needed for CPU Basic. Verified 2026-11-17: the owner account is not PRO and has no payment method (`canPay: false`), so Hugging Face cannot bill it; Space hardware `cpu-basic`, no persistent storage, sleep after 172,800 s (48 h) |
 | Overages | none: free hardware has no metered usage |
 | Sleep | sleeps after ~48 h without traffic; the next visitor wakes it (cold start) |
 | Storage | disk is **not persistent**: lost on restart, rebuild or sleep |
@@ -84,11 +84,12 @@ with one branch (`production`), one database and one compute; Neon Auth,
 object storage, functions and the AI gateway are **not** provisioned (NeuroClass
 keeps its own auth). Usage after deployment and tests: 0.05 CU-hours, 33 MB.
 
-Recommended setting: in the Neon console, cap autoscaling at 0.25 CU so the
-100 CU-hours last ~400 active hours a month. If Neon suspends, set
-`DATABASE_URL` empty (or leave it; `/api/ready` reports the database as down and
-the API keeps serving benchmarks and research search). Wakes after scale-to-zero
-add a few hundred milliseconds to the first query.
+Compute setting (verified 2026-11-17 in the console): the `production` compute
+is a fixed **0.25 CU**, so 100 CU-hours cover ~400 active hours a month, and
+scale-to-zero after 5 idle minutes is always on for Free. If Neon suspends at its
+limit, the API answers 503 "temporarily unavailable" for data features and keeps
+serving research answers (in-memory index), benchmarks and samples (tested).
+Waking from scale-to-zero adds a few hundred milliseconds to the first query.
 
 ### Gemini API — optional LLM
 Source: [pricing](https://ai.google.dev/gemini-api/docs/pricing),
@@ -101,7 +102,7 @@ aistudio.google.com/docs/...).
 | Plan | Free tier, on a project with **no billing account linked** |
 | Models | free-tier models include `gemini-3.8-flash`, `gemini-3.6-flash`, `gemini-3.5-flash-lite` (stable). Default: `gemini-3.5-flash-lite`; override with `NEUROCLASS_LLM_MODEL` |
 | Rate limits | per project and per model, shown in AI Studio (RPM, TPM, RPD); daily quotas reset at midnight Pacific |
-| Payment method | not needed. Moving to a paid tier requires setting up billing |
+| Payment method | not needed. Moving to a paid tier requires setting up billing. The tier of the project behind the deployed key could not be checked from here (AI Studio was not accessible in the available browser profile): confirm in AI Studio → API keys that the project shows the Free tier and no billing account |
 | Overages | not possible on an unbilled project: over-quota requests fail (429) |
 | Auto-upgrade | Google upgrades a project's tier automatically **once billing is linked**. Never link billing to the project that issues this key |
 | Data use | free-tier content may be used to improve Google's products. NeuroClass sends model numbers, reliability findings, public literature excerpts and the user's question/note — never images. The assistant page says so |

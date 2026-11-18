@@ -186,3 +186,26 @@ def test_report_language_and_provenance():
     assert "diagnosis" not in low and "diagnosed" not in low
     html = render_html(md, "t")
     assert html.startswith("<!doctype html>") and "<script" not in html
+
+
+def test_research_answers_verify_every_statement_against_its_sources():
+    """Regression (live Gemini evaluation): in Q&A there is no inference, so a cited fact
+    labelled "limitation" must be checked against its passage, not an empty number set."""
+    from neuroclass.agent.verify import verify
+    from neuroclass.schemas import DraftExplanation, Passage, Statement
+
+    p = Passage(chunk_id="project:readme#3", doc_id="project:readme", title="README", section="Results",
+                text="The current model scores 89.4% on test images with no near-duplicate in training.",
+                source_url="https://example.org", license="MIT", year=2026, journal=None,
+                source_type="project_document", score=1.0)
+    draft = DraftExplanation(summary="About 89.4%.", statements=[
+        Statement(kind="limitation", text="The model scores 89.4% on test images with no near-duplicate in training.",
+                  citations=["project:readme#3"]),
+        Statement(kind="model_output", text="It reaches 97.0% on unseen images.", citations=["project:readme#3"]),
+        Statement(kind="limitation", text="Accuracy drops on novel images.", citations=[]),
+    ])
+    summary, kept, removed = verify(draft, [p], None, None)
+    assert [s.text[:22] for s in kept] == ["The model scores 89.4%"]
+    assert kept[0].kind == "limitation" and kept[0].status == "supported"
+    reasons = sorted(r.reason for r in removed)
+    assert any("'97'" in r for r in reasons) and any("without a citation" in r for r in reasons)

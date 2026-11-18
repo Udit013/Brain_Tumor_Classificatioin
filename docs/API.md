@@ -18,7 +18,8 @@ diagnoses.
 | Reviewer | an email listed in `NEUROCLASS_REVIEWER_EMAILS` **and** the operator's `NEUROCLASS_REVIEWER_CODE`, given at sign-up (`reviewer_code`) or later via `POST /auth/reviewer` | the review queue; can approve / request revision / reject |
 
 Requests without either header get 401 on owned resources. Another owner's
-analysis is a 404, not a 403.
+analysis is a 404, not a 403. Reviewers can open analyses that are awaiting
+review or have been reviewed, and nothing else.
 
 ## Endpoints
 
@@ -32,6 +33,7 @@ analysis is a 404, not a 403.
 | GET | `/analyses/{id}/events` | server-sent events: `step` events, then one `status` event |
 | GET | `/analyses/{id}/gradcam.png` | the overlay |
 | GET | `/analyses/{id}/report?format=md\|html\|json` | downloadable research report |
+| DELETE | `/analyses/{id}` | owner only: deletes the analysis, its reviews, trace events, checkpoints and upload (204); 409 while it is still running |
 | GET | `/analyses/review-queue` | reviewer only |
 | POST | `/analyses/{id}/reviews` | reviewer only: `{"decision": "approve"\|"request_revision"\|"reject", "note": ...}`; resumes the paused graph |
 | POST | `/research/search` | ranked passages (routed hybrid search): `{"question", "top_k" ≤ 12, "filters"}` |

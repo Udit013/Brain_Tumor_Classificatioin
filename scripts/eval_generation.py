@@ -27,6 +27,12 @@ Metrics (computed on what a user would be *shown*):
   latency p50/p95, LLM calls, tokens (cost is 0 on the free tier)
 
     PYTHONPATH=src python scripts/eval_generation.py [--variants ...] [--rpm 4 --max-calls 60]
+
+Live mode (no key needed locally): `--live-api URL --live-ids P01 P02 ...` sends the
+questions to a deployed NeuroClass API's /research/ask, which runs the production
+pipeline (routed retrieval -> Gemini free tier -> verifier) with the server's own
+key. Recorded as `gemini_full_live`; a question answered in extractive mode (budget
+or quota reached) stops the run instead of being scored as an LLM answer.
 """
 
 from __future__ import annotations
@@ -113,6 +119,31 @@ def run_variant(variant, q, retriever, gemini):
             **score(q, summary, statements, {p.chunk_id for p in seen}, seen)}
 
 
+def run_live(q: dict, api: str, client_id: str) -> dict:
+    """One question through a deployed API; scored on exactly what the API returned."""
+    import urllib.request
+
+    from neuroclass.schemas import Passage
+
+    req = urllib.request.Request(f"{api.rstrip('/')}/research/ask",
+                                 data=json.dumps({"question": q["question"]}).encode(),
+                                 headers={"content-type": "application/json", "X-Client-Id": client_id})
+    t0 = time.perf_counter()
+    with urllib.request.urlopen(req, timeout=180) as r:
+        d = json.load(r)
+    latency = (time.perf_counter() - t0) * 1000
+    a = d["answer"]
+    passages = [Passage(**p) for p in a["passages"]]
+    statements = [{k: s[k] for k in ("text", "kind", "citations")} for s in a["statements"]]
+    row = {"id": q["id"], "kind": q["kind"], "latency_ms": latency, "mode": a["mode"],
+           "llm_model": a.get("llm_model"), "fallback_reason": a.get("fallback_reason"),
+           "usage": a.get("usage") or {}, "summary": a["summary"], "statements": statements,
+           "removed": [{"text": s["text"], "reason": s.get("reason")} for s in a["removed_statements"]],
+           "seen": [p.chunk_id for p in passages]}
+    row.update(score(q, a["summary"], statements, {p.chunk_id for p in passages}, passages))
+    return row
+
+
 def aggregate(rows: list[dict], n_questions: int) -> dict:
     def mean(key, sel=None):
         vals = [r[key] for r in rows if key in r and (sel is None or r["kind"] == sel)]
@@ -137,6 +168,7 @@ def aggregate(rows: list[dict], n_questions: int) -> dict:
         "input_tokens": sum(r["usage"].get("input_tokens", 0) for r in rows),
         "output_tokens": sum(r["usage"].get("output_tokens", 0) for r in rows),
         "cost_usd": 0.0,
+        "verifier_removed_statements": sum(len(r.get("removed", [])) for r in rows),
     }
 
 
@@ -145,7 +177,12 @@ def main() -> None:
     ap.add_argument("--variants", nargs="+", default=[*EXTRACTIVE, *GEMINI])
     ap.add_argument("--rpm", type=int, default=4, help="Gemini calls per minute (stay under free tier)")
     ap.add_argument("--max-calls", type=int, default=60, help="Gemini calls this run (stay under RPD)")
+    ap.add_argument("--live-api", help="deployed API base URL, e.g. https://...hf.space/api")
+    ap.add_argument("--live-ids", nargs="+", help="question ids to send to the live API")
+    ap.add_argument("--pace-s", type=float, default=32.0, help="seconds between live questions")
     args = ap.parse_args()
+    if args.live_api:
+        return run_live_eval(args)
     s = get_settings()
     questions = [json.loads(line) for line in QUESTIONS.open()]
     retriever = Retriever(Index.load(latest_index(s.index_dir, s.embedding_model)),
@@ -206,6 +243,59 @@ def main() -> None:
               f"invalid={agg['invalid_citation_rate'] or 0:.3f} unsupported_shown="
               f"{agg['unsupported_shown_rate'] or 0:.3f} p50={agg['latency_ms_p50']:.0f}ms | {status}")
     OUT.write_text(json.dumps(results, indent=2))
+
+
+def run_live_eval(args) -> None:
+    """Score the production pipeline through its API, on a question subset, paced to
+    the server's free-tier budget, and compare with the extractive pipeline on the
+    same questions."""
+    import secrets
+
+    questions = [json.loads(line) for line in QUESTIONS.open()]
+    wanted = set(args.live_ids or [q["id"] for q in questions])
+    subset = sorted((q for q in questions if q["id"] in wanted), key=lambda q: q["kind"] != "project")
+    cache = RUNS / "gemini_full_live.jsonl"
+    RUNS.mkdir(parents=True, exist_ok=True)
+    done = {json.loads(line)["id"]: json.loads(line) for line in cache.open()} if cache.exists() else {}
+    client_id = "eval-" + secrets.token_hex(12)
+    stop = None
+    for q in subset:
+        if q["id"] in done:
+            continue
+        for attempt in range(4):
+            row = run_live(q, args.live_api, client_id)
+            reason = str(row.get("fallback_reason") or "")
+            transient = any(t in reason for t in ("503", "UNAVAILABLE", "500", "request failed"))
+            if row["mode"] == "llm" or not transient:
+                break
+            print(f"{q['id']}: transient provider error ({reason}); retrying in 90 s", flush=True)
+            time.sleep(90)
+        if row["mode"] != "llm":
+            stop = f"stopped at {q['id']}: server answered without the LLM ({row['fallback_reason']})"
+            break
+        done[q["id"]] = row
+        with cache.open("a") as f:
+            f.write(json.dumps(row) + "\n")
+        print(f"{q['id']}: facts={row.get('fact_recall')} cited_relevant={row['cited_relevant']} "
+              f"removed={len(row['removed'])} {row['latency_ms']:.0f} ms", flush=True)
+        time.sleep(args.pace_s)
+    rows = [done[q["id"]] for q in subset if q["id"] in done]
+    ids = {r["id"] for r in rows}
+    extractive = [json.loads(line) for line in (RUNS / "extractive_full.jsonl").open()]
+    ext_same = [r for r in extractive if r["id"] in ids]
+    results = json.loads(OUT.read_text()) if OUT.exists() else {"variants": {}}
+    results.setdefault("variants", {})["gemini_full_live"] = {
+        "status": stop or ("complete for the subset" if len(rows) == len(subset) else "incomplete"),
+        "how": "production /research/ask on the deployed API (Gemini free tier, server-side key)",
+        "llm_model": rows[0]["llm_model"] if rows else None,
+        "question_ids": sorted(ids),
+        **aggregate(rows, len(subset)),
+        "extractive_full_same_questions": aggregate(ext_same, len(ext_same)) if ext_same else None,
+        "removed_reasons": [r for row in rows for r in row.get("removed", [])],
+    }
+    OUT.write_text(json.dumps(results, indent=2))
+    print(json.dumps({k: v for k, v in results["variants"]["gemini_full_live"].items()
+                      if k not in ("removed_reasons", "question_ids")}, indent=2))
 
 
 if __name__ == "__main__":

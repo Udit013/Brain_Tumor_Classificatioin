@@ -110,8 +110,18 @@ def verify(draft: DraftExplanation, passages: list[Passage], inference: Inferenc
     by_id = {p.chunk_id: p for p in passages}
     allowed = allowed_model_numbers(inference, reliability)
     kept, removed = [], []
+    # Research Q&A has no inference result, so "model_output"/"limitation" labels
+    # can't be checked against one: every statement must meet the literature rule
+    # (cited, supported, numbers present in the cited passages). Measured on the live
+    # Gemini evaluation: without this, correct cited facts labelled "limitation"
+    # were removed for "numbers not present in the inference result".
+    qa = inference is None and reliability is None
     for st in draft.statements:
-        v = verify_statement(st, by_id, allowed)
+        if qa and st.kind != "literature":
+            v = verify_statement(st.model_copy(update={"kind": "literature"}), by_id, allowed)
+            v = v.model_copy(update={"kind": st.kind})
+        else:
+            v = verify_statement(st, by_id, allowed)
         (removed if v.status == "unsupported" else kept).append(v)
     summary = draft.summary
     # The summary has no citations; it may only repeat numbers that are verifiable.

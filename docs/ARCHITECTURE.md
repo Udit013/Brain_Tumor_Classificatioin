@@ -123,7 +123,7 @@ only see the `Explainer` protocol, so changing providers touches neither.
 
 | Table | Contents | Retention |
 |---|---|---|
-| `analyses` | owner key, status, inference JSON (incl. Grad-CAM PNG), reliability, explanation, errors | until deleted by the operator |
+| `analyses` | owner key, status, inference JSON (incl. Grad-CAM PNG), reliability, explanation, errors | until the owner deletes it; overlays of uploads cleared after 30 days |
 | `reviews` | reviewer, decision, note | with the analysis |
 | `trace_events` | per-step events (no image data) | with the analysis |
 | `users` | email, scrypt hash, role | until deleted |

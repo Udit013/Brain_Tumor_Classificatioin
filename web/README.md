@@ -3,7 +3,7 @@
 Next.js 16 (App Router) + TypeScript + Tailwind v4 frontend for the NeuroClass
 research platform. Research and education only — not a medical device.
 
-Live: https://neuroclass-gilt.vercel.app (Vercel Hobby), calling the API on the
+Live: https://neuroclass-lab.vercel.app (Vercel Hobby), calling the API on the
 free Hugging Face Space.
 
 ```bash

@@ -1,7 +1,7 @@
 # Model Card — NeuroClass (EfficientNetB3 Brain Tumor MRI Classifier)
 
-**Live demo:** https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier
-· **Research platform:** https://neuroclass-gilt.vercel.app
+**Research platform (live):** https://neuroclass-lab.vercel.app
+· **API:** https://udit013-brain-tumor-mri-classifier.hf.space/api/docs
 · **Model:** https://huggingface.co/Udit013/brain-tumor-efficientnetb3
 · **Code:** https://github.com/Udit013/Brain_Tumor_Classificatioin
 
