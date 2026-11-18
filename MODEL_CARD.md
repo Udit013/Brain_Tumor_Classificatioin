@@ -1,6 +1,7 @@
 # Model Card — NeuroClass (EfficientNetB3 Brain Tumor MRI Classifier)
 
 **Live demo:** https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier
+· **Research platform:** https://neuroclass-gilt.vercel.app
 · **Model:** https://huggingface.co/Udit013/brain-tumor-efficientnetb3
 · **Code:** https://github.com/Udit013/Brain_Tumor_Classificatioin
 
@@ -132,9 +133,11 @@ on the test set, so the comparison if anything favours the previous model.
   brightness, contrast, JPEG compression and rotation, lowest under heavy blur
   (81%). Other shifts (different scanners, sequences, slice orientations) are
   untested beyond the external set.
-- **Uncertainty:** the Space's stability level (agreement of 6 slightly altered
-  views plus calibrated confidence) is a fixed heuristic that flags fragile
-  answers; a "High" level is not evidence that an answer is correct.
+- **Uncertainty:** the platform's reliability level (rules over calibrated
+  confidence, agreement of 6 slightly altered views, an input-shift distance and
+  measured per-class weaknesses) flags fragile answers: on test, "standard"
+  results were right 96.0% of the time and "caution" results 47.4%. "Standard"
+  is not evidence that an individual answer is correct.
 - **Bias:** demographic, scanner, and acquisition-protocol distributions of the
   compiled dataset are undocumented; performance across subgroups is unknown.
 
@@ -147,9 +150,10 @@ On the same evaluation it scores 90.25% accuracy (85.7% novel), glioma recall
 scaling fit on the test set, and 69.6% out of distribution. Its weights, ONNX
 export and live temperature (T = 0.561) are on the Hub at tag `parity-2024` and
 in `models/archive/parity-2024/` (with SHA-256 checksums); its metrics and
-figures are in `results/archive/parity-2024/`. The Space serves it again with
-the variable `NEUROCLASS_REVISION=parity-2024` (or, for a full rollback, restore
-the model repo's `main` and the Space code from their `parity-2024` tags). `python -m btc.train`
+figures are in `results/archive/parity-2024/`. The pre-platform Space code (tag
+`tf-gradio5-2026-10`) serves it with the variable `NEUROCLASS_REVISION=parity-2024`
+(or, for a full rollback, restore the model repo's `main` and the Space code
+from their `parity-2024` tags). `python -m btc.train`
 reproduces it into `models/EfficientNetB3_parity_weights.h5`.
 
 ## How to reproduce
@@ -159,3 +163,13 @@ bash scripts/download_data.sh      # needs Kaggle credentials
 bash scripts/reproduce.sh          # trains with btc.finetune if no weights exist
 python scripts/fill_readme_results.py
 ```
+
+## Serving (since November 2026)
+The platform serves the model without TensorFlow: one ONNX graph returns the
+probabilities and the last convolutional feature map, and Grad-CAM is computed
+in closed form through the dense head. The export is refused unless it matches
+TensorFlow (probabilities within 5e-6 on all 1,600 test images, 0 changed
+predictions; heatmaps within 9e-6). Per image including Grad-CAM on an Apple M3
+Pro CPU: 41 ms vs 89 ms for TensorFlow, 262 MB vs 803 MB peak memory
+(`results/metrics/serving_benchmark.json`). The serving bundle and its checksums
+are described by `models/serving/manifest.json`.

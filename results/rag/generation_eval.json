@@ -1,0 +1,54 @@
+{
+  "n_questions": 50,
+  "index_version": "20261117-bge-small-en-v1.5-bddad395",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "variants": {
+    "extractive_naive": {
+      "status": "complete",
+      "n": 50,
+      "complete": true,
+      "answered": 1.0,
+      "fact_recall[project]": 0.5357142857142857,
+      "cited_relevant": 0.94,
+      "cited_relevant[known_item]": 0.9722222222222222,
+      "cited_relevant[project]": 0.8571428571428571,
+      "citation_precision": 0.776,
+      "invalid_citation_rate": 0.0,
+      "unsupported_shown_rate": 0.0,
+      "latency_ms_p50": 12.780687495251186,
+      "latency_ms_p95": 19.396472960943345,
+      "llm_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_usd": 0.0
+    },
+    "extractive_full": {
+      "status": "complete",
+      "n": 50,
+      "complete": true,
+      "answered": 1.0,
+      "fact_recall[project]": 0.6607142857142857,
+      "cited_relevant": 0.98,
+      "cited_relevant[known_item]": 0.9722222222222222,
+      "cited_relevant[project]": 1.0,
+      "citation_precision": 0.528,
+      "invalid_citation_rate": 0.0,
+      "unsupported_shown_rate": 0.0,
+      "latency_ms_p50": 17.593020500498824,
+      "latency_ms_p95": 28.60547062737168,
+      "llm_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_usd": 0.0
+    },
+    "gemini_closed_book": {
+      "status": "not run: GEMINI_API_KEY not set (no free-tier key available)"
+    },
+    "gemini_naive_rag": {
+      "status": "not run: GEMINI_API_KEY not set (no free-tier key available)"
+    },
+    "gemini_full": {
+      "status": "not run: GEMINI_API_KEY not set (no free-tier key available)"
+    }
+  }
+}

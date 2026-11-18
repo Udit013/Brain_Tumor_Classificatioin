@@ -220,10 +220,14 @@ class Retriever:
         return f"{self.index.docs[c['doc_id']]['title']}. {c['text']}"
 
     def _passage(self, i: int, score: float) -> Passage:
+        from .corpus import clean_text
+
         c = self.index.chunks[i]
         d = self.index.docs[c["doc_id"]]
+        # clean_text is idempotent; indexes built before it removed empty citation
+        # brackets still display clean text.
         return Passage(chunk_id=c["id"], doc_id=c["doc_id"], title=d["title"], section=c["section"],
-                       text=c["text"], source_url=d["source_url"], license=d["license"],
+                       text=clean_text(c["text"]), source_url=d["source_url"], license=d["license"],
                        year=d.get("year"), journal=d.get("journal"), source_type=d["source_type"],
                        score=round(float(score), 6))
 

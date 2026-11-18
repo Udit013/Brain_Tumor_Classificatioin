@@ -129,9 +129,14 @@ _CONTROL = re.compile(r"[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f​-‏ -
 _WS = re.compile(r"\s+")
 
 
+_EMPTY_REFS = re.compile(r"\s*[\[(]\s*(?:[,;–\-]\s*)*[\])]")
+
+
 def clean_text(text: str) -> str:
+    """NFKC, no control characters, no empty brackets left by removed citation markers."""
     text = unicodedata.normalize("NFKC", text)
     text = _CONTROL.sub(" ", text)
+    text = _EMPTY_REFS.sub("", text)
     return _WS.sub(" ", text).strip()
 
 

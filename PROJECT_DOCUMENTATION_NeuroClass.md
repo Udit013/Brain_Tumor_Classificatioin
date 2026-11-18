@@ -2,7 +2,7 @@
 
 **A single source of truth for understanding this repository end to end** — for interview prep, for recruiters, for a new contributor, and for anyone with zero programming background who wants to understand what this system actually does.
 
-> **Important framing note before you read further.** This document follows a comprehensive documentation template that assumes a typical web application (frontend framework, database, user authentication, React components, hooks, etc.). **This repository is not that kind of project.** It is a Python machine-learning system: a computer-vision classifier, a battery of evaluation/audit tooling, and two thin serving layers (a Gradio web app and a FastAPI service). There is **no database, no user accounts, no login, no frontend framework, no React**. Every section below is mapped onto what **actually exists** in this codebase — where a requested topic (e.g. "database schema," "JWT auth," "Redux state") has no real equivalent here, that is stated explicitly rather than invented. Nothing in this document describes code that isn't in the repository.
+> **How this document is organised.** Part I (sections 1–21) documents the research system — the IEEE 2024 work and the `src/btc` extension: a Python computer-vision classifier, its evaluation and audit tooling, and its original serving layers. Statements in Part I such as "there is no database" or "no user accounts" describe that research system and remain true of it. **Part II (sections 22–28), added November 2026, documents the NeuroClass research platform** built on top of it (`src/neuroclass`, `web/`, `deploy/`), which does have a database, accounts, an agent workflow, retrieval and a Next.js frontend — and the zero-cost deployment that runs it. The platform is not part of the IEEE paper. Nothing in this document describes code that isn't in the repository.
 
 ---
 
@@ -29,6 +29,16 @@
 19. [Interview Question Bank](#19-interview-question-bank)
 20. [Common Follow-Up / "What If" Questions](#20-common-follow-up-what-if-questions)
 21. [Complete End-to-End Walkthrough](#21-complete-end-to-end-walkthrough)
+
+**Part II — The NeuroClass research platform (2026)**
+
+22. [Platform Overview and What Changed](#22-platform-overview-and-what-changed)
+23. [Platform Components](#23-platform-components)
+24. [Zero-Cost Architecture: Every Service, Limit and Safeguard](#24-zero-cost-architecture-every-service-limit-and-safeguard)
+25. [Deploying and Maintaining for $0, Step by Step](#25-deploying-and-maintaining-for-0-step-by-step)
+26. [Free-Tier Behaviour: Cold Starts, Quotas and Limits](#26-free-tier-behaviour-cold-starts-quotas-and-limits)
+27. [Platform Evaluation Results](#27-platform-evaluation-results)
+28. [Platform Limitations and Open Work](#28-platform-limitations-and-open-work)
 
 ---
 
@@ -590,6 +600,8 @@ Exact McNemar on paired predictions: full test p = 1.4e-6 (81 vs 30 discordant i
 
 ## 6. The Serving Layer: Gradio App & FastAPI Service
 
+> *Part II update:* the live Space now runs the TF-free platform (section 23); the TensorFlow serving described here is preserved at Space tag `tf-gradio5-2026-10` and in `src/btc/serve`.
+
 There are **two separate, independently-runnable ways** to actually use the trained model. They share the same underlying preprocessing and model logic but are built for different purposes.
 
 ### 6.1 `space/app.py` — The Live Public Demo (Gradio)
@@ -717,6 +729,8 @@ This CI configuration has been run and **passed with a `success` conclusion**, c
 
 ## 10. Data Storage: How This Project Handles "The Database Question"
 
+> *Part II update:* this describes the research system. The platform adds SQLAlchemy/Alembic persistence on SQLite or PostgreSQL + pgvector — see section 23.
+
 **There is no database in this project** — no SQL, no NoSQL, no ORM, no schema migrations. This is a deliberate, correct architectural choice, not a gap: nothing in this system needs transactional writes, relational queries, or concurrent multi-user record management. Here is what actually plays each of the roles a database would normally play:
 
 | Traditional DB concept | What this project uses instead |
@@ -733,6 +747,8 @@ This CI configuration has been run and **passed with a `success` conclusion**, c
 
 ## 11. Authentication & Secrets: How This Project Handles "The Auth Question"
 
+> *Part II update:* this describes the research system. The platform adds accounts (scrypt + JWT), anonymous client ids, owner scoping and a reviewer role — see section 23.
+
 **There is no end-user authentication anywhere in this system.** Nobody logs in; there are no user accounts, no sessions, no JWTs, no OAuth flows, and no role-based access control for the live demo or the FastAPI service — both are open, unauthenticated, publicly-callable endpoints, appropriate for a public research demo with no user-specific data to protect.
 
 The credential/auth-shaped things that **do** exist in this project are all developer/deployment-time, not end-user-facing:
@@ -746,6 +762,8 @@ The credential/auth-shaped things that **do** exist in this project are all deve
 ---
 
 ## 12. State Management: How This Project Handles "The State Question"
+
+> *Part II update:* this describes the research system. The platform's Next.js app and LangGraph checkpoints are covered in section 23.
 
 There is no React/Redux/Zustand-style client-side state management, because there is no custom frontend JavaScript. The state that *does* exist in this system falls into three categories:
 
@@ -1180,3 +1198,162 @@ Start to finish, narrating every layer, for someone who has never seen this proj
 11. **Making it honest, end to end.** `scripts/reproduce.sh` chains all ten pipeline stages into one command, and `scripts/fill_readme_results.py` is the *only* mechanism that ever writes a number into this project's public README — reading real JSON output files, refusing to run at all if any required file is missing, so the documentation can never claim a result that wasn't actually measured on that machine.
 
 12. **The result.** A visitor today can go to a real, live URL, upload their own MRI image, and within roughly a second get back a prediction, a confidence score that's been mathematically corrected to be trustworthy, an uncertainty estimate that leans higher when the model is wrong, a heatmap showing exactly what the model focused on, and — unusually for a portfolio ML project — a clear, explicit accounting of exactly how much to trust the whole system, backed by original, reproducible investigative work rather than a single, unexamined headline accuracy number.
+
+---
+
+# Part II — The NeuroClass research platform (2026)
+
+> Everything in Part II was added in November 2026 and is **not part of the IEEE
+> 2024 paper**. Research and education only — not a medical device, not
+> clinically validated, never a diagnosis.
+
+## 22. Platform Overview and What Changed
+
+The research system answers "how accurate is the model, honestly?". The
+platform answers "what can a researcher trust about *one* prediction, and why?".
+For each MRI slice it returns the model-predicted class with calibrated
+confidence, a Grad-CAM heatmap, a reliability level from validated rules, an
+explanation grounded in openly licensed literature whose citations are checked,
+optional human review, and a downloadable report — and it runs for **$0**.
+
+| Surface | URL |
+|---|---|
+| Web app (Next.js, Vercel Hobby) | https://neuroclass-gilt.vercel.app |
+| API (FastAPI on the HF Space) | https://udit013-brain-tumor-mri-classifier.hf.space/api/docs |
+| Demo (Gradio, same Space) | https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier |
+
+Decision records: `docs/adr/0001-platform-architecture.md` and
+`docs/adr/0002-zero-cost-deployment.md`.
+
+## 23. Platform Components
+
+| Component | Code | What it does |
+|---|---|---|
+| Serving export | `src/btc/export_serving.py`, `src/btc/serving_math.py` | one ONNX graph → probabilities + 8×8×1536 conv map; Grad-CAM in closed form through max-pool → BN → Dense 512 → 256 → 4; export refused unless within 1e-4 (probabilities) / 1e-3 (heatmaps) of TensorFlow — measured 5e-6 / 9e-6 |
+| Vision service | `src/neuroclass/vision/` | upload validation (10 MB, 25 MP, JPEG/PNG by content), quality checks, 6-view TTA in one ONNX call, temperature scaling, Mahalanobis input-shift distance, overlay PNG, timeout |
+| Reliability | `src/neuroclass/reliability.py` | deterministic rules (version `2026.11-r1`) → standard / caution / unreliable; review required when not standard |
+| Retrieval | `src/neuroclass/rag/` | PMC OA corpus (CC licences, ND excluded), section-aware chunking, local bge-small embeddings, BM25 + dense + RRF, project-question routing, per-document cap, optional cross-encoder, in-process or pgvector store |
+| Agent | `src/neuroclass/agent/graph.py` | LangGraph: validate → infer (retry ×2) → assess → retrieve → explain → verify → human_review (`interrupt`) → revise (≤ 2) → report; SQLite/Postgres checkpointer; trace events |
+| Verifier | `src/neuroclass/agent/verify.py` | removes uncited, unretrieved, weakly supported statements and untraceable numbers; withholds a summary with untraceable numbers |
+| LLM layer | `agent/llm.py`, `llm_gemini.py`, `llm_anthropic.py` | provider contract, QuotaGuard; Gemini free tier (default when keyed); Claude adapter refused unless paid use is explicitly allowed; extractive composer otherwise |
+| Persistence | `src/neuroclass/db/` | SQLAlchemy 2 + Alembic: users, analyses, reviews, trace events, LLM usage ledger, index versions/documents/chunks (pgvector) |
+| API | `src/neuroclass/api/` | FastAPI: analyses (+ SSE, reports, reviews), research search/ask, benchmarks, models, samples, auth; request ids, JSON logs, security headers, rate limits, idempotency |
+| Auth | `src/neuroclass/auth/security.py`, `api/deps.py` | scrypt hashes, HS256 JWT, anonymous `X-Client-Id` (hashed), owner scoping (404 for others), reviewer role by configured email |
+| Web | `web/` | Next.js 16 App Router + TypeScript + Tailwind v4: landing, workbench, analysis detail, research assistant, history, benchmarks (accessible charts with table views), system status, review queue, login |
+| MLOps | `src/neuroclass/registry.py`, `models/registry.json` | registry of deployed versions, promotion gate (tolerances + paired McNemar), Hub tags for rollback |
+| MCP | `src/neuroclass/mcp_server.py` | local, read-only tools over benchmarks, model info, reproducibility, literature |
+| Space entrypoint | `deploy/hf_space/app.py`, `build.py` | one uvicorn process: FastAPI at `/api`, Gradio demo at `/` (client-side rendering) |
+
+## 24. Zero-Cost Architecture: Every Service, Limit and Safeguard
+
+Checked on the providers' own pages on 2026-11-17 (full table and links:
+`docs/FREE_TIER.md`).
+
+| Need | Choice | Free plan facts | Payment method | Overage possible? | At the limit | Sleep / persistence | Fallback |
+|---|---|---|---|---|---|---|---|
+| Hosting (API + demo) | Hugging Face Space, existing Gradio Space | CPU Basic free: 2 vCPU, 16 GB RAM, 50 GB disk | no | no | no metered limit; requests queue | sleeps after ~48 h idle; disk not persistent | — |
+| Frontend | Vercel Hobby | 100 GB transfer, 1M invocations, 4 CPU-h/month; non-commercial | no | no ("no billing cycles") | feature paused (~30 days) | — | Space demo + API docs |
+| Database | SQLite on the Space; Neon Free optional | Neon: 100 CU-h/project/month, 1 GB/project, scale-to-zero after 5 min | no (do not add one) | no | Neon suspends compute until next month; writes fail above 1 GB; data kept | Neon wakes in under a second; SQLite resets on restart | SQLite |
+| LLM | Gemini API free tier | free models incl. `gemini-3.5-flash-lite` (default), `gemini-3.8-flash`; RPM/RPD per project in AI Studio; daily reset midnight Pacific | no | no on an unbilled project (429 instead); tier upgrades only after billing is linked | NeuroClass stops calling and goes extractive | free-tier content may be used to improve Google products; images never sent | extractive answers |
+| Embeddings | fastembed bge-small (local ONNX) | open model | — | — | — | — | — |
+| Auth | built in | — | — | — | — | — | — |
+| Background jobs | in-process thread pool + DB state + SSE | — | — | — | queue grows | checkpoints survive restarts (with Neon) | — |
+| Observability | JSON logs + DB trace events + `/api/ready` | — | — | — | — | Space logs in the HF UI | — |
+| CI | GitHub Actions (public repo) | standard runners | — | — | — | — | run locally |
+
+**Safeguards in code.** `auto` provider never selects a paid LLM;
+`NEUROCLASS_ALLOW_PAID_LLM` must be set to enable one. `QuotaGuard` takes a
+per-minute (default 4) and per-day (default 100) slot *before* a request; SDK
+retries are off; a 429 pauses the LLM (until midnight Pacific for daily
+quotas); at most two LLM calls per request; 45 s LLM and 20 s inference
+timeouts; per-client rate limits (10 analyses/min, 60 research calls/min); 10 MB
+/ 25 MP upload limits; 24 h upload retention; tests strip every LLM key from the
+environment. Every fallback is visible: `fallback_reason` on explanations,
+`/api/ready` shows provider, budget use and pause state.
+
+## 25. Deploying and Maintaining for $0, Step by Step
+
+Never add a payment method, upgrade a plan or enable an add-on; if a screen asks
+for one, the step is not needed. Full commands: `docs/DEPLOYMENT.md`.
+
+1. **Build the Space folder**: `.venv-app/bin/python deploy/hf_space/build.py`
+   (platform code, verified ONNX bundle, metrics, bge-small index, examples, and
+   a requirements file that satisfies `gradio[oauth,mcp]`'s pins).
+2. **Upload to the existing Space**: `hf upload Udit013/brain-tumor-mri-classifier build/hf_space . --repo-type space`.
+   Keep CPU Basic; no persistent storage.
+3. **Space settings**: secret `NEUROCLASS_JWT_SECRET` (random); variables
+   `NEUROCLASS_EPHEMERAL_STORAGE=true`, `NEUROCLASS_LLM_PROVIDER=auto`,
+   `NEUROCLASS_CORS_ORIGINS` and `NEUROCLASS_WEB_URL` = the Vercel URL.
+4. **Check** `/api/ready`: vision and retrieval ok, `paid_allowed: false`.
+5. **Frontend**: in `web/`, `vercel link --project neuroclass`, add
+   `NEXT_PUBLIC_API_URL=<space>/api` for production, `vercel deploy --prod`.
+   `web/vercel.json` pins the Next.js preset.
+6. **Optional Gemini**: create a key in an AI Studio project *without billing*;
+   add `GEMINI_API_KEY` as a Space secret; set `NEUROCLASS_LLM_RPM` /
+   `NEUROCLASS_LLM_DAILY_CAP` below the limits AI Studio shows.
+7. **Optional Neon**: Free project, autoscaling capped at 0.25 CU; put the
+   connection string in the `DATABASE_URL` secret; set
+   `NEUROCLASS_EPHEMERAL_STORAGE=false`.
+8. **Rollback**: Space tags `tf-gradio5-2026-10` (TensorFlow app) and
+   `parity-2024` (previous model); `hf download --revision <tag>` then upload.
+
+Maintenance: CI on every push (research, platform on Postgres, the Space's exact
+dependency set, web); monthly `pip-audit` / `npm audit`; quarterly re-check of
+free-tier terms; change `NEUROCLASS_LLM_MODEL` when Google retires a model;
+refresh the corpus and rerun `scripts/eval_rag.py` before redeploying; new
+models must pass `python -m neuroclass.registry gate`.
+
+## 26. Free-Tier Behaviour: Cold Starts, Quotas and Limits
+
+- **Cold start.** After ~48 h without visitors the Space sleeps. The next
+  request wakes it; observed restart-to-running times during deploys were
+  40–60 s, plus model and index loading, so plan for a minute or two. During
+  that time the web app reports that the API is unreachable.
+- **First request after start.** ONNX Runtime warms up: one observed analysis
+  spent 500 ms in the model, later ones ~180 ms (2 vCPU).
+- **Throughput.** Two analysis workers and two concurrent demo predictions;
+  beyond that, requests queue; a client sending more than 10 analyses a minute
+  gets 429.
+- **History.** Without Neon, SQLite lives on the Space's temporary disk: history,
+  accounts and review queues reset on restart. The web app says so on History
+  and System.
+- **LLM.** With a key: at most 4 calls/min and 100/day by default (2 per
+  request), set below the project's free limits. When the local budget or
+  Google's quota is used up, answers become extractive with the reason shown,
+  until the minute window passes or the daily quota resets at midnight Pacific.
+  Without a key: always extractive.
+- **Neon.** If the monthly compute allowance runs out, the database suspends
+  until next month; analyses fail with a clear error while benchmarks and
+  research search keep working; remove `DATABASE_URL` to fall back to SQLite.
+- **Vercel.** Usage over the Hobby allowance pauses the affected feature; the
+  Space's demo and API docs remain available.
+- **Modest traffic, not production.** This is a free public demo. It never
+  charges; under load it gets slower or less fluent.
+
+## 27. Platform Evaluation Results
+
+Measured 2026-11-17 (details: `docs/EVALUATION.md`).
+
+| What | Result |
+|---|---|
+| Reliability levels on test (n=1,600) | standard 94.8% of images, 96.0% accurate; caution 4.9%, 47.4%; unreliable 0.4% (6 images) |
+| Input-shift heuristic | AUROC 0.95 vs synthetic non-MRI; 0.52 vs external MRI (not an OOD detector) |
+| Retrieval (50 labelled questions) | routed hybrid bge-small: R@10 1.00, MRR@10 0.953, nDCG@10 0.966, 27 ms p50; BM25 0.96 R@10; bge-base routed MRR 0.967 at 75 ms; reranking +1 s with no recall gain |
+| Generation (extractive) | fact recall on project questions 0.536 (naive) → 0.661 (full); cites a relevant document 94% → 98%; citation precision 0.776 → 0.528 |
+| Generation (LLM variants) | not run — no free-tier key available; harness ready and resumable |
+| Serving per image incl. Grad-CAM (M3 Pro CPU) | TensorFlow 89 ms / 803 MB; ONNX 41 ms / 262 MB; ONNX with 6 TTA views 175 ms |
+| Images | platform API 1.49 GB (TensorFlow API 3.29 GB); web 406 MB |
+| Tests | platform 71 + 1 skipped (SQLite), 72 (Postgres), 62 + 5 skipped (Space dependency set); research 65; web 8; Playwright 12/12 against dev, Docker Compose and live |
+
+## 28. Platform Limitations and Open Work
+
+- The LLM-vs-RAG comparison needs a free Gemini key (harness ready).
+- Verification is lexical; extractive answers quote rather than synthesise.
+- Corpus: 241 openly licensed articles; the evaluation's relevance labels are
+  incomplete, so recall and precision are lower bounds. The indexed project
+  documents are the 2026-11-17 snapshot taken before this documentation update.
+- Free deployment: cold starts, temporary history without Neon, modest traffic.
+- No email verification; in-process rate limits; tokens in `localStorage`; no
+  CSP yet (see `docs/SECURITY.md`).
+- The model's own limitations are unchanged: single seed, glioma recall 79.5%,
+  72.7% on an external dataset, no clinical validation.

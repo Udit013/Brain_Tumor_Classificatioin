@@ -1,0 +1,5226 @@
+{
+  "n_questions": 50,
+  "configs": {
+    "bm25": {
+      "embedding_model": null,
+      "mode": "bm25",
+      "index_version": "20261117-bge-small-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 6.34920850279741,
+      "latency_ms_p95": 11.622835905291138,
+      "recall@5": 0.96,
+      "recall@5[known_item]": 1.0,
+      "recall@5[project]": 0.857142857142857,
+      "recall@10": 0.96,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 0.857142857142857,
+      "mrr@10": 0.92,
+      "mrr@10[known_item]": 0.9444444444444444,
+      "mrr@10[project]": 0.8571428571428571,
+      "ndcg@10": 0.9176424830806624,
+      "ndcg@10[known_item]": 0.9589921948412731,
+      "ndcg@10[project]": 0.8113146528390923,
+      "failures_at_10": [
+        "P10"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9674679834891693,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9197207891481876,
+          "first_rank": 1
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.6508205185601091,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.5307212739772434,
+          "first_rank": 2
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9469024295259745,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9060254355346823,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7039180890341347,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.7328286204777911,
+          "first_rank": 2
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-small-en-v1.5:dense": {
+      "embedding_model": "BAAI/bge-small-en-v1.5",
+      "mode": "dense",
+      "index_version": "20261117-bge-small-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 19.8245420033345,
+      "latency_ms_p95": 32.034404642763526,
+      "recall@5": 0.9066666666666667,
+      "recall@5[known_item]": 0.9722222222222222,
+      "recall@5[project]": 0.738095238095238,
+      "recall@10": 0.9200000000000002,
+      "recall@10[known_item]": 0.9722222222222222,
+      "recall@10[project]": 0.7857142857142857,
+      "mrr@10": 0.9099999999999998,
+      "mrr@10[known_item]": 0.9583333333333334,
+      "mrr@10[project]": 0.7857142857142856,
+      "ndcg@10": 0.8997674913444995,
+      "ndcg@10[known_item]": 0.9619702709325405,
+      "ndcg@10[project]": 0.7398174866895371,
+      "failures_at_10": [
+        "K05",
+        "P10"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9325210919548239,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5437713091520254,
+          "first_rank": 3
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.49818925746641285,
+          "first_rank": 2
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7653606369886217,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7653606369886217,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7653606369886217,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.3333333333333333,
+          "mrr@10": 0.16666666666666666,
+          "ndcg@10": 0.16716045496620227,
+          "first_rank": 6
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9197207891481876,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-small-en-v1.5:hybrid": {
+      "embedding_model": "BAAI/bge-small-en-v1.5",
+      "mode": "hybrid",
+      "index_version": "20261117-bge-small-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 27.189000000362284,
+      "latency_ms_p95": 41.80189650505781,
+      "recall@5": 0.9266666666666667,
+      "recall@5[known_item]": 0.9722222222222222,
+      "recall@5[project]": 0.8095238095238094,
+      "recall@10": 0.9733333333333334,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 0.9047619047619048,
+      "mrr@10": 0.9333333333333335,
+      "mrr@10[known_item]": 0.9629629629629631,
+      "mrr@10[project]": 0.8571428571428571,
+      "ndcg@10": 0.9311704597130533,
+      "ndcg@10[known_item]": 0.9718649150188744,
+      "ndcg@10[project]": 0.8265275746409417,
+      "failures_at_10": [
+        "P10"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.16666666666666666,
+          "ndcg@10": 0.3562071871080222,
+          "first_rank": 6
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9217868789962071,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7864724919925569,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.3333333333333333,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.6105456988825855,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9674679834891693,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9469024295259745,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6447841584694202,
+          "first_rank": 2
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-small-en-v1.5:routed": {
+      "embedding_model": "BAAI/bge-small-en-v1.5",
+      "mode": "routed",
+      "index_version": "20261117-bge-small-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 27.116833502077498,
+      "latency_ms_p95": 41.37129779264796,
+      "recall@5": 0.98,
+      "recall@5[known_item]": 0.9722222222222222,
+      "recall@5[project]": 1.0,
+      "recall@10": 1.0,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 1.0,
+      "mrr@10": 0.9533333333333335,
+      "mrr@10[known_item]": 0.9629629629629631,
+      "mrr@10[project]": 0.9285714285714286,
+      "ndcg@10": 0.9662298619573642,
+      "ndcg@10[known_item]": 0.9718649150188744,
+      "ndcg@10[project]": 0.9517397255134805,
+      "failures_at_10": [],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.16666666666666666,
+          "ndcg@10": 0.3562071871080222,
+          "first_rank": 6
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-small-en-v1.5:rerank": {
+      "embedding_model": "BAAI/bge-small-en-v1.5",
+      "mode": "rerank",
+      "index_version": "20261117-bge-small-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 1029.2930205177981,
+      "latency_ms_p95": 1430.1796331521473,
+      "recall@5": 0.98,
+      "recall@5[known_item]": 0.9722222222222222,
+      "recall@5[project]": 1.0,
+      "recall@10": 0.98,
+      "recall@10[known_item]": 0.9722222222222222,
+      "recall@10[project]": 1.0,
+      "mrr@10": 0.97,
+      "mrr@10[known_item]": 0.9722222222222222,
+      "mrr@10[project]": 0.9642857142857143,
+      "ndcg@10": 0.9710130108543928,
+      "ndcg@10[known_item]": 0.9722222222222222,
+      "ndcg@10[project]": 0.9679036101942603,
+      "failures_at_10": [
+        "K06"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9197207891481876,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "snowflake-arctic-embed-s:dense": {
+      "embedding_model": "snowflake/snowflake-arctic-embed-s",
+      "mode": "dense",
+      "index_version": "20261117-snowflake-arctic-embed-s-bddad395",
+      "n": 50,
+      "latency_ms_p50": 19.062875013332814,
+      "latency_ms_p95": 30.561833457613808,
+      "recall@5": 0.8133333333333332,
+      "recall@5[known_item]": 0.8055555555555556,
+      "recall@5[project]": 0.8333333333333333,
+      "recall@10": 0.92,
+      "recall@10[known_item]": 0.9166666666666666,
+      "recall@10[project]": 0.9285714285714286,
+      "mrr@10": 0.7477142857142856,
+      "mrr@10[known_item]": 0.6982142857142857,
+      "mrr@10[project]": 0.875,
+      "ndcg@10": 0.7698982208946216,
+      "ndcg@10[known_item]": 0.7501242984808023,
+      "ndcg@10[project]": 0.820745449958728,
+      "failures_at_10": [
+        "K06",
+        "K07",
+        "K12"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.16666666666666666,
+          "ndcg@10": 0.3562071871080222,
+          "first_rank": 6
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.14285714285714285,
+          "ndcg@10": 0.3333333333333333,
+          "first_rank": 7
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.25,
+          "ndcg@10": 0.43067655807339306,
+          "first_rank": 4
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.1,
+          "ndcg@10": 0.2890648263178879,
+          "first_rank": 10
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.14285714285714285,
+          "ndcg@10": 0.3333333333333333,
+          "first_rank": 7
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.8385465274895063,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.8772153153380493,
+          "first_rank": 1
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9674679834891693,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7653606369886217,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.3333333333333333,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.6257049680303419,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9469024295259745,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 0.3333333333333333,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.431733884398313,
+          "first_rank": 2
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.25,
+          "ndcg@10": 0.43067655807339306,
+          "first_rank": 4
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9134015924715543,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        }
+      ]
+    },
+    "snowflake-arctic-embed-s:hybrid": {
+      "embedding_model": "snowflake/snowflake-arctic-embed-s",
+      "mode": "hybrid",
+      "index_version": "20261117-snowflake-arctic-embed-s-bddad395",
+      "n": 50,
+      "latency_ms_p50": 26.56510400993284,
+      "latency_ms_p95": 40.89456861256621,
+      "recall@5": 0.96,
+      "recall@5[known_item]": 1.0,
+      "recall@5[project]": 0.857142857142857,
+      "recall@10": 0.9933333333333334,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 0.9761904761904762,
+      "mrr@10": 0.8625238095238095,
+      "mrr@10[known_item]": 0.8467592592592593,
+      "mrr@10[project]": 0.9030612244897959,
+      "ndcg@10": 0.8826628440690348,
+      "ndcg@10[known_item]": 0.8849730816777712,
+      "ndcg@10[project]": 0.8767222330751406,
+      "failures_at_10": [],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.2,
+          "ndcg@10": 0.38685280723454163,
+          "first_rank": 5
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.25,
+          "ndcg@10": 0.43067655807339306,
+          "first_rank": 4
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.2,
+          "ndcg@10": 0.38685280723454163,
+          "first_rank": 5
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9060254355346823,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.6713860725233041,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.8854598815714874,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.8519590445170673,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.14285714285714285,
+          "ndcg@10": 0.3333333333333333,
+          "first_rank": 7
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9325210919548239,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "snowflake-arctic-embed-s:routed": {
+      "embedding_model": "snowflake/snowflake-arctic-embed-s",
+      "mode": "routed",
+      "index_version": "20261117-snowflake-arctic-embed-s-bddad395",
+      "n": 50,
+      "latency_ms_p50": 26.78127099352423,
+      "latency_ms_p95": 40.926202597620424,
+      "recall@5": 1.0,
+      "recall@5[known_item]": 1.0,
+      "recall@5[project]": 1.0,
+      "recall@10": 1.0,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 1.0,
+      "mrr@10": 0.8696666666666667,
+      "mrr@10[known_item]": 0.8467592592592593,
+      "mrr@10[project]": 0.9285714285714286,
+      "ndcg@10": 0.9020621577347336,
+      "ndcg@10[known_item]": 0.8849730816777712,
+      "ndcg@10[project]": 0.9460054961669224,
+      "failures_at_10": [],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.2,
+          "ndcg@10": 0.38685280723454163,
+          "first_rank": 5
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.25,
+          "ndcg@10": 0.43067655807339306,
+          "first_rank": 4
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.2,
+          "ndcg@10": 0.38685280723454163,
+          "first_rank": 5
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9197207891481876,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-base-en-v1.5:dense": {
+      "embedding_model": "BAAI/bge-base-en-v1.5",
+      "mode": "dense",
+      "index_version": "20261117-bge-base-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 65.11868750385474,
+      "latency_ms_p95": 107.55726250063155,
+      "recall@5": 0.9133333333333333,
+      "recall@5[known_item]": 1.0,
+      "recall@5[project]": 0.6904761904761905,
+      "recall@10": 0.9266666666666665,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 0.738095238095238,
+      "mrr@10": 0.904,
+      "mrr@10[known_item]": 0.9361111111111112,
+      "mrr@10[project]": 0.8214285714285714,
+      "ndcg@10": 0.8823617915608089,
+      "ndcg@10[known_item]": 0.9522122796652476,
+      "ndcg@10[project]": 0.7027462507208231,
+      "failures_at_10": [
+        "P04",
+        "P10"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.2,
+          "ndcg@10": 0.38685280723454163,
+          "first_rank": 5
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7864724919925569,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6240505200038379,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.8854598815714874,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.3333333333333333,
+          "recall@10": 0.3333333333333333,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.46927872602275644,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7653606369886217,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.6713860725233041,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 0.3333333333333333,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.6364391809889587,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-base-en-v1.5:hybrid": {
+      "embedding_model": "BAAI/bge-base-en-v1.5",
+      "mode": "hybrid",
+      "index_version": "20261117-bge-base-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 73.3987079875078,
+      "latency_ms_p95": 116.76651236339234,
+      "recall@5": 0.9333333333333332,
+      "recall@5[known_item]": 1.0,
+      "recall@5[project]": 0.7619047619047619,
+      "recall@10": 0.9533333333333335,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 0.8333333333333333,
+      "mrr@10": 0.9466666666666665,
+      "mrr@10[known_item]": 0.9814814814814814,
+      "mrr@10[project]": 0.8571428571428571,
+      "ndcg@10": 0.9325354318383426,
+      "ndcg@10[known_item]": 0.9861111111111112,
+      "ndcg@10[project]": 0.7947693994226522,
+      "failures_at_10": [
+        "P10"
+      ],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9217868789962071,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 0.3333333333333333,
+          "recall@10": 0.3333333333333333,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.46927872602275644,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7653606369886217,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9066276098484507,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 0.6666666666666666,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.7039180890341347,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr@10": 0.0,
+          "ndcg@10": 0.0,
+          "first_rank": null
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 0.6666666666666666,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6663732474096913,
+          "first_rank": 2
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    },
+    "bge-base-en-v1.5:routed": {
+      "embedding_model": "BAAI/bge-base-en-v1.5",
+      "mode": "routed",
+      "index_version": "20261117-bge-base-en-v1.5-bddad395",
+      "n": 50,
+      "latency_ms_p50": 74.6781045163516,
+      "latency_ms_p95": 117.0575123498565,
+      "recall@5": 1.0,
+      "recall@5[known_item]": 1.0,
+      "recall@5[project]": 1.0,
+      "recall@10": 1.0,
+      "recall@10[known_item]": 1.0,
+      "recall@10[project]": 1.0,
+      "mrr@10": 0.9666666666666666,
+      "mrr@10[known_item]": 0.9814814814814814,
+      "mrr@10[project]": 0.9285714285714286,
+      "ndcg@10": 0.9764871231437746,
+      "ndcg@10[known_item]": 0.9861111111111112,
+      "ndcg@10[project]": 0.9517397255134805,
+      "failures_at_10": [],
+      "per_question": [
+        {
+          "id": "K01",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K02",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K03",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K04",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K05",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.3333333333333333,
+          "ndcg@10": 0.5,
+          "first_rank": 3
+        },
+        {
+          "id": "K06",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K07",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K08",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K09",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K10",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K11",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K12",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K13",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K14",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K15",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K16",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K17",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K18",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K19",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K20",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K21",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K22",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K23",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K24",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K25",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K26",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K27",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K28",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K29",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K30",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K31",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K32",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K33",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K34",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K35",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "K36",
+          "kind": "known_item",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P01",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P02",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6934264036172708,
+          "first_rank": 2
+        },
+        {
+          "id": "P03",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P04",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P05",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P06",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P07",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P08",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P09",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P10",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 0.5,
+          "ndcg@10": 0.6309297535714575,
+          "first_rank": 2
+        },
+        {
+          "id": "P11",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P12",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P13",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        },
+        {
+          "id": "P14",
+          "kind": "project",
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "first_rank": 1
+        }
+      ]
+    }
+  }
+}

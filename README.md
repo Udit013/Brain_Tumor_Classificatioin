@@ -1,30 +1,67 @@
-# NeuroClass — Brain Tumor MRI Classification
+# NeuroClass — Agentic MRI Research & Explainability Platform
 
-**Published baseline (IEEE 2024) + an audited, production-hardened extension.**
+> **⚠️ Research and education only.** NeuroClass is not a medical device, is not
+> clinically validated, and must never be used for diagnosis, triage or any
+> decision about a person's care. Its outputs are an experimental model's
+> predictions.
 
-T1-weighted MRI brain-tumor classification across four classes
-(`glioma`, `meningioma`, `notumor`, `pituitary`). This repository has two
+NeuroClass grew out of an **IEEE ICC-ROBINS 2024 paper** on brain-tumour MRI
+classification (glioma, meningioma, pituitary tumour, no tumour). It has three
 clearly separated layers:
 
-1. **Published Work (IEEE 2024)** — the original four-architecture benchmark,
-   preserved byte-for-byte under [`/legacy`](legacy/) and never modified.
-2. **Production Extension** — an independent audit of that benchmark plus the
-   evaluation, calibration, explainability, serving, and testing work needed to
-   deploy it honestly. All new code lives in [`src/btc`](src/btc/).
+1. **Published work (IEEE 2024)** — the original four-architecture benchmark,
+   preserved byte-for-byte in [`legacy/`](legacy/). Its 99.844% is the paper's
+   reported claim (scored on 640 of 1,311 test images) and is always shown as such.
+2. **Model extension** ([`src/btc`](src/btc/)) — an audit of that benchmark
+   (partial test set, 44.6% train/test near-duplicates, a Metal backend defect)
+   and a retrained model measured honestly: **93.4%** test accuracy, **89.4%** on
+   images with no near-duplicate in training, **72.7%** on an external dataset.
+3. **Research platform** ([`src/neuroclass`](src/neuroclass/), [`web/`](web/)) —
+   added in 2026 and **not part of the paper**: TF-free inference with analytic
+   Grad-CAM, validated reliability rules, a LangGraph workflow with human review,
+   retrieval over openly licensed literature with verified citations, a FastAPI
+   backend, a Next.js app, and a deployment that costs **$0**.
 
-**🚀 Live demo:** [huggingface.co/spaces/Udit013/brain-tumor-mri-classifier](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
+**🌐 Web app:** [neuroclass-gilt.vercel.app](https://neuroclass-gilt.vercel.app)
+· **⚙️ API:** [udit013-brain-tumor-mri-classifier.hf.space/api/docs](https://udit013-brain-tumor-mri-classifier.hf.space/api/docs)
+· **🧪 Demo:** [HF Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
 · **🤗 Model:** [Udit013/brain-tumor-efficientnetb3](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
 · **📄 Paper:** [DOI 10.1109/ICC-ROBINS60238.2024.10533941](https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941)
 · ![CI](https://github.com/Udit013/Brain_Tumor_Classificatioin/actions/workflows/ci.yml/badge.svg)
 
-Upload an MRI to get the predicted class, a temperature-calibrated confidence,
-a plain-language stability level (does the answer survive small changes to the
-image?), a Grad-CAM overlay, and inference latency, alongside an explicit
-not-a-medical-device disclaimer. The Space runs on free
-CPU hardware and sleeps when idle; the first request after a sleep takes 1–2
-minutes while it wakes.
+The backend runs on a free Hugging Face Space that sleeps when idle: the first
+request after a quiet period can take a minute or two. History is temporary on the
+free deployment (see [docs/FREE_TIER.md](docs/FREE_TIER.md)).
 
----
+```mermaid
+flowchart LR
+    B[Browser] --> W[Next.js app<br/>Vercel Hobby]
+    W -- REST + SSE --> A[FastAPI /api<br/>HF Space, free CPU]
+    A --> G[LangGraph workflow]
+    G --> V[ONNX model +<br/>NumPy Grad-CAM]
+    G --> R[Reliability rules]
+    G --> Q[Hybrid retrieval<br/>241 CC-licensed PMC articles]
+    G --> L{LLM?}
+    L -- free key, in budget --> GM[Gemini free tier]
+    L -- none / quota / error --> X[Extractive composer]
+    GM --> VF[Citation verifier]
+    X --> VF
+    VF --> H[Human review<br/>interrupt + checkpoint]
+    G <--> DB[(SQLite or<br/>Neon Postgres)]
+```
+
+| Platform result (measured 2026-11-17) | Value |
+|---|---|
+| Reliability rules on test: "standard" vs "caution" accuracy | **96.0%** (95% of images) vs **47.4%** (5%) |
+| Retrieval, routed hybrid (bge-small): recall@10 / MRR@10, 50 labelled questions | **1.00 / 0.953**, 27 ms p50 |
+| Grounded answers: fact recall, naive → full pipeline (extractive) | 0.54 → **0.66** |
+| Serving per image incl. Grad-CAM: TensorFlow → ONNX | 89 → **41 ms**, 803 → **262 MB** RSS |
+| Tests | 72 platform (SQLite + Postgres), 65 research, 8 web, 12 browser journeys × 3 targets |
+| Monthly cost | **$0** — and no configuration that can incur a charge |
+
+Details: [docs/EVALUATION.md](docs/EVALUATION.md). The LLM-vs-RAG comparison
+needs a free Gemini key and is reported as *not run*, not estimated.
+
 
 ## Section 1 — Published Work (IEEE 2024)
 
@@ -119,7 +156,7 @@ from the JSON files a real run produces.
 | 7 | Uncertainty (test-time augmentation) | [`uncertainty.py`](src/btc/uncertainty.py) | `results/metrics/uncertainty.json` |
 | 8 | Drift monitoring stub (PCA + PSI) | [`monitoring.py`](src/btc/monitoring.py) | `models/drift_reference.npz`, `drift_log.jsonl` |
 | 9 | ONNX export + latency benchmark | [`export_onnx.py`](src/btc/export_onnx.py) | `models/efficientnetb3.onnx`, `latency.json` |
-| 10 | Serving: Gradio Space + FastAPI | [`space/app.py`](space/app.py), [`serve/app.py`](src/btc/serve/app.py) | live demo, REST API |
+| 10 | Serving: original Gradio app + FastAPI (TensorFlow), superseded in deployment by the platform (Section 3) | [`space/app.py`](space/app.py), [`serve/app.py`](src/btc/serve/app.py) | Space tag `tf-gradio5-2026-10`, REST API |
 | 11 | Packaging, tests, CI | [`Dockerfile`](Dockerfile), [`requirements.txt`](requirements.txt), [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml), [`MODEL_CARD.md`](MODEL_CARD.md) | pinned deps, lint + 65 tests on every push, verified Docker image |
 
 ### Results of the deployed model (measured on CPU)
@@ -358,9 +395,9 @@ on the Hub at tag `parity-2024` (model repo and Space). The current model's
 artifacts and one-time evaluation are in `models/archive/retrain-2026-10/`.
 Two ways back:
 
-- *Quick* (one setting, no code change): set the Space variable
-  `NEUROCLASS_REVISION=parity-2024`. The Space then serves the previous model;
-  only its "About" panel still describes the current one.
+- *Quick*: restore the Space from its tag `tf-gradio5-2026-10` (the last
+  TensorFlow/Gradio-5 version) and set the Space variable
+  `NEUROCLASS_REVISION=parity-2024`; that app then serves the previous model.
 - *Full*: copy the previous model's files from the model repo's `parity-2024`
   tag back onto `main`, and restore the Space's code from its own
   `parity-2024` tag.
@@ -368,161 +405,135 @@ Two ways back:
 ### Roadmap
 1. Target the remaining glioma → `notumor` misses (6.25% on test).
 2. Report results over several training seeds instead of one.
-3. Upgrade the Space to Gradio 6 to clear its remaining dependency advisories.
+3. Run the generation evaluation's LLM variants with a free-tier Gemini key.
 
 ---
 
-## Live demo & deployment
+## Section 3 — Research Platform (2026, not part of the paper)
 
-The [Gradio Space](https://huggingface.co/spaces/Udit013/brain-tumor-mri-classifier)
-runs on Hugging Face free-tier CPU. Inference (class + calibrated confidence +
-stability level from 6 test-time-augmentation views) uses **ONNX Runtime**; Grad-CAM uses the Keras model, compiled
-into a single graph. Weights are pulled from the
-[HF Hub model repo](https://huggingface.co/Udit013/brain-tumor-efficientnetb3)
-at startup, so the model is versioned separately from the app.
-
-```mermaid
-flowchart LR
-    U[User uploads MRI] --> G[Gradio app on HF Spaces]
-    H[(HF Hub model repo<br/>ONNX + weights + T)] -->|download at startup| G
-    G -->|ONNX Runtime, CPU| P[Class + calibrated confidence<br/>+ TTA uncertainty + latency]
-    G -->|Keras, compiled graph| C[Grad-CAM overlay]
-    P --> O[Result + disclaimer]
-    C --> O
-```
-
-The deployed ONNX model is verified identical to the evaluated CPU model
-(max |output difference| 0.0 against a fresh export).
-
-**Deploy your own** (weights already on the Hub):
-```bash
-hf auth login
-```
-```bash
-hf upload Udit013/brain-tumor-mri-classifier space/ . --repo-type space
-```
-Keep `python_version: "3.11"` in the Space README — TensorFlow 2.15 doesn't
-support newer Python versions.
-
-**Choosing the served model.** The Space serves the model repo's `main`
-branch. The optional Space variable `NEUROCLASS_REVISION` (Space settings →
-Variables) selects another branch, tag or commit: `candidate` is how a new
-model is staged and smoke-tested before promotion, and `parity-2024` rolls back
-to the previous model.
-
-The FastAPI service takes `BTC_WEIGHTS` and `BTC_TEMPERATURE` paths for the same purpose.
-
-### FastAPI service
-
-```bash
-uvicorn btc.serve.app:app --host 0.0.0.0 --port 8000
-```
-```bash
-curl -F "file=@some_mri.jpg" http://localhost:8000/predict
-```
-
-| Endpoint | Behaviour |
-|---|---|
-| `GET /health` | `{"status","model_loaded","calibrated"}` — used by the Docker `HEALTHCHECK` |
-| `POST /predict` | multipart `file` → class, calibrated + raw confidence, per-class probabilities, base64 Grad-CAM PNG, `inference_ms` / `gradcam_ms` / `latency_ms` |
-| errors | `413` upload over 10 MB (enforced on bytes read, not the client's `Content-Length`); `400` unreadable or empty image; `422` no `file` field; `503` model failed to load (the server stays up and `/health` returns 503 with the cause) |
-
-Measured on a laptop CPU (Apple M3 Pro, inference pinned to CPU), before → after
-this repo's serving fixes:
-
-| | Before | After |
+| Capability | How | Evidence |
 |---|---|---|
-| Warm `/predict`, server time (median) | ~420 ms (Grad-CAM ~380 ms) | **74 ms** wall-clock (41 ms inference + 30 ms Grad-CAM/PNG) |
-| 16 concurrent `/predict` burst | 5.9 s | **1.2 s** |
-| Worst `/health` latency during that burst | **3.3 s** | **57 ms** |
+| **TF-free inference** | one ONNX graph outputs probabilities and the last conv map; Grad-CAM is computed in closed form through the dense head ([`serving_math.py`](src/btc/serving_math.py)); the export refuses to write a manifest unless it matches TensorFlow | probabilities within 5e-6 of TF on all 1,600 test images, heatmaps within 9e-6; 41 vs 89 ms |
+| **Reliability assessment** | deterministic rules over calibrated confidence, 6-view TTA agreement, a Mahalanobis input-shift distance and the model's measured weaknesses ([`reliability.py`](src/neuroclass/reliability.py)) | test: standard 96.0% accurate, caution 47.4%; the input-shift heuristic flags non-MRI inputs (AUROC 0.95) but not other MRI datasets (0.52) — labelled a heuristic |
+| **Agent workflow** | LangGraph: validate → infer → assess → retrieve → explain → verify → human review (`interrupt`) → report; typed state, retries, bounded revisions, SQLite/Postgres checkpoints, per-step traces streamed over SSE ([`graph.py`](src/neuroclass/agent/graph.py)) | a review paused before an API restart resumes after it (Postgres) |
+| **Scientific RAG** | 241 PubMed Central open-access articles with a declared CC licence (ND excluded) + project docs; section-aware chunks; BM25 + local bge-small embeddings, RRF, routing, per-document cap; pgvector or in-process ([`rag/`](src/neuroclass/rag/)) | recall@10 1.00 on 50 labelled questions; embedders and reranking compared |
+| **Verified explanations** | statements must cite retrieved passages; numbers must appear in their sources or the inference; unsupported statements are removed and shown with reasons ([`verify.py`](src/neuroclass/agent/verify.py)) | tested with scripted LLM outputs that invent ids and numbers |
+| **LLM, free-first** | provider abstraction; Gemini free tier when a key is set, behind a per-minute/per-day quota guard with 429 back-off; extractive fallback with the reason shown; paid Claude adapter refused unless explicitly allowed ([`llm.py`](src/neuroclass/agent/llm.py)) | [ADR 0002](docs/adr/0002-zero-cost-deployment.md) |
+| **API** | FastAPI, Pydantic, Alembic, JWT + anonymous client ids, owner scoping, rate limits, request ids, idempotency, SSE, report export, retention job ([`api/`](src/neuroclass/api/)) | [docs/API.md](docs/API.md) |
+| **Web app** | Next.js 16, TypeScript, Tailwind; workbench, research assistant, history, benchmarks (charts with table views), system status, review queue; generated API types | Vitest + Playwright (desktop + mobile) |
+| **MLOps** | model registry, promotion gate with tolerances and a paired McNemar check ([`registry.py`](src/neuroclass/registry.py)), Hub tags for rollback, reproducible evaluation scripts | `results/metrics/promotion_gate.json` |
+| **MCP** | narrow read-only MCP server (benchmarks, model info, reproducibility, literature) for local use ([`mcp_server.py`](src/neuroclass/mcp_server.py)) | annotations tested |
 
-Two changes produced this. Grad-CAM's forward+backward pass is compiled once
-with `tf.function` (232 → 26 ms, bit-identical heatmaps). And inference now runs
-in a worker thread behind a lock, so it no longer freezes the event loop: before,
-16 in-flight requests pushed `/health` toward the Docker healthcheck's 5 s
-timeout, where a busy container would be marked unhealthy and restarted.
+Design notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
+security and privacy: [docs/SECURITY.md](docs/SECURITY.md) ·
+data, licences and limitations: [docs/PROVENANCE.md](docs/PROVENANCE.md) ·
+the engineering story: [docs/CASE_STUDY.md](docs/CASE_STUDY.md).
+
+---
+
+## Deployment ($0)
+
+| Layer | Service (free plan) | Without it |
+|---|---|---|
+| API + demo | existing Hugging Face Space, CPU Basic | — |
+| Web app | Vercel Hobby | the Space's own demo and API docs |
+| Durable database (optional) | Neon Free | SQLite on the Space disk (resets on restart) |
+| LLM (optional) | Gemini API free tier, unbilled project | extractive answers |
+| Embeddings | local ONNX (fastembed) | — |
+
+No paid plan, card or add-on is used, and free-tier exhaustion degrades a
+feature instead of charging. Step-by-step setup, limits and maintenance:
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) and [docs/FREE_TIER.md](docs/FREE_TIER.md).
 
 ---
 
 ## Quickstart
 
+**Platform (no TensorFlow, no GPU, no keys):**
 ```bash
-# 1. Environment (creates .venv with Python 3.11 + pinned deps)
-bash scripts/setup_env.sh
-source .venv/bin/activate
+python3.11 -m venv .venv-app && .venv-app/bin/pip install -r requirements-app.txt && .venv-app/bin/pip install -e . --no-deps
+```
+```bash
+docker compose -f deploy/docker-compose.yml up --build
+```
+Web on http://localhost:3000, API docs on http://localhost:8000/docs. The
+serving bundle (`models/serving`) and the literature index (`data/rag_index`)
+are build artifacts: create them with `python -m btc.export_serving` (research
+environment) and `python -m neuroclass.rag.corpus fetch && python -m neuroclass.rag.corpus build && python -m neuroclass.rag.index build`.
 
-# 2. Data (needs Kaggle credentials: ~/.kaggle/kaggle.json or KAGGLE_USERNAME/KAGGLE_KEY)
+```bash
+PYTHONPATH=src .venv-app/bin/pytest tests/app_tests -q
+```
+```bash
+cd web && npm ci && npm test && npm run build
+```
+
+**Research (TensorFlow 2.15, Python 3.11):**
+```bash
+bash scripts/setup_env.sh && source .venv/bin/activate
+```
+```bash
 bash scripts/download_data.sh
-
-# 3. Reproduce everything (train → evaluate → leakage → external → calibration →
-#    Grad-CAM → ONNX/latency → robustness → uncertainty → drift reference)
+```
+```bash
 bash scripts/reproduce.sh            # add --skip-train to reuse existing weights
-
-# 4. Write the measured numbers into this README
-python scripts/fill_readme_results.py
-
-# 5. Tests (no TensorFlow, data, or weights needed)
-PYTHONPATH=src pytest tests/ -q
-```
-
-### Docker
-```bash
-docker build -t neuroclass-api .
 ```
 ```bash
-docker run -p 8000:8000 neuroclass-api
+PYTHONPATH=src pytest tests/ -q --ignore=tests/app_tests
 ```
-The deployed model is baked into the image; mount another `models/` directory
-(`-v "$(pwd)/models:/app/models"`) to serve a different one.
 
-Verified on Docker 29.9.2 (linux/arm64) with the deployed model:
-- the image is 3.29 GB on disk, **715 MB compressed**; it ships only the served
-  model (the rollback archive and the parity weights are excluded);
-- it runs as the non-root `appuser`, which cannot write to `/app`, with the
-  pinned stack (TF 2.15.0, FastAPI 0.142.2, Starlette 1.7.0, Pillow 12.3.0);
-- predictions on the four example images equal the offline Keras-CPU
-  predictions exactly; 413 oversized, 400 corrupt or empty, 422 no file,
-  grayscale PNG accepted;
-- 12 concurrent predictions complete in 1.4 s while `/health` stays under 45 ms;
-  after warm-up a prediction including Grad-CAM takes ~120–150 ms;
-- Docker's healthcheck reports **healthy**; with the weights missing the
-  container keeps running, `/health` and `/predict` return 503 with the cause,
-  and Docker reports **unhealthy** instead of a crash loop.
+Evaluations: `scripts/eval_reliability.py`, `scripts/eval_rag.py --rerank`,
+`scripts/eval_generation.py`, `scripts/bench_serving.py` — see
+[docs/EVALUATION.md](docs/EVALUATION.md). All settings:
+[docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+
+### Research-model service (TensorFlow)
+The original `btc.serve` FastAPI service and root [`Dockerfile`](Dockerfile)
+still serve the Keras model (`POST /predict`); the verified details are in
+[PROJECT_DOCUMENTATION_NeuroClass.md](PROJECT_DOCUMENTATION_NeuroClass.md).
+The platform API supersedes it for deployment.
 
 ## Environment & dependencies
 
-The published stack is **TensorFlow 2.15 / Keras 2** (required for parity),
-which supports **Python 3.9–3.11 only**. `scripts/setup_env.sh` provisions a
-3.11 virtualenv; on Apple Silicon it installs `tensorflow-macos` +
-`tensorflow-metal` (see [`requirements-macos.txt`](requirements-macos.txt)).
+Two environments, on purpose: `.venv` (research; TensorFlow 2.15 / Keras 2,
+needed for parity, Python 3.9–3.11 only) and `.venv-app` (platform; no
+TensorFlow, pinned in [`requirements-app.txt`](requirements-app.txt)). The
+Space installs the platform pins adjusted for Gradio's extras
+([`deploy/hf_space/build.py`](deploy/hf_space/build.py)); CI installs that exact
+set and runs the platform tests on it.
 
-**Security.** Dependencies are audited with `pip-audit`. Upgrading the serving
-and imaging stack (FastAPI, Starlette, python-multipart, Pillow, scikit-learn,
-ONNX, Protobuf) cut known advisories in `requirements.txt` from **57 to 22**
-(vulnerable packages 7 → 3), verified by reproducing every evaluation metric
-and the full API behaviour on the new versions. The remaining 22 are all
-blocked by the TF 2.15 parity requirement: Keras 2.15 (fixes only in Keras 3),
-ONNX (capped at 1.18 by TF's `ml_dtypes~=0.2` pin), and Protobuf (capped below
-5). The app loads only its own model files, which limits exposure to the
-model-loading advisories. The Space's Gradio 5.50 caps Pillow below 12 and
-Starlette below 1.0, so those advisories need a Gradio 6 upgrade.
+**Security.** `pip-audit` reports no known vulnerabilities in
+`requirements-app.txt`, and `npm audit` none in the web app's production
+dependencies (both run in CI). Moving the Space from Gradio 5.50 to 6.32 removed
+the Pillow < 12 and Starlette < 1.0 caps that had blocked fixes. The research
+environment still carries advisories that the TF 2.15 parity requirement blocks
+(Keras 2.15, ONNX ≤ 1.18, Protobuf < 5); it is not deployed.
 
 ## Repository layout
 ```
-legacy/                     # original four notebooks — byte-for-byte, read-only
-src/btc/                    # production extension package
-  config.py  data.py  model.py  train.py
-  evaluate.py  leakage.py  external_validation.py  calibration.py
-  explain.py  robustness.py  uncertainty.py  monitoring.py  export_onnx.py
-  preprocess.py             # the one image preprocessing: serving, evaluation, training
-  splits.py                 # leakage-safe train/val split of Kaggle Training
-  finetune.py               # trains the deployed model (runs go to runs/, gitignored)
-  serve/app.py              # FastAPI service
-space/                      # Gradio app (app.py), its tested logic (logic.py), examples
-scripts/                    # setup_env, download_data, reproduce, fill_readme_results,
-                            #   v2_sanity_checks, evaluate_candidate
-tests/                      # 65 tests: pure logic, Space logic, FastAPI contract (no TF)
-results/                    # metrics, figures, and the train/val split (generated, tracked)
-models/                     # weights, ONNX, temperature, drift reference (generated, ignored)
-Dockerfile  requirements*.txt  pyproject.toml  MODEL_CARD.md  PROJECT_DOCUMENTATION_NeuroClass.md
+legacy/                 original IEEE 2024 notebooks — byte-for-byte, read-only
+src/btc/                research package: reproduction, audit, training, evaluation, export
+src/neuroclass/         platform: vision, reliability, rag, agent, api, db, registry, mcp_server
+web/                    Next.js app (workbench, assistant, history, benchmarks, system, review)
+deploy/                 docker-compose (local stack), hf_space/ (Space entrypoint + build)
+scripts/                reproduce, evaluate_candidate, eval_reliability, eval_rag,
+                        eval_generation, bench_serving, export_openapi, ...
+evals/                  labelled retrieval/generation questions with gold facts
+tests/                  research tests (no TF) and tests/app_tests (platform)
+results/                metrics, figures, retrieval/generation evaluations (tracked)
+docs/                   architecture, API, configuration, deployment, free tier, security,
+                        evaluation, provenance, case study, demo script, ADRs
+models/                 registry.json, serving manifest (weights are build artifacts)
 ```
+
+## Documentation
+| | |
+|---|---|
+| [MODEL_CARD.md](MODEL_CARD.md) | intended use, data, metrics, limitations of the model |
+| [PROJECT_DOCUMENTATION_NeuroClass.md](PROJECT_DOCUMENTATION_NeuroClass.md) | the full project documentation |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/API.md](docs/API.md) · [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | how the platform works |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) · [docs/FREE_TIER.md](docs/FREE_TIER.md) | running it for $0 |
+| [docs/EVALUATION.md](docs/EVALUATION.md) · [docs/PROVENANCE.md](docs/PROVENANCE.md) · [docs/SECURITY.md](docs/SECURITY.md) | evidence, sources, limits |
+| [docs/CASE_STUDY.md](docs/CASE_STUDY.md) · [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | the story and a 4-minute demo |
+| [docs/adr/](docs/adr/) | architecture decision records |
+

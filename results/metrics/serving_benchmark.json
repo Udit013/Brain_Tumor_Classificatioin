@@ -1,0 +1,37 @@
+{
+  "note": "single-image requests incl. Grad-CAM, warm, CPU; one process per backend",
+  "cpu": "Apple M3 Pro",
+  "measured": "2026-11-17",
+  "results": {
+    "tf": {
+      "backend": "tf",
+      "n": 48,
+      "load_seconds": 6.98,
+      "latency_ms_p50": 89.2,
+      "latency_ms_p95": 93.9,
+      "peak_rss_mb": 803.0,
+      "machine": "arm64 Darwin",
+      "python": "3.11.17"
+    },
+    "onnx_1view": {
+      "backend": "onnx_1view",
+      "n": 48,
+      "load_seconds": 0.24,
+      "latency_ms_p50": 41.4,
+      "latency_ms_p95": 41.9,
+      "peak_rss_mb": 262.0,
+      "machine": "arm64 Darwin",
+      "python": "3.11.17"
+    },
+    "onnx_tta": {
+      "backend": "onnx_tta",
+      "n": 48,
+      "load_seconds": 0.2,
+      "latency_ms_p50": 175.2,
+      "latency_ms_p95": 238.4,
+      "peak_rss_mb": 571.0,
+      "machine": "arm64 Darwin",
+      "python": "3.11.17"
+    }
+  }
+}
