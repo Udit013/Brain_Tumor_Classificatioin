@@ -38,50 +38,56 @@ export function Assistant() {
   }
 
   return (
-    <div className="grid gap-6">
-      <form
-        onSubmit={(e) => { e.preventDefault(); ask(question); }}
-        className="rounded-xl border border-line bg-raised p-4"
-      >
-        <label htmlFor="q" className="text-sm font-medium text-ink">Ask a research question</label>
-        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-          <input id="q" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={1000}
-                 placeholder="e.g. Why can near-duplicate images inflate test accuracy?"
-                 className="flex-1 rounded-lg border border-line bg-surface px-3 py-2" />
+    <div className="grid gap-8">
+      <form onSubmit={(e) => { e.preventDefault(); ask(question); }}
+            className="rounded-xl border border-line bg-raised shadow-card focus-within:border-line-strong">
+        <label htmlFor="q" className="sr-only">Ask a research question</label>
+        <textarea id="q" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={1000} rows={2}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(question); } }}
+                  placeholder="Ask a research question, e.g. why can near-duplicate images inflate test accuracy?"
+                  className="block w-full resize-none rounded-t-xl bg-transparent px-4 pt-4 text-[15px] text-ink placeholder:text-muted focus:outline-none" />
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 pb-3 pt-2">
           <select aria-label="Sources to search" value={scope} onChange={(e) => setScope(e.target.value as typeof scope)}
-                  className="rounded-lg border border-line bg-surface px-2 py-2 text-sm">
-            <option value="">All sources (auto-routed)</option>
+                  className="h-8 rounded-md border border-line bg-surface px-2 text-sm text-ink-2">
+            <option value="">All sources, auto-routed</option>
             <option value="pmc_article">Open-access papers only</option>
             <option value="project_document">NeuroClass documents only</option>
           </select>
-          <button disabled={busy || question.trim().length < 3}
-                  className={buttonClass("primary", "md")}>
+          <button disabled={busy || question.trim().length < 3} className={buttonClass("primary", "sm")}>
             Ask
           </button>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {SUGGESTIONS.map((s) => (
-            <button key={s} type="button" onClick={() => ask(s)} disabled={busy}
-                    className="rounded-full border border-line px-3 py-1 text-left text-xs text-ink-2 hover:bg-sunken">
-              {s}
-            </button>
-          ))}
-        </div>
       </form>
 
-      <div aria-live="polite" className="grid gap-6">
+      {turns.length === 0 && (
+        <section aria-labelledby="try">
+          <h2 id="try" className="text-xs font-medium text-muted">Try asking</h2>
+          <ul className="mt-2 divide-y divide-line border-y border-line">
+            {SUGGESTIONS.map((q) => (
+              <li key={q}>
+                <button type="button" onClick={() => ask(q)} disabled={busy}
+                        className="group flex w-full items-center justify-between gap-4 py-3 text-left text-sm text-ink-2 hover:text-ink">
+                  {q}
+                  <span aria-hidden className="text-muted transition-transform group-hover:translate-x-0.5">→</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div aria-live="polite" className="grid gap-10">
         {turns.map((t, i) => (
-          <article key={turns.length - i} className="grid gap-3">
-            <p className="font-medium text-ink">Q: {t.question}</p>
+          <article key={turns.length - i} className="grid gap-4">
+            <p className="text-lg font-medium leading-snug tracking-[-0.01em] text-ink">{t.question}</p>
             {!t.answer && !t.error && <Spinner label="Searching the literature…" />}
             {t.error && <ErrorState error={t.error} />}
             {t.answer && (
               <>
                 <ExplanationView explanation={t.answer.answer} title="Answer" />
                 <p className="text-xs text-muted">
-                  Retrieval {Math.round(t.answer.retrieval_ms)} ms · generation {Math.round(t.answer.generation_ms)} ms.
-                  Answers come only from the indexed open-access papers and project documents; they are research
-                  context, not medical advice.
+                  Retrieval {Math.round(t.answer.retrieval_ms)} ms · generation {Math.round(t.answer.generation_ms)} ms ·
+                  research context from indexed open-access papers and project documents, not medical advice.
                 </p>
               </>
             )}

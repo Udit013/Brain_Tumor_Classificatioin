@@ -23,7 +23,7 @@ export default function HistoryPage() {
 
   return (
     <>
-      <PageHeader eyebrow="History" title="Your analyses">
+      <PageHeader title="Your analyses">
         {signedIn
           ? "Analyses saved to your account."
           : "Analyses started from this browser. Sign in to keep them across devices and to use human review."}
@@ -33,16 +33,13 @@ export default function HistoryPage() {
           This free deployment keeps history on a temporary disk, so it is cleared whenever the server restarts.
         </Notice></div>
       )}
-      <div className="mb-4 flex items-center gap-2">
-        <label htmlFor="status" className="text-sm text-ink-2">Status</label>
-        <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}
-                className="rounded-md border border-line bg-surface px-2 py-1 text-sm">
-          <option value="">All</option>
-          <option value="completed">Completed</option>
-          <option value="awaiting_review">Awaiting review</option>
-          <option value="running">Running</option>
-          <option value="failed">Failed</option>
-        </select>
+      <div role="radiogroup" aria-label="Filter by status" className="mb-4 inline-flex flex-wrap rounded-lg bg-sunken p-0.5">
+        {[["", "All"], ["completed", "Completed"], ["awaiting_review", "Awaiting review"], ["running", "Running"], ["failed", "Failed"]].map(([v, label]) => (
+          <button key={v} role="radio" aria-checked={status === v} onClick={() => setStatus(v)}
+                  className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${status === v ? "bg-raised text-ink shadow-card" : "text-ink-2 hover:text-ink"}`}>
+            {label}
+          </button>
+        ))}
       </div>
       {error && <ErrorState error={error} />}
       {!rows && !error && <Spinner label="Loading history…" />}
@@ -54,29 +51,29 @@ export default function HistoryPage() {
       {shown.length > 0 && (
         <div className="overflow-x-auto rounded-xl border border-line bg-raised">
           <table className="w-full text-sm">
-            <thead className="border-b border-line text-left text-muted">
+            <thead className="border-b border-line text-left text-xs text-muted">
               <tr>
-                <th className="px-4 py-2 font-normal">Started</th>
-                <th className="px-4 py-2 font-normal">Input</th>
-                <th className="px-4 py-2 font-normal">Model-predicted class</th>
-                <th className="px-4 py-2 font-normal">Confidence</th>
-                <th className="px-4 py-2 font-normal">Reliability</th>
-                <th className="px-4 py-2 font-normal">Status</th>
+                <th className="px-4 py-2.5 font-normal">Started</th>
+                <th className="px-4 py-2.5 font-normal">Input</th>
+                <th className="px-4 py-2.5 font-normal">Model-predicted class</th>
+                <th className="px-4 py-2.5 font-normal">Confidence</th>
+                <th className="px-4 py-2.5 font-normal">Reliability</th>
+                <th className="px-4 py-2.5 font-normal">Status</th>
               </tr>
             </thead>
             <tbody>
               {shown.map((r) => (
-                <tr key={r.id} className="border-b border-line last:border-0 hover:bg-sunken">
-                  <td className="px-4 py-2">
-                    <Link href={`/analyses/${r.id}`} className="whitespace-nowrap">
+                <tr key={r.id} className="border-b border-line last:border-0 hover:bg-sunken/60">
+                  <td className="px-4 py-3">
+                    <Link href={`/analyses/${r.id}`} className="whitespace-nowrap font-medium text-ink no-underline hover:underline">
                       {new Date(r.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
                     </Link>
                   </td>
-                  <td className="px-4 py-2 text-ink-2">{r.sample_id ? `Example: ${r.sample_id}` : "Upload"}</td>
-                  <td className="px-4 py-2">{r.predicted_class ? DISPLAY[r.predicted_class as keyof typeof DISPLAY] : "—"}</td>
-                  <td className="px-4 py-2 tabular-nums">{pct(r.calibrated_confidence)}</td>
-                  <td className="px-4 py-2"><LevelBadge level={r.reliability_level} /></td>
-                  <td className="px-4 py-2 capitalize text-ink-2">{r.status.replace("_", " ")}</td>
+                  <td className="px-4 py-3 text-ink-2">{r.sample_id ? `Example: ${r.sample_id}` : "Upload"}</td>
+                  <td className="px-4 py-3">{r.predicted_class ? DISPLAY[r.predicted_class as keyof typeof DISPLAY] : "—"}</td>
+                  <td className="px-4 py-3 tabular-nums">{pct(r.calibrated_confidence)}</td>
+                  <td className="px-4 py-3"><LevelBadge level={r.reliability_level} /></td>
+                  <td className="px-4 py-3 capitalize text-ink-2">{r.status.replace("_", " ")}</td>
                 </tr>
               ))}
             </tbody>

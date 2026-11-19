@@ -60,7 +60,7 @@ export function GroupedBars({ title, caption, categories, series, values }: {
   const y = (v: number) => top + plotH * (1 - v);
   const table = (
     <table className="w-full text-sm">
-      <thead><tr className="text-left text-muted"><th className="font-normal">Metric</th>{series.map((s) => <th key={s.key} className="font-normal">{s.label}</th>)}</tr></thead>
+      <thead><tr className="text-left text-xs text-muted"><th className="font-normal">Metric</th>{series.map((s) => <th key={s.key} className="font-normal">{s.label}</th>)}</tr></thead>
       <tbody>{categories.map((c, i) => (
         <tr key={c} className="border-t border-line"><td className="py-1 text-ink">{c}</td>{series.map((s) => <td key={s.key} className="tabular-nums">{pctLabel(values[s.key][i])}</td>)}</tr>
       ))}</tbody>
@@ -177,7 +177,7 @@ export function RobustnessPanels({ title, caption, series, data }: {
   const y = (v: number) => t + (H - t - b) * (1 - v);
   const table = (
     <table className="w-full text-sm">
-      <thead><tr className="text-left text-muted"><th className="font-normal">Corruption</th><th className="font-normal">Model</th>{[1, 2, 3, 4, 5].map((s) => <th key={s} className="font-normal">Sev {s}</th>)}</tr></thead>
+      <thead><tr className="text-left text-xs text-muted"><th className="font-normal">Corruption</th><th className="font-normal">Model</th>{[1, 2, 3, 4, 5].map((s) => <th key={s} className="font-normal">Sev {s}</th>)}</tr></thead>
       <tbody>{corruptions.flatMap((c) => series.map((s) => (
         <tr key={c + s.key} className="border-t border-line"><td>{c.replace("_", " ")}</td><td>{s.label}</td>{data[c][s.key].map((v, i) => <td key={i} className="tabular-nums">{pctLabel(v)}</td>)}</tr>
       )))}</tbody>

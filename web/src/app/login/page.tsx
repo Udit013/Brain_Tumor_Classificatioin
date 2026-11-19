@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api, ApiError, setSession } from "@/lib/api";
-import { buttonClass, Card, PageHeader } from "@/components/ui";
+import Image from "next/image";
+import { buttonClass } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,23 +31,28 @@ export default function LoginPage() {
   }
 
   return (
-    <>
-      <PageHeader eyebrow="Account" title={mode === "login" ? "Sign in" : "Create an account"}>
-        An account keeps your analyses across devices and lets reviewers return flagged reports to you. Reviewer
-        access is granted by the operator, not chosen at sign-up.
-      </PageHeader>
-      <Card className="max-w-md">
+    <div className="mx-auto w-full max-w-sm py-6 sm:py-10">
+      <div className="text-center">
+        <Image src="/brand-mark.png" alt="" width={44} height={44} className="mx-auto rounded-[11px]" priority />
+        <h1 className="mt-5 text-2xl font-semibold tracking-[-0.02em] text-ink">
+          {mode === "login" ? "Sign in to NeuroClass" : "Create your account"}
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-ink-2">
+          Keep your analyses across devices and receive reviewed reports.
+        </p>
+      </div>
+      <div className="mt-8 rounded-xl border border-line bg-raised p-6 shadow-card">
         <form onSubmit={submit} className="grid gap-4">
           <label className="grid gap-1.5 text-sm">
-            <span className="text-ink-2">Email</span>
+            <span className="font-medium text-ink">Email</span>
             <input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                   className="h-10 rounded-lg border border-line-strong bg-surface px-3 text-ink shadow-card placeholder:text-muted focus:border-accent" />
+                   className="h-10 rounded-lg border border-line-strong bg-surface px-3 text-ink placeholder:text-muted focus:border-accent" />
           </label>
           <label className="grid gap-1.5 text-sm">
-            <span className="text-ink-2">Password (at least 10 characters)</span>
+            <span className="flex items-baseline justify-between font-medium text-ink">Password <span className="text-xs font-normal text-muted">10+ characters</span></span>
             <input type="password" required minLength={10} autoComplete={mode === "login" ? "current-password" : "new-password"}
                    value={password} onChange={(e) => setPassword(e.target.value)}
-                   className="h-10 rounded-lg border border-line-strong bg-surface px-3 text-ink shadow-card placeholder:text-muted focus:border-accent" />
+                   className="h-10 rounded-lg border border-line-strong bg-surface px-3 text-ink placeholder:text-muted focus:border-accent" />
           </label>
           {mode === "signup" && (
             <details className="text-sm">
@@ -54,7 +60,7 @@ export default function LoginPage() {
               <label className="mt-3 grid gap-1.5">
                 <span className="text-ink-2">Reviewer access code</span>
                 <input type="password" autoComplete="off" value={reviewerCode} onChange={(e) => setReviewerCode(e.target.value)}
-                       className="h-10 rounded-lg border border-line-strong bg-surface px-3 text-ink shadow-card placeholder:text-muted focus:border-accent" />
+                       className="h-10 rounded-lg border border-line-strong bg-surface px-3 text-ink placeholder:text-muted focus:border-accent" />
                 <span className="text-xs text-muted">
                   Given by the operator. It only takes effect for an email the operator has listed.
                 </span>
@@ -62,7 +68,7 @@ export default function LoginPage() {
             </details>
           )}
           {error && <p role="alert" className="text-sm text-critical-ink">{error}</p>}
-          <button disabled={busy} className={buttonClass("primary", "md")}>
+          <button disabled={busy} className={buttonClass("primary", "md", "mt-1 w-full")}>
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </button>
           <button type="button" onClick={() => setMode(mode === "login" ? "signup" : "login")}
@@ -70,7 +76,10 @@ export default function LoginPage() {
             {mode === "login" ? "New here? Create an account" : "Have an account? Sign in"}
           </button>
         </form>
-      </Card>
-    </>
+      </div>
+      <p className="mt-6 text-center text-xs leading-relaxed text-muted">
+        Reviewer access is granted by the operator, not chosen at sign-up.
+      </p>
+    </div>
   );
 }

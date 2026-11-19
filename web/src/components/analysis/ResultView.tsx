@@ -26,64 +26,64 @@ export function ResultView({ analysis, localImage }: { analysis: Analysis; local
   const original = analysis.sample_id ? api.sampleImageUrl(analysis.sample_id) : localImage ?? null;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
+    <div className="@container grid grid-cols-[minmax(0,1fr)] gap-5">
       {inf && (
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 @2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Card title="Image and Grad-CAM">
             <div className="grid grid-cols-2 gap-3">
               <figure>
                 {original ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={original} alt="Input MRI slice" className="aspect-square w-full rounded-lg border border-line bg-black object-contain" />
+                  <img src={original} alt="Input MRI slice" className="aspect-square w-full rounded-md bg-black object-contain" />
                 ) : (
-                  <div className="grid aspect-square place-items-center rounded-lg border border-line bg-sunken text-sm text-muted">
+                  <div className="grid aspect-square place-items-center rounded-md bg-sunken text-sm text-muted">
                     Upload not retained
                   </div>
                 )}
-                <figcaption className="mt-1 text-xs text-muted">Input as received</figcaption>
+                <figcaption className="mt-1.5 text-xs text-muted">Input as received</figcaption>
               </figure>
               <figure>
                 {gradcam ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={gradcam} alt={`Grad-CAM heatmap for the predicted class ${DISPLAY[inf.predicted_class]}`} className="aspect-square w-full rounded-lg border border-line object-contain" />
+                  <img src={gradcam} alt={`Grad-CAM heatmap for the predicted class ${DISPLAY[inf.predicted_class]}`} className="aspect-square w-full rounded-md object-contain" />
                 ) : (
-                  <div className="aspect-square animate-pulse rounded-lg bg-sunken" />
+                  <div className="aspect-square animate-pulse rounded-md bg-sunken" />
                 )}
-                <figcaption className="mt-1 text-xs text-muted">Grad-CAM (256 × 256 model input)</figcaption>
+                <figcaption className="mt-1.5 text-xs text-muted">Grad-CAM · 256 × 256 model input</figcaption>
               </figure>
             </div>
-            <p className="mt-3 text-sm text-ink-2">
+            <p className="mt-4 text-[13px] leading-relaxed text-muted">
               Red areas increased the score for the predicted class most. This is not a tumor outline and does not
               show that those regions caused the prediction, or that it is correct.
             </p>
           </Card>
 
           <Card title="Model output" aside={<Pill>{inf.model_version}</Pill>}>
-            <p className="text-sm text-ink-2">Model-predicted class</p>
-            <p className="text-3xl font-semibold text-ink">{DISPLAY[inf.predicted_class]}</p>
-            <p className="mt-1 text-ink-2">
-              <span className="text-2xl font-semibold text-ink">{pct(inf.calibrated_confidence)}</span>{" "}
-              calibrated confidence <span className="text-muted">(uncalibrated {pct(inf.raw_confidence)})</span>
+            <p className="text-xs text-muted">Model-predicted class</p>
+            <p className="mt-0.5 text-[1.75rem] font-semibold capitalize leading-tight tracking-[-0.02em] text-ink">{DISPLAY[inf.predicted_class]}</p>
+            <p className="mt-1 text-sm text-ink-2">
+              <span className="tabular font-semibold text-ink">{pct(inf.calibrated_confidence)}</span> calibrated confidence
+              <span className="text-muted"> · uncalibrated {pct(inf.raw_confidence)}</span>
             </p>
             <ProbabilityTable probabilities={inf.probabilities} predicted={inf.predicted_class} />
-            <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-line pt-4 text-sm">
               <div>
-                <dt className="text-muted">Stability under small changes</dt>
+                <dt className="text-xs text-muted">Stability under small changes</dt>
                 <dd className="text-ink">{inf.tta_agreement} of {inf.tta_views} views agree</dd>
               </div>
               <div>
-                <dt className="text-muted">Input-shift heuristic</dt>
+                <dt className="text-xs text-muted">Input-shift heuristic</dt>
                 <dd className="text-ink">
                   {inf.ood_flag ? "Flagged" : "Not flagged"}{" "}
                   <span className="text-muted">({inf.ood_distance.toFixed(0)} / {inf.ood_threshold.toFixed(0)})</span>
                 </dd>
               </div>
               <div>
-                <dt className="text-muted">Input</dt>
+                <dt className="text-xs text-muted">Input</dt>
                 <dd className="text-ink">{inf.input_quality.width}×{inf.input_quality.height} {inf.input_quality.format ?? ""}</dd>
               </div>
               <div>
-                <dt className="text-muted">CPU latency</dt>
+                <dt className="text-xs text-muted">CPU latency</dt>
                 <dd className="text-ink">{Math.round(inf.latency_ms.total ?? 0)} ms</dd>
               </div>
             </dl>
@@ -93,19 +93,21 @@ export function ResultView({ analysis, localImage }: { analysis: Analysis; local
 
       {analysis.reliability && (
         <Card title="Reliability assessment" aside={<LevelBadge level={analysis.reliability.level} />}>
-          <p className="mb-3 text-sm text-ink-2">
-            Deterministic rules (version {analysis.reliability.rules_version}) over this result and the model&apos;s
-            measured evaluation. On the test set, results at the standard level were right far more often than
-            results flagged for caution — see Benchmarks.
-          </p>
-          <ul className="grid gap-2">
+          <ul className="divide-y divide-line">
             {analysis.reliability.findings.map((f) => (
-              <li key={f.code} className="flex gap-3 text-sm">
-                <span className="w-16 shrink-0 font-medium text-ink-2">{f.severity === "info" ? "Note" : "Caution"}</span>
+              <li key={f.code} className="flex gap-4 py-2.5 text-sm first:pt-0">
+                <span className={`w-16 shrink-0 text-xs font-medium leading-5 ${f.severity === "info" ? "text-muted" : "text-warning-ink"}`}>
+                  {f.severity === "info" ? "Note" : "Caution"}
+                </span>
                 <span className="text-ink">{f.message}</span>
               </li>
             ))}
           </ul>
+          <p className="mt-4 text-[13px] leading-relaxed text-muted">
+            Deterministic rules (version {analysis.reliability.rules_version}) over this result and the model&apos;s
+            measured evaluation. On the test set, standard-level results were right far more often than results
+            flagged for caution.
+          </p>
         </Card>
       )}
 
@@ -123,9 +125,9 @@ function ProbabilityTable({ probabilities, predicted }: {
     <table className="mt-4 w-full text-sm">
       <caption className="sr-only">Calibrated class probabilities</caption>
       <thead>
-        <tr className="text-left text-muted">
-          <th className="pb-1 font-normal">Class</th>
-          <th className="pb-1 font-normal">Calibrated probability</th>
+        <tr className="text-left text-xs text-muted">
+          <th className="pb-1.5 font-normal">Class</th>
+          <th className="pb-1.5 font-normal">Calibrated probability</th>
         </tr>
       </thead>
       <tbody>
@@ -134,8 +136,8 @@ function ProbabilityTable({ probabilities, predicted }: {
             <td className={`py-1 pr-3 ${p.label === predicted ? "font-medium text-ink" : "text-ink-2"}`}>{DISPLAY[p.label]}</td>
             <td className="w-3/5 py-1">
               <div className="flex items-center gap-2">
-                <div className="h-2.5 flex-1 rounded-r bg-sunken">
-                  <div className="h-2.5 rounded-r bg-series-1" style={{ width: `${Math.max(p.calibrated * 100, 0.5)}%` }} />
+                <div className="h-1.5 flex-1 rounded-full bg-sunken">
+                  <div className="h-1.5 rounded-full bg-series-1" style={{ width: `${Math.max(p.calibrated * 100, 0.5)}%` }} />
                 </div>
                 <span className="w-14 text-right text-ink-2 tabular-nums">{pct(p.calibrated)}</span>
               </div>
@@ -160,15 +162,15 @@ export function ExplanationView({ explanation, title = "Research interpretation"
         {explanation.mode === "llm" ? `Generated · ${explanation.llm_model}` : "Extractive · no language model"}
       </Pill>}
     >
-      <p className="text-ink">{explanation.summary}</p>
+      <p className="leading-relaxed text-ink">{explanation.summary}</p>
       {explanation.mode === "extractive" && (
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-[13px] leading-relaxed text-muted">
           {explanation.fallback_reason ? `Language model not used (${explanation.fallback_reason}). ` : ""}
           Research context is quoted from the retrieved passages, ranked by relevance. Every statement below was
           checked against its sources.
         </p>
       )}
-      <ul className="mt-4 grid gap-3">
+      <ul className="mt-4 divide-y divide-line border-t border-line">
         {explanation.statements.map((s, i) => (
           <StatementItem key={i} s={s} onCite={setOpen} active={open} />
         ))}
@@ -176,8 +178,8 @@ export function ExplanationView({ explanation, title = "Research interpretation"
       {shown && <PassagePreview passage={shown} onClose={() => setOpen(null)} />}
 
       {explanation.removed_statements.length > 0 && (
-        <details className="mt-4 rounded-lg border border-line px-4 py-3 text-sm">
-          <summary className="cursor-pointer font-medium text-ink">
+        <details className="mt-4 rounded-lg bg-sunken px-4 py-3 text-sm">
+          <summary className="cursor-pointer font-medium text-ink-2 hover:text-ink">
             {explanation.removed_statements.length} statement(s) removed by verification
           </summary>
           <ul className="mt-2 grid gap-2">
@@ -192,16 +194,18 @@ export function ExplanationView({ explanation, title = "Research interpretation"
       )}
 
       {explanation.passages.length > 0 && (
-        <div className="mt-5">
-          <h3 className="mb-2 text-sm font-semibold text-ink">Sources</h3>
-          <ol className="grid gap-1.5 text-sm">
+        <div className="mt-6">
+          <h3 className="mb-2 text-xs font-medium text-muted">Sources</h3>
+          <ol className="grid gap-2 text-sm">
             {explanation.passages.map((p) => (
-              <li key={p.chunk_id} className="text-ink-2">
-                <button className="mr-1 font-mono text-xs text-accent underline-offset-2 hover:underline" onClick={() => setOpen(p.chunk_id)}>
-                  [{p.chunk_id}]
+              <li key={p.chunk_id} className="flex gap-3">
+                <button className="h-fit shrink-0 rounded border border-line bg-sunken px-1.5 py-px font-mono text-[11px] text-ink-2 hover:text-ink" onClick={() => setOpen(p.chunk_id)}>
+                  {p.chunk_id}
                 </button>
-                <a href={p.source_url} target="_blank" rel="noreferrer">{p.title}</a>
-                {p.year ? ` (${p.year})` : ""} — <span className="text-muted">{p.license}</span>
+                <span className="min-w-0 text-ink-2">
+                  <a href={p.source_url} target="_blank" rel="noreferrer" className="text-ink no-underline hover:underline">{p.title}</a>
+                  <span className="text-muted">{p.year ? ` · ${p.year}` : ""} · {p.license}</span>
+                </span>
               </li>
             ))}
           </ol>
@@ -213,16 +217,16 @@ export function ExplanationView({ explanation, title = "Research interpretation"
 
 function StatementItem({ s, onCite, active }: { s: Statement; onCite: (id: string) => void; active: string | null }) {
   return (
-    <li className="flex gap-3 text-sm">
-      <span className="w-28 shrink-0 text-xs font-medium uppercase tracking-wide text-muted">{KIND_LABEL[s.kind]}</span>
-      <span className="text-ink">
+    <li className="flex gap-4 py-3 text-sm">
+      <span className="w-28 shrink-0 text-xs leading-5 text-muted">{KIND_LABEL[s.kind]}</span>
+      <span className="leading-relaxed text-ink">
         {s.text}{" "}
         {s.citations?.map((c) => (
           <button
             key={c}
             onClick={() => onCite(c)}
             aria-pressed={active === c}
-            className="ml-0.5 rounded bg-sunken px-1 font-mono text-xs text-accent hover:underline"
+            className={`ml-1 rounded border px-1 py-px align-[1px] font-mono text-[11px] transition-colors ${active === c ? "border-accent bg-accent-soft text-accent" : "border-line bg-sunken text-ink-2 hover:text-ink"}`}
             aria-label={`Show source passage ${c}`}
           >
             {c}
@@ -235,7 +239,7 @@ function StatementItem({ s, onCite, active }: { s: Statement; onCite: (id: strin
 
 function PassagePreview({ passage, onClose }: { passage: Passage; onClose: () => void }) {
   return (
-    <aside aria-label="Source passage" className="mt-4 rounded-lg border border-line bg-sunken p-4 text-sm">
+    <aside aria-label="Source passage" className="mt-4 rounded-lg border border-line bg-surface p-4 text-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-medium text-ink">{passage.title}</p>
@@ -257,23 +261,23 @@ export function TraceView({ trace }: { trace: Analysis["trace"] }) {
   const rows = trace.filter((t) => t.status !== "started");
   return (
     <Card title="Execution trace">
-      <p className="mb-3 text-sm text-ink-2">
-        Each step of the LangGraph workflow, as recorded by the server. No image data or text content is logged.
+      <p className="mb-3 text-[13px] text-muted">
+        Each LangGraph step as recorded by the server. No image data or text content is logged.
       </p>
       <div className="overflow-x-auto">
       <table className="w-full min-w-[28rem] text-sm">
         <thead>
-          <tr className="text-left text-muted">
-            <th className="pb-1 font-normal">Step</th>
-            <th className="pb-1 font-normal">Status</th>
-            <th className="pb-1 text-right font-normal">Time</th>
-            <th className="pb-1 pl-4 font-normal">Detail</th>
+          <tr className="border-b border-line text-left text-xs text-muted">
+            <th className="pb-2 font-normal">Step</th>
+            <th className="pb-2 font-normal">Status</th>
+            <th className="pb-2 text-right font-normal">Time</th>
+            <th className="pb-2 pl-4 font-normal">Detail</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((t, i) => (
-            <tr key={i} className="border-t border-line align-top">
-              <td className="py-1.5 font-mono text-xs text-ink">{t.step}</td>
+            <tr key={i} className="border-b border-line align-top last:border-0">
+              <td className="py-2 font-mono text-xs text-ink">{t.step}</td>
               <td className="py-1.5 text-ink-2">{t.status}</td>
               <td className="py-1.5 text-right text-ink-2 tabular-nums">{t.duration_ms == null ? "" : `${Math.round(t.duration_ms)} ms`}</td>
               <td className="max-w-md truncate py-1.5 pl-4 font-mono text-xs text-muted" title={JSON.stringify(t.detail)}>
@@ -306,10 +310,10 @@ export function ReportLinks({ id }: { id: string }) {
   }
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <button onClick={() => download("html")} className={buttonClass("primary", "sm")}>
+      <button onClick={() => download("html")} className={buttonClass("secondary", "sm")}>
         Download report (HTML)
       </button>
-      <button onClick={() => download("md")} className={buttonClass("secondary", "sm")}>
+      <button onClick={() => download("md")} className={buttonClass("ghost", "sm")}>
         Markdown
       </button>
       {error && <span role="alert" className="text-sm text-critical-ink">{error}</span>}

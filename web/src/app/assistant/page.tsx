@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Research assistant" };
 export default function AssistantPage() {
   return (
     <>
-      <PageHeader eyebrow="Research assistant" title="Ask the literature">
+      <PageHeader title="Ask the literature">
         Answers come from 241 openly licensed PubMed Central articles and the project&apos;s own documents. Every
         statement cites a passage; a deterministic check removes anything its sources don&apos;t support.
       </PageHeader>

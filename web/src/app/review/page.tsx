@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, ApiError, DISPLAY, useSession, type Analysis, type AnalysisSummary } from "@/lib/api";
 import { ResultView } from "@/components/analysis/ResultView";
-import { buttonClass, Card, Empty, ErrorState, LevelBadge, Notice, PageHeader, pct, Spinner } from "@/components/ui";
+import { buttonClass, Card, Empty, ErrorState, LevelBadge, PageHeader, pct, Spinner } from "@/components/ui";
 
 export default function ReviewPage() {
   const [queue, setQueue] = useState<AnalysisSummary[] | null>(null);
@@ -43,24 +43,24 @@ export default function ReviewPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Human review" title="Review queue">
+      <PageHeader title="Review queue">
         Reports the reliability rules flagged wait here. Approve, reject or request a revision — a revision request
         sends your note back to the explanation step (at most twice).
       </PageHeader>
-      <Notice tone="warning">
+      <p className="-mt-4 mb-8 max-w-2xl text-[13px] leading-relaxed text-muted">
         A review records a researcher&apos;s assessment of an explanation report. It is not clinical validation and
         never turns a model output into a diagnosis.
-      </Notice>
-      <div className="mt-6">
+      </p>
+      <div>
         {!allowed && <Empty title="Reviewer access required">Sign in with an account the operator has granted the reviewer role.</Empty>}
         {error && <ErrorState error={error} />}
         {allowed && !queue && !error && <Spinner label="Loading queue…" />}
         {queue && queue.length === 0 && <Empty title="Nothing to review">Flagged reports will appear here.</Empty>}
         {queue && queue.length > 0 && !selected && (
-          <ul className="grid gap-2">
+          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-raised">
             {queue.map((q) => (
               <li key={q.id}>
-                <button onClick={() => open(q.id)} className="flex w-full flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-raised px-4 py-3 text-left hover:border-line-strong">
+                <button onClick={() => open(q.id)} className="flex w-full flex-wrap items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-sunken/60">
                   <span className="text-ink">
                     {q.predicted_class ? DISPLAY[q.predicted_class as keyof typeof DISPLAY] : "—"} · {pct(q.calibrated_confidence)}
                     <span className="ml-2 text-sm text-muted">{new Date(q.created_at).toLocaleString()}</span>

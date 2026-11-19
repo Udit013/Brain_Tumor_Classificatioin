@@ -42,7 +42,7 @@ export function Benchmarks() {
         <div className="overflow-x-auto rounded-xl border border-line bg-raised">
           <table className="w-full text-sm">
             <caption className="sr-only">Published benchmark</caption>
-            <thead className="border-b border-line text-left text-muted">
+            <thead className="border-b border-line text-left text-xs text-muted">
               <tr>
                 <th className="px-4 py-2 font-normal">Model</th>
                 <th className="px-4 py-2 font-normal">Parameters</th>
@@ -118,7 +118,7 @@ export function Benchmarks() {
           <div className="overflow-x-auto rounded-xl border border-line bg-raised">
             <table className="w-full text-sm">
               <caption className="sr-only">Paired significance</caption>
-              <thead className="border-b border-line text-left text-muted">
+              <thead className="border-b border-line text-left text-xs text-muted">
                 <tr><th className="px-4 py-2 font-normal">Paired comparison (exact McNemar)</th><th className="px-4 py-2 font-normal">Only current correct</th><th className="px-4 py-2 font-normal">Only previous correct</th><th className="px-4 py-2 font-normal">p-value</th></tr>
               </thead>
               <tbody>
@@ -148,7 +148,7 @@ export function Benchmarks() {
             </Card>
             <Card title="Precision, recall and F1">
               <table className="w-full text-sm">
-                <thead className="text-left text-muted"><tr><th className="font-normal">Class</th><th className="font-normal">Precision</th><th className="font-normal">Recall</th><th className="font-normal">F1</th></tr></thead>
+                <thead className="text-left text-xs text-muted"><tr><th className="font-normal">Class</th><th className="font-normal">Precision</th><th className="font-normal">Recall</th><th className="font-normal">F1</th></tr></thead>
                 <tbody>
                   {(["glioma", "meningioma", "notumor", "pituitary"] as const).map((c, i) => {
                     const r = cmp.current.per_class[c];
@@ -190,7 +190,7 @@ export function Benchmarks() {
                 Accuracy by level, measured after the rules were fixed:
               </p>
               <table className="w-full text-sm">
-                <thead className="text-left text-muted"><tr><th className="font-normal">Split</th><th className="font-normal">Level</th><th className="font-normal">Images</th><th className="font-normal">Share</th><th className="font-normal">Accuracy</th></tr></thead>
+                <thead className="text-left text-xs text-muted"><tr><th className="font-normal">Split</th><th className="font-normal">Level</th><th className="font-normal">Images</th><th className="font-normal">Share</th><th className="font-normal">Accuracy</th></tr></thead>
                 <tbody>
                   {(["val", "test"] as const).flatMap((split) =>
                     (["standard", "caution", "unreliable"] as const).map((lv) => {
@@ -259,7 +259,7 @@ export function Benchmarks() {
                 {retr.n_questions} labelled questions (known-item questions written from article abstracts, plus
                 questions about this project). Recall is a lower bound: other articles may also be relevant.
               </caption>
-              <thead className="border-b border-line text-left text-muted">
+              <thead className="border-b border-line text-left text-xs text-muted">
                 <tr><th className="px-4 py-2 font-normal">Configuration</th><th className="px-4 py-2 font-normal">Recall@5</th><th className="px-4 py-2 font-normal">Recall@10</th><th className="px-4 py-2 font-normal">MRR@10</th><th className="px-4 py-2 font-normal">nDCG@10</th><th className="px-4 py-2 font-normal">p50 latency</th></tr>
               </thead>
               <tbody>

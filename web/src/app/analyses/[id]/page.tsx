@@ -5,7 +5,7 @@ import { AnalysisDetail } from "./AnalysisDetail";
 export default function AnalysisPage() {
   return (
     <>
-      <PageHeader eyebrow="Analysis" title="Analysis result" />
+      <PageHeader title="Analysis result" />
       <Suspense fallback={<Spinner label="Loading analysis…" />}>
         <AnalysisDetail />
       </Suspense>
