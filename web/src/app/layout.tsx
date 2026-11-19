@@ -23,7 +23,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "NeuroClass — MRI research & explainability platform", template: "%s · NeuroClass" },
+  title: { default: "NeuroClass | MRI research & explainability platform", template: "%s | NeuroClass" },
   description:
     "Research workbench built on an IEEE 2024 brain MRI classification study: audited model, explainability, evidence-grounded literature retrieval and human review. Not for clinical use.",
 };
