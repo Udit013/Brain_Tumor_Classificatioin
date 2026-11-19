@@ -3,11 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import Image from "next/image";
 import { DISCLAIMER } from "@/components/ui";
+import { THEME_SCRIPT } from "@/lib/theme";
 
 const FOOTER = [
   { title: "Product", links: [
     { label: "Workbench", href: "/workbench" }, { label: "Research assistant", href: "/assistant" },
-    { label: "History", href: "/history" } ] },
+    { label: "History", href: "/history" }, { label: "Human review", href: "/review" } ] },
   { title: "Evidence", links: [
     { label: "Benchmarks", href: "/benchmarks" }, { label: "System status", href: "/system" },
     { label: "IEEE paper", href: "https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941" } ] },
@@ -29,7 +30,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        {/* Apply a stored light/dark choice before first paint (no flash). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <SiteHeader />
         <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 pt-12 sm:px-6 sm:pt-20">

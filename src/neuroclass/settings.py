@@ -158,6 +158,11 @@ class Settings:
         return f"sqlite:///{self.data_dir / 'neuroclass.db'}"
 
     @property
+    def review_enabled(self) -> bool:
+        """Human review can only happen when someone can become a reviewer."""
+        return len(self.reviewer_code) >= 16 and bool(self.reviewer_emails)
+
+    @property
     def db_is_pooled(self) -> bool:
         """Neon's pooled endpoints (PgBouncer, transaction mode) have '-pooler' in the host."""
         from urllib.parse import urlsplit

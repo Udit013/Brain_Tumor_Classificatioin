@@ -48,7 +48,7 @@ review or have been reviewed, and nothing else.
 Status codes worth knowing: 413 upload too large; 400 unusable image (with a
 machine-readable `code`: `empty_file`, `file_too_large`,
 `unsupported_format`, `too_many_pixels`, `corrupt_image`, `too_small`); 422 neither or both of `file`/`sample_id`; 403
-review requested without signing in; 409 report or review requested in the
+review requested without signing in; 409 `review_mode=always` when no reviewer is configured (without a reviewer setup, flagged results complete instead of waiting for a review that can't happen); 409 report or review requested in the
 wrong state; 503 `the database is temporarily unavailable` (e.g. Neon suspended at its
 free limit — benchmarks and literature search keep working); 429 rate
 limited (per client: 10 analyses/min, 60 research calls/min), 503 subsystem

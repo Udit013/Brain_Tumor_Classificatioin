@@ -48,6 +48,8 @@ async def create_analysis(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "send exactly one of file or sample_id")
     if review_mode == "always" and ident.user is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "human review requires signing in")
+    if review_mode == "always" and not services.settings.review_enabled:
+        raise HTTPException(status.HTTP_409_CONFLICT, "human review is not set up on this deployment")
     try:
         services.vision.ensure_loaded()
     except ModelUnavailable:
@@ -61,7 +63,8 @@ async def create_analysis(
 
     a = Analysis(owner_id=ident.user.id if ident.user else None, owner_key=ident.owner_key,
                  idempotency_key=idempotency_key, question=question or None,
-                 review_mode=review_mode if ident.user else "never", status="queued")
+                 review_mode=(review_mode if ident.user and services.settings.review_enabled else "never"),
+                 status="queued")
     if sample_id is not None:
         sample = services.samples.get(sample_id)
         if sample is None:

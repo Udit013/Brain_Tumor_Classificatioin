@@ -20,6 +20,7 @@ export function System() {
 
   const label: Record<string, string> = {
     database: "Database", vision: "Vision model", retrieval: "Literature index", llm: "Language model",
+    review: "Human review",
   };
 
   return (
@@ -138,6 +139,9 @@ function describe(key: string, v: Record<string, unknown>): string {
       return `EfficientNetB3 · ${v.model_version} · ONNX Runtime on CPU`;
     case "retrieval":
       return `${n(v.documents)} documents · ${n(v.chunks)} passages · ${v.backend === "pgvector" ? "pgvector" : String(v.backend)}`;
+    case "review":
+      return v.enabled ? "Reviewers configured — flagged results wait for a reviewer"
+        : "No reviewer configured — flagged results are reported without review";
     case "llm": {
       if (!v.enabled) return "No language model configured — explanations quote retrieved passages";
       const b = (v.budget ?? {}) as Record<string, unknown>;

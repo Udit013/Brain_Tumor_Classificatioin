@@ -5,6 +5,17 @@ import { api, ApiError, DISPLAY, useSession, type Analysis, type AnalysisSummary
 import { ResultView } from "@/components/analysis/ResultView";
 import { buttonClass, Card, Empty, ErrorState, LevelBadge, PageHeader, pct, Spinner } from "@/components/ui";
 
+const HOW = [
+  { title: "A signed-in user runs an analysis",
+    body: "Anonymous analyses are never reviewed. Signed-in users can also ask for review of every result." },
+  { title: "The rules flag it",
+    body: "If the reliability level isn't standard (low confidence, unstable views, input shift), the workflow pauses before the report." },
+  { title: "A reviewer decides",
+    body: "Approve, reject, or request a revision with a note; a revision re-runs the explanation step (at most twice)." },
+  { title: "The workflow resumes",
+    body: "The decision and note go into the report the user sees. The pause survives restarts — it's saved in the database." },
+];
+
 export default function ReviewPage() {
   const [queue, setQueue] = useState<AnalysisSummary[] | null>(null);
   const [selected, setSelected] = useState<Analysis | null>(null);
@@ -51,8 +62,25 @@ export default function ReviewPage() {
         A review records a researcher&apos;s assessment of an explanation report. It is not clinical validation and
         never turns a model output into a diagnosis.
       </p>
+      <section aria-labelledby="how" className="mb-10">
+        <h2 id="how" className="text-[15px] font-semibold tracking-[-0.01em] text-ink">How human review works</h2>
+        <ol className="mt-4 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+          {HOW.map((h, i) => (
+            <li key={h.title} className="bg-raised p-4">
+              <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
+              <p className="mt-2 text-sm font-medium text-ink">{h.title}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-ink-2">{h.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
       <div>
-        {!allowed && <Empty title="Reviewer access required">Sign in with an account the operator has granted the reviewer role.</Empty>}
+        {!allowed && (
+          <Empty title="Reviewer access required">
+            Reviewers are invited by the operator: their email must be on the reviewer list and they enter the
+            operator&apos;s reviewer code when creating an account.
+          </Empty>
+        )}
         {error && <ErrorState error={error} />}
         {allowed && !queue && !error && <Spinner label="Loading queue…" />}
         {queue && queue.length === 0 && <Empty title="Nothing to review">Flagged reports will appear here.</Empty>}

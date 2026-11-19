@@ -23,9 +23,11 @@ export function Workbench() {
   const inputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLElement>(null);
   const signedIn = Boolean(useSession());
+  const [reviewEnabled, setReviewEnabled] = useState(false);
 
   useEffect(() => {
     api.samples().then(setSamples).catch((e) => setSamplesError(e instanceof ApiError ? e.message : String(e)));
+    api.ready().then((r) => setReviewEnabled(r.checks.review?.enabled === true)).catch(() => undefined);
   }, []);
 
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
@@ -148,7 +150,7 @@ export function Workbench() {
                       rows={3} placeholder="How reliable is Grad-CAM for brain tumour MRI?"
                       className="mt-2 w-full resize-none rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm placeholder:text-muted" />
             <p className="mt-1 text-xs text-muted">Added to the literature search for the explanation.</p>
-            {signedIn && (
+            {signedIn && reviewEnabled && (
               <label className="mt-3 flex items-start gap-2 text-sm text-ink-2">
                 <input type="checkbox" className="mt-0.5" checked={requestReview} onChange={(e) => setRequestReview(e.target.checked)} />
                 Always send to a research reviewer (otherwise only when the reliability rules require it)

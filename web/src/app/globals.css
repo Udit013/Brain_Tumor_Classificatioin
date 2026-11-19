@@ -61,6 +61,31 @@
   }
 }
 
+/* Explicit choice from the theme toggle (stored in localStorage). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #0b0d11;
+  --surface-raised: #13161c;
+  --surface-sunken: #0f1216;
+  --ink: #eceef2;
+  --ink-secondary: #b6bdc9;
+  --ink-muted: #8b93a3;
+  --line: #232832;
+  --line-strong: #343b47;
+  --accent: #86a8ff;
+  --accent-hover: #a3bdff;
+  --accent-ink: #0b1124;
+  --accent-soft: #18213a;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --seq-100: #1a2a3d; --seq-250: #184f95; --seq-400: #256abf; --seq-550: #6da7ec; --seq-700: #cde2fb;
+  --seq-ink-low: #f0efec; --seq-ink-high: #0b0b0b;
+  --good-ink: #5fd35f; --warning-ink: #fab219; --critical-ink: #f08a8a;
+  --focus: #86a8ff;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 16px rgb(0 0 0 / 0.35);
+}
+
 @theme inline {
   --color-surface: var(--surface);
   --color-raised: var(--surface-raised);

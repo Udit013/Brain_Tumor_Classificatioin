@@ -96,6 +96,7 @@ def ready(services: Services = Depends(get_services)):
                             "documents": len(r.index.docs), "chunks": len(r.index.chunks),
                             "backend": _store_name(r.store)}
                            if r is not None else {"ok": False, "error": services.retriever_error})
+    checks["review"] = {"ok": True, "enabled": services.settings.review_enabled}
     llm = services.llm_status()
     checks["llm"] = {"ok": True, **llm, "mode": "llm" if llm["enabled"] else "extractive"}
     ok = checks["database"]["ok"] and checks["vision"]["ok"]

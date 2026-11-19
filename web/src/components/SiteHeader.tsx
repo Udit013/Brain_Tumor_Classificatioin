@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
 import { clearSession, useSession } from "@/lib/api";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
   { href: "/workbench", label: "Workbench" },
@@ -53,8 +54,9 @@ export function SiteHeader() {
           <Image src="/brand-mark.png" alt="" width={28} height={28} priority className="rounded-[7px]" />
           NeuroClass
         </Link>
+        <div className="flex items-center gap-1.5">
         <button
-          className="inline-flex h-9 items-center gap-2 rounded-lg border border-line bg-raised px-3 text-sm font-medium text-ink md:hidden"
+          className="order-last inline-flex h-9 items-center gap-2 rounded-lg border border-line bg-raised px-3 text-sm font-medium text-ink md:hidden"
           aria-expanded={open}
           aria-controls="site-nav"
           onClick={() => setOpen((o) => !o)}
@@ -78,6 +80,8 @@ export function SiteHeader() {
             </Link>
           )}
         </nav>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

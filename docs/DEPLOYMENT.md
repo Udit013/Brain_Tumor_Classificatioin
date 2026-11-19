@@ -83,7 +83,7 @@ a reviewer: add your email to `NEUROCLASS_REVIEWER_EMAILS` and a random secret
 in the Space settings; then create your account on the web app and open "I have
 a reviewer access code" during sign-up. An existing account can claim the role
 with `POST /api/auth/reviewer {"code": ...}`. Share the code only with people
-you add to the list. Without a code configured, nobody can become a reviewer.
+you add to the list. Without a code configured, nobody can become a reviewer. In that case review is switched off: flagged results are reported directly, `/api/ready` shows `review.enabled: false`, and the workbench hides the "send to reviewer" option.
 
 Rollback: the Space repository keeps history and tags. `tf-gradio5-2026-10` is
 the last TensorFlow/Gradio-5 version, `parity-2024` the previous model.

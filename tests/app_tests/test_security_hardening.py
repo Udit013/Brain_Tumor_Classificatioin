@@ -89,3 +89,14 @@ def test_upload_overlays_expire_but_example_overlays_stay(make_client):
     services.purge_expired_uploads()
     assert c.get(f"/analyses/{up}/gradcam.png", headers=CLIENT).status_code == 404
     assert c.get(f"/analyses/{ex}/gradcam.png", headers=CLIENT).status_code == 200
+
+
+def test_without_a_reviewer_setup_nothing_waits_for_review(make_client):
+    """No reviewer code configured -> no one could review, so flagged results complete."""
+    c, _ = make_client(vision=FakeVision(**LOW), reviewer_code="")
+    user = signup(c, "student@example.org")
+    assert c.get("/ready").json()["checks"]["review"]["enabled"] is False
+    aid = c.post("/analyses", data={"sample_id": "glioma", "review_mode": "auto"}, headers=user).json()["id"]
+    assert wait_for(c, aid, headers=user)["status"] == "completed"
+    r = c.post("/analyses", data={"sample_id": "glioma", "review_mode": "always"}, headers=user)
+    assert r.status_code == 409 and "not set up" in r.json()["detail"]
