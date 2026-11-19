@@ -32,7 +32,7 @@ export function Benchmarks() {
     <div className="grid gap-10">
       {/* 1. paper ------------------------------------------------------------- */}
       <section aria-labelledby="paper" className="grid gap-4">
-        <h2 id="paper" className="text-2xl font-semibold">1 · What the IEEE paper reported</h2>
+        <h2 id="paper" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">01</span>What the IEEE paper reported</h2>
         <Notice>
           <strong>Reported, not re-validated.</strong> {data.paper.citation} (DOI{" "}
           <a href={`https://doi.org/${data.paper.doi}`}>{data.paper.doi}</a>). Dataset: {data.paper.dataset}. These are the
@@ -67,7 +67,7 @@ export function Benchmarks() {
       {/* 2. audit ------------------------------------------------------------- */}
       {leak && cmp && (
         <section aria-labelledby="audit" className="grid gap-4">
-          <h2 id="audit" className="text-2xl font-semibold">2 · What the audit found</h2>
+          <h2 id="audit" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">02</span>What the audit found</h2>
           <p className="max-w-3xl text-ink-2">
             A perceptual- and content-hash comparison of every train/test image pair on the current Kaggle release
             (1,600 test images). Patient IDs are not available, so this is a lower bound on leakage.
@@ -97,7 +97,7 @@ export function Benchmarks() {
       {/* 3. retraining ---------------------------------------------------------- */}
       {cmp && (
         <section aria-labelledby="retrain" className="grid gap-4">
-          <h2 id="retrain" className="text-2xl font-semibold">3 · Retrained model vs the paper&apos;s recipe</h2>
+          <h2 id="retrain" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">03</span>Retrained model vs the paper&apos;s recipe</h2>
           <p className="max-w-3xl text-ink-2">
             Measured on CPU with the serving preprocessing. The current model was selected on a leakage-safe
             validation split and scored on the test set once. Results come from a single training seed.
@@ -139,7 +139,7 @@ export function Benchmarks() {
       {/* 4. per class ------------------------------------------------------------ */}
       {cmp && (
         <section aria-labelledby="perclass" className="grid gap-4">
-          <h2 id="perclass" className="text-2xl font-semibold">4 · Per-class results (current model)</h2>
+          <h2 id="perclass" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">04</span>Per-class results (current model)</h2>
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <ConfusionMatrix title="Confusion matrix, test set (n = 1,600)"
@@ -175,7 +175,7 @@ export function Benchmarks() {
       {/* 5. calibration & reliability ---------------------------------------------- */}
       {cmp && (
         <section aria-labelledby="calib" className="grid gap-4">
-          <h2 id="calib" className="text-2xl font-semibold">5 · Calibration and reliability rules</h2>
+          <h2 id="calib" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">05</span>Calibration and reliability rules</h2>
           <div className="grid gap-4 sm:grid-cols-3">
             <StatTile label="Expected calibration error, current" value={cmp.current.ece_raw.toFixed(3)}
                       sub={`after temperature scaling ${cmp.current.ece_calibrated.toFixed(3)}`} />
@@ -222,7 +222,7 @@ export function Benchmarks() {
       {/* 6. robustness & generalisation --------------------------------------------- */}
       {cmp && (
         <section aria-labelledby="robust" className="grid gap-4">
-          <h2 id="robust" className="text-2xl font-semibold">6 · Robustness and generalisation</h2>
+          <h2 id="robust" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">06</span>Robustness and generalisation</h2>
           <Card>
             <RobustnessPanels
               title="Accuracy under image corruptions (400 test images)"
@@ -251,7 +251,7 @@ export function Benchmarks() {
 
       {/* 7. retrieval ----------------------------------------------------------------- */}
       <section aria-labelledby="rag" className="grid gap-4">
-        <h2 id="rag" className="text-2xl font-semibold">7 · Literature retrieval evaluation</h2>
+        <h2 id="rag" className="flex items-baseline gap-3 text-[1.5rem] font-semibold tracking-[-0.02em] text-ink"><span className="font-mono text-sm font-normal text-muted">07</span>Literature retrieval evaluation</h2>
         {retr ? (
           <div className="overflow-x-auto rounded-xl border border-line bg-raised">
             <table className="w-full text-sm">

@@ -59,7 +59,7 @@ export function Workbench() {
 
   return (
     <div className="grid gap-8">
-      <Card title="1 · Choose an image">
+      <Card title="Image">
         <div role="tablist" aria-label="Input source" className="mb-4 inline-flex rounded-lg border border-line p-1">
           {(["sample", "upload"] as const).map((m) => (
             <button
@@ -128,7 +128,7 @@ export function Workbench() {
         )}
       </Card>
 
-      <Card title="2 · Optional research question">
+      <Card title="Research question" aside={<span className="text-xs text-muted">Optional</span>}>
         <label htmlFor="question" className="text-sm text-ink-2">
           Added to the literature search, e.g. “How reliable is Grad-CAM for brain tumour MRI?”
         </label>

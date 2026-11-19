@@ -1,7 +1,21 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import Image from "next/image";
 import { DISCLAIMER } from "@/components/ui";
+
+const FOOTER = [
+  { title: "Product", links: [
+    { label: "Workbench", href: "/workbench" }, { label: "Research assistant", href: "/assistant" },
+    { label: "History", href: "/history" } ] },
+  { title: "Evidence", links: [
+    { label: "Benchmarks", href: "/benchmarks" }, { label: "System status", href: "/system" },
+    { label: "IEEE paper", href: "https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941" } ] },
+  { title: "Developers", links: [
+    { label: "API reference", href: "https://udit013-brain-tumor-mri-classifier.hf.space/api/docs" },
+    { label: "Source code", href: "https://github.com/Udit013/Brain_Tumor_Classificatioin" },
+    { label: "Model card", href: "https://huggingface.co/Udit013/brain-tumor-efficientnetb3" } ] },
+];
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -18,20 +32,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <SiteHeader />
-        <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+        <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 pt-12 sm:px-6 sm:pt-20">
           {children}
         </main>
-        <footer className="border-t border-line bg-raised/40">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:flex-row sm:items-start sm:justify-between sm:px-6">
-            <div className="max-w-xl">
-              <p className="font-medium text-ink">NeuroClass</p>
-              <p className="mt-1 leading-relaxed text-ink-2">{DISCLAIMER}</p>
+        <footer className="mt-24 border-t border-line">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 text-sm sm:px-6 md:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
+            <div className="max-w-sm">
+              <p className="flex items-center gap-2 font-semibold text-ink">
+                <Image src="/brand-mark.png" alt="" width={22} height={22} className="rounded-[6px]" />
+                NeuroClass
+              </p>
+              <p className="mt-3 leading-relaxed text-muted">{DISCLAIMER}</p>
             </div>
-            <nav aria-label="Footer" className="flex shrink-0 flex-wrap gap-x-5 gap-y-2 text-ink-2">
-              <a className="whitespace-nowrap text-ink-2 no-underline hover:text-ink hover:underline" href="https://doi.org/10.1109/ICC-ROBINS60238.2024.10533941">IEEE paper</a>
-              <a className="whitespace-nowrap text-ink-2 no-underline hover:text-ink hover:underline" href="https://github.com/Udit013/Brain_Tumor_Classificatioin">Source code</a>
-              <a className="whitespace-nowrap text-ink-2 no-underline hover:text-ink hover:underline" href="https://udit013-brain-tumor-mri-classifier.hf.space/api/docs">API</a>
-            </nav>
+            {FOOTER.map((col) => (
+              <nav key={col.title} aria-label={col.title}>
+                <p className="font-medium text-ink">{col.title}</p>
+                <ul className="mt-3 grid gap-2">
+                  {col.links.map((l) => (
+                    <li key={l.href}>
+                      <a href={l.href} className="text-muted no-underline hover:text-ink">{l.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
           </div>
         </footer>
       </body>

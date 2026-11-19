@@ -33,10 +33,10 @@ export function Card({ title, children, className = "", aside }: {
   title?: ReactNode; children: ReactNode; className?: string; aside?: ReactNode;
 }) {
   return (
-    <section className={`rounded-xl border border-line bg-raised p-5 shadow-card sm:p-6 ${className}`}>
+    <section className={`rounded-xl border border-line bg-raised p-5 sm:p-6 ${className}`}>
       {(title || aside) && (
         <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-          {title && <h2 className="text-[15px] font-semibold tracking-tight text-ink">{title}</h2>}
+          {title && <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-ink">{title}</h2>}
           {aside}
         </div>
       )}
@@ -49,11 +49,11 @@ export function PageHeader({ eyebrow, title, children, actions }: {
   eyebrow?: string; title: string; children?: ReactNode; actions?: ReactNode;
 }) {
   return (
-    <header className="mb-10 flex flex-col gap-6 border-b border-line pb-8 sm:flex-row sm:items-end sm:justify-between">
-      <div className="max-w-3xl">
-        {eyebrow && <p className="mb-2 text-sm font-medium text-accent">{eyebrow}</p>}
-        <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-[2.5rem] sm:leading-[1.1]">{title}</h1>
-        {children && <div className="mt-3 text-base leading-relaxed text-ink-2 sm:text-lg">{children}</div>}
+    <header className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        {eyebrow && <p className="mb-3 text-[13px] font-medium text-muted">{eyebrow}</p>}
+        <h1 className="text-[1.875rem] font-semibold leading-[1.15] tracking-[-0.025em] text-ink sm:text-[2.25rem]">{title}</h1>
+        {children && <div className="mt-3 text-[15px] leading-relaxed text-ink-2 sm:text-base">{children}</div>}
       </div>
       {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
     </header>
