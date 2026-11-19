@@ -1,4 +1,4 @@
-// Regenerates the README screenshots: BASE=https://neuroclass-lab.vercel.app OUT=../docs/images node scripts/readme-screenshots.mjs
+// Regenerates the README screenshots: BASE=https://neuroclass-lab.vercel.app OUT=../docs/images node scripts/readme-screenshots.mjs (then convert to WebP)
 import { chromium } from "@playwright/test";
 
 const BASE = process.env.BASE ?? "http://localhost:3000";
@@ -18,6 +18,8 @@ await p.getByRole("radio", { name: /Labelled: Meningioma/ }).check({ force: true
 await p.getByRole("button", { name: "Run analysis" }).click();
 await p.getByText("Completed", { exact: true }).first().waitFor({ timeout: 90000 });
 await settle(2000);
+await p.evaluate(() => window.scrollTo(0, 0));
+await settle(600);
 await p.screenshot({ path: `${OUT}/workbench.png` });
 const href = await p.getByRole("link", { name: "Permalink" }).getAttribute("href");
 

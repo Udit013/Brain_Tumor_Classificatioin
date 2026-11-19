@@ -66,6 +66,19 @@ mostly because of a verifier rule bug the evaluation exposed (fixed afterwards;
 the numbers above are as measured), and the closed-book / naive-RAG Gemini
 variants were not run.
 
+## Product tour
+
+![NeuroClass landing page: a real analysis preview beside the headline](docs/images/landing.webp)
+
+| Workbench: setup on the left, the traced result on the right | Analysis in dark mode: reliability rules and a verified, cited explanation |
+|---|---|
+| ![Workbench with a completed meningioma analysis](docs/images/workbench.webp) | ![Analysis page in dark mode](docs/images/analysis-dark.webp) |
+| **Research assistant:** answers cite passages; the verifier removes unsupported claims | **Benchmarks:** the paper's reported figures beside the audit and retraining |
+| ![Research assistant answering with citations](docs/images/assistant.webp) | ![Benchmarks page with the leakage audit chart](docs/images/benchmarks.webp) |
+
+Screenshots of the live site, regenerated with `web/scripts/readme-screenshots.mjs`.
+Light and dark themes follow the system setting, or the toggle in the header.
+
 
 ## Section 1 — Published Work (IEEE 2024)
 
